@@ -10,7 +10,7 @@ const viz = new Spacekit.Simulation(document.getElementById('main-container'), {
   const skybox = viz.createSkybox(Spacekit.SkyboxPresets.ESO_GIGAGALAXY)
   
   // Set simulation speed
-  viz.setJdDelta(viz.getJdDelta() * 0.02);
+  viz.setJdDelta(viz.getJdDelta() * 0.002);
   
   // Set Controls
   // document.getElementById('btn-start').onclick = function () {
