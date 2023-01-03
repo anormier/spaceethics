@@ -75,8 +75,9 @@ const viz = new Spacekit.Simulation(document.getElementById('main-container'), {
   viz.createObject('saturn', { labelText: 'Saturn', ephem: Spacekit.EphemPresets.SATURN, });
   viz.createObject('naptune', { labelText: 'Neptune', ephem: Spacekit.EphemPresets.NEPTUNE, });
   viz.createObject('jupiter', { labelText: 'Jupiter', ephem: Spacekit.EphemPresets.JUPITER, });
+  const moon = viz.createObject('moon', { labelText: 'Moon', ephem: Spacekit.EphemPresets.MOON, });
   const earth = viz.createObject('earth', { labelText: 'Earth', ephem: Spacekit.EphemPresets.EARTH, });
-  const moon = viz.createObject('moon', { labelText: 'moon', ephem: Spacekit.EphemPresets.MOON, });
+
   
   moon.orbitAround(earth);
   
