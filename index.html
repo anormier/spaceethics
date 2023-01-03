@@ -1,0 +1,69 @@
+<script src="https://typpo.github.io/spacekit/src/lib/three.r98.min.js"></script>
+<script src="https://typpo.github.io/spacekit/src/lib/TrackballControls.js"></script>
+<script src="https://typpo.github.io/spacekit/build/spacekit.js"></script>
+
+<html>
+<head>
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    html, body {
+      margin: 0;
+      overflow: hidden;
+    }
+
+    #main-container {
+      width: 100%;
+      height: 100%;
+    }
+
+    .sim-info {
+      position:absolute;
+      top: 0;
+      padding: 0.5em;
+      background-color: transparent;
+      color: grey;
+    }
+    
+ Button {
+      background-color: transparent;
+      color: grey;
+      background-color: grey; /* Green */
+  border: none;
+  color: white;
+  padding: 5px 5px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 10 px;
+    }
+    
+  </style>
+  </head>
+<body>
+<div class="sim-info"> 
+    <br>    
+   A. Normier         <br>
+    Ethics beyond Earth: <a href="https://www.spaceethics.org/">spaceethics.org</a>
+             <br>
+     Data: J. McDowell : <a href="https://planet4589.org/space/gcat/">GCAT</a>  catalog
+         <br>             <br>
+
+             Red dots: Man-made objects in the Solar System 
+         <br>
+  <button id="btn-slower">Slower</button>
+  <button id="btn-faster">Faster</button>
+           <br>
+                    <br>
+
+  <button id="btn-moon">moon</button>
+  <button id="btn-earth">earth</button>
+  <button id="btn-system">system</button>
+
+ </div>
+<div id="main-container">
+</div>
+
+<script src="./app.js"></script>
+</body>
+</html>
