@@ -32,28 +32,32 @@ const viz = new Spacekit.Simulation(document.getElementById('main-container'), {
     viz.setJdDelta(viz.getJdDelta() * 0.5);
   };
   
-  document.getElementById('btn-moon').onclick = function () {
-   viz.getViewer().followObject(moonV, [-10, 10, 10]);
-  };
+  // document.getElementById('btn-moon').onclick = function () {
+  //  viz.getViewer().followObject(moonV,[0,0,0]); 
+  // };
+
+  // document.getElementById('btn-zoom').onclick = function () {
+  //   viz.getViewer().doZoomToFit(moonV, 3);
+  //  };
   
-  document.getElementById('btn-earth').onclick = function () {
-    viz.getViewer().followObject(earthV, [-1, 1, 1]);
-  };
-  
-  document.getElementById('btn-system').onclick = function () {
-    viz.getViewer().followObject(sun, [-1, 1, 1]);
-  };
-  
-  // document.getElementById('Restart').onclick = function () {
-  //   viz.setDate(new Date('2022-10-10'));
+  // document.getElementById('btn-earth').onclick = function () {
+  //   viz.getViewer().followObject(earthV, [0,0,0]);
   // };
   
-  // show date
+  // document.getElementById('btn-system').onclick = function () {
+  //   viz.getViewer().followObject(sun, [0,0,0]);
+  // };
+  
+  // document.getElementById('Restart').onclick = function () {
+  //    viz.setDate(new Date('2022-10-10'));
+  // };
+  
+  // //show date
   // const dateElt = document.getElementById('current-date');
   // viz.onTick = function () {
   //   const d = viz.getDate();
   //   dateElt.innerHTML = d.toLocaleDateString();
-  // /};
+  // };
   
   // NATURAL OBJECTS 
   const sun = viz.createObject('sun', Spacekit.SpaceObjectPresets.SUN);
@@ -115,11 +119,12 @@ const viz = new Spacekit.Simulation(document.getElementById('main-container'), {
   });
   moonV.orbitAround(earth);
   
-  const ly = viz.createSphere('ly', {
-    textureUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Moon_map_grid_showing_artificial_objects_on_moon.PNG/1280px-Moon_map_grid_showing_artificial_objects_on_moon.PNG',
-    radius: 100, // une année lumière
-    setPosition: [ 0, 0, 0],
-  });
+  // //PROTO
+  // const ly = viz.createSphere('ly', {
+  //   textureUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Moon_map_grid_showing_artificial_objects_on_moon.PNG/1280px-Moon_map_grid_showing_artificial_objects_on_moon.PNG',
+  //   radius: 100, // une année lumière
+  //   setPosition: [ 0, 0, 0],
+  // });
   
         
   
@@ -146,33 +151,34 @@ const viz = new Spacekit.Simulation(document.getElementById('main-container'), {
   });
   
   // ARTIFICIAL OBJECTS
+  // PROTO
+
+  // viz.createObject("'Oumuamua", {
+  //   ephem: new Spacekit.Ephem(
+  //     {
+  //       epoch: 2458080.5,
+  //       a: -1.27234500742808,
+  //       e: 1.201133796102373,
+  //       q: 0.2559115812959116,
+  //       n: 0.6867469493413392,
+  //       i: 122.7417062847286,
+  //       om: 24.59690955523242,
+  //       w: 241.8105360304898,
+  //       ma: 51.1576197938249,
+  //       tp: 2458006.01,
+  //     },
+  //     'deg',
+  //   ),
+  //   theme: {
+  //     orbitColor: 0xff00ff,
+  //   },
+  //   labelText: "'TEST Object",
+  // });
   
-  viz.createObject("'Oumuamua", {
-    ephem: new Spacekit.Ephem(
-      {
-        epoch: 2458080.5,
-        a: -1.27234500742808,
-        e: 1.201133796102373,
-        q: 0.2559115812959116,
-        n: 0.6867469493413392,
-        i: 122.7417062847286,
-        om: 24.59690955523242,
-        w: 241.8105360304898,
-        ma: 51.1576197938249,
-        tp: 2458006.01,
-      },
-      'deg',
-    ),
-    theme: {
-      orbitColor: 0xff00ff,
-    },
-    labelText: "'TEST Object",
-  });
   
   // With Labels and Orbits
   viz.createObject('D00993', {labelText: 'Elon s Tesla Roadster',  particleSize:4,hideOrbit:false , ephem: new Spacekit.Ephem({ a: 1.325, e: 0.255849056603774, i: 1.08, om: 220.287484892518, w: 177, ma: 176, epoch: 2458426.5, }, 'deg'), theme: { color:0xcc0000, orbitColor:0x611B0C,}, });
-  
-  viz.createObject('D00699', { labelText:  'Yo-yo despin weight', particleSize:10,hideOrbit:false , ephem: new Spacekit.Ephem({ a: 9.0715, e: 0.890205588932371, i: 2, om: 119.606824611058, w: 177, ma: 176, epoch: 2458426.5, }, 'deg'), theme: { color:0xFF2D00, orbitColor:0x611B0C,}, });
+  // viz.createObject('D00699', { labelText:  'Yo-yo despin weight', particleSize:10,hideOrbit:false , ephem: new Spacekit.Ephem({ a: 9.0715, e: 0.890205588932371, i: 2, om: 119.606824611058, w: 177, ma: 176, epoch: 2458426.5, }, 'deg'), theme: { color:0xFF2D00, orbitColor:0x611B0C,}, });
   
   
   // Without Labels and Orbits
