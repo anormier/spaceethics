@@ -6,7 +6,7 @@ const viz = new Spacekit.Simulation(document.getElementById("main-container"), {
   startDate: Date.now(),
   unitsPerAu: 1.0,
   camera: {
-    enableDrift: true,
+    enableDrift: false,
     initialPosition: [2, -2, 1],
   },
 });
@@ -165,7 +165,7 @@ const earthV = viz.createSphere("earthV", {
   },
   rotation: {
     enable: true,
-    speed: 1,
+    speed: 0.3,
   },
 });
 
@@ -213,3 +213,30 @@ const jupiter3 = viz.createSphere("jupiter3", {
 });
 
 // ARTIFICIAL OBJECTS
+
+
+document.getElementById("btn-system").onclick = function () {
+  viz.getViewer().followObject(sun, [2, 2, 2]);
+  viz.zoomToFit(sun, 2);
+};
+
+
+document.getElementById("btn-earth").onclick = function () {
+  viz.getViewer().followObject(sun, [-0.75, -0.75, 0.5]);
+  viz.zoomToFit(sun, 10000);
+  setTimeout(() => {
+    {
+      viz.getViewer().followObject(earthV, [2, 0, 0]);
+      viz.zoomToFit(earth, 0.00003);  
+    } 
+  }, 20);}
+
+document.getElementById("btn-moon").onclick = function () {
+  viz.getViewer().followObject(sun, [-0.75, -0.75, 0.5]);
+  viz.zoomToFit(sun, 10000);
+  setTimeout(() => {
+    {
+      viz.getViewer().followObject(moonV, [2, 0, 0]);
+      viz.zoomToFit(moonV, 0.003);  
+    } 
+  }, 20);}
