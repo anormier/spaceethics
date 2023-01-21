@@ -169,6 +169,26 @@ const earthV = viz.createSphere("earthV", {
   },
 });
 
+const marsV = viz.createSphere("marsV", {
+  textureUrl:
+    "./maps/Mars.png",
+  radius: 3389 / 149598000,
+  ephem: Spacekit.EphemPresets.MARS,
+  levelsOfDetail: [
+    { radii: 0, segments: 64 },
+    { radii: 30, segments: 16 },
+    { radii: 60, segments: 8 },
+  ],
+  atmosphere: {
+    enable: true,
+    color: 0xc7c1a8,
+  },
+  rotation: {
+    enable: true,
+    speed: 0.1,
+  },
+});
+
 const moonV = viz.createSphere("moonV", {
   textureUrl:
     "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Moon_map_grid_showing_artificial_objects_on_moon.PNG/1280px-Moon_map_grid_showing_artificial_objects_on_moon.PNG",
@@ -230,6 +250,16 @@ document.getElementById("btn-earth").onclick = function () {
       viz.zoomToFit(earth, 0.00003);  
     } 
   }, 20);}
+
+  document.getElementById("btn-mars").onclick = function () {
+    viz.getViewer().followObject(sun, [-0.75, -0.75, 0.5]);
+    viz.zoomToFit(sun, 10000);
+    setTimeout(() => {
+      {
+        viz.getViewer().followObject(marsV, [2, 0, 0]);
+        viz.zoomToFit(marsV, 0.00001);  
+      } 
+    }, 20);}
 
 document.getElementById("btn-moon").onclick = function () {
   viz.getViewer().followObject(sun, [-0.75, -0.75, 0.5]);
