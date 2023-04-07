@@ -42,7 +42,7 @@ viz.onTick = function () {
 
   transformedObjects.forEach((point) => {
     const pointShouldAppear = checkIfVisible(point, date);
-    
+
     if (!pointShouldAppear) {
       point.visible = false;
       viz.removeObject(point.newObject);
@@ -63,39 +63,47 @@ document.getElementById("btn-slower").onclick = function () {
   viz.setJdDelta(viz.getJdDelta() * 0.5);
 };
 
-document.getElementById("1950").onclick = function () {
-  viz.setDate(new Date("1950-01-01"));
-};
+// document.getElementById("1950").onclick = function () {
+//   viz.setDate(new Date("1950-01-01"));
+// };
 
-document.getElementById("1960").onclick = function () {
-  viz.setDate(new Date("1960-01-01"));
-};
+// document.getElementById("1960").onclick = function () {
+//   viz.setDate(new Date("1960-01-01"));
+// };
 
-document.getElementById("1970").onclick = function () {
-  viz.setDate(new Date("1970-01-01"));
-};
+// document.getElementById("1970").onclick = function () {
+//   viz.setDate(new Date("1970-01-01"));
+// };
 
-document.getElementById("1980").onclick = function () {
-  viz.setDate(new Date("1980-01-01"));
-};
+// document.getElementById("1980").onclick = function () {
+//   viz.setDate(new Date("1980-01-01"));
+// };
 
 
-document.getElementById("1990").onclick = function () {
-  viz.setDate(new Date("1990-01-01"));
-};
+// document.getElementById("1990").onclick = function () {
+//   viz.setDate(new Date("1990-01-01"));
+// };
 
-document.getElementById("2000").onclick = function () {
-  viz.setDate(new Date("2000-01-01"));
-};
+// document.getElementById("2000").onclick = function () {
+//   viz.setDate(new Date("2000-01-01"));
+// };
 
-document.getElementById("2010").onclick = function () {
-  viz.setDate(new Date("2010-01-01"));
-};
+// document.getElementById("2010").onclick = function () {
+//   viz.setDate(new Date("2010-01-01"));
+// };
 
-document.getElementById("Today").onclick = function () {
-  viz.setDate(Date.now());
-};
+// document.getElementById("Today").onclick = function () {
+//   viz.setDate(Date.now());
+// };
 
+
+// CHAT GPT HERE
+const yearSlider = document.getElementById("year-slider");
+
+yearSlider.addEventListener("input", (event) => {
+  const selectedYear = parseInt(event.target.value);
+  viz.setDate(new Date(`${selectedYear}-01-01`));
+});
 
 // NATURAL OBJECTS
 const sun = viz.createObject("sun", Spacekit.SpaceObjectPresets.SUN);
@@ -247,19 +255,21 @@ document.getElementById("btn-earth").onclick = function () {
   setTimeout(() => {
     {
       viz.getViewer().followObject(earthV, [2, 0, 0]);
-      viz.zoomToFit(earth, 0.00003);  
-    } 
-  }, 20);}
+      viz.zoomToFit(earth, 0.00003);
+    }
+  }, 20);
+}
 
-  document.getElementById("btn-mars").onclick = function () {
-    viz.getViewer().followObject(sun, [-0.75, -0.75, 0.5]);
-    viz.zoomToFit(sun, 10000);
-    setTimeout(() => {
-      {
-        viz.getViewer().followObject(marsV, [2, 0, 0]);
-        viz.zoomToFit(marsV, 0.00001);  
-      } 
-    }, 20);}
+document.getElementById("btn-mars").onclick = function () {
+  viz.getViewer().followObject(sun, [-0.75, -0.75, 0.5]);
+  viz.zoomToFit(sun, 10000);
+  setTimeout(() => {
+    {
+      viz.getViewer().followObject(marsV, [2, 0, 0]);
+      viz.zoomToFit(marsV, 0.00001);
+    }
+  }, 20);
+}
 
 document.getElementById("btn-moon").onclick = function () {
   viz.getViewer().followObject(sun, [-0.75, -0.75, 0.5]);
@@ -267,6 +277,7 @@ document.getElementById("btn-moon").onclick = function () {
   setTimeout(() => {
     {
       viz.getViewer().followObject(moonV, [2, 0, 0]);
-      viz.zoomToFit(moonV, 0.003);  
-    } 
-  }, 20);}
+      viz.zoomToFit(moonV, 0.003);
+    }
+  }, 20);
+}

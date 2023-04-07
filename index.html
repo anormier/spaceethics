@@ -59,16 +59,17 @@
   </head>
   <body>
     <div class="sim-info">
-      <button id="1950">1950</button> 
+      <!-- <button id="1950">1950</button> 
       <button id="1960">1960</button> 
       <button id="1970">1970</button>
       <button id="1980">1980</button>
       <button id="1990">1990</button>
       <button id="2000">2000</button> 
       <button id="2010">2010</button>
-      <button id="Today">Today</button>
-/ <button id="btn-slower">Slower</button>
-<button id="btn-faster">Faster</button>       <br /><br />
+      <button id="Today">Today</button> -->
+      <input type="range" id="year-slider" min="1950" max="2023" value="1950" step="10" />
+      / <button id="btn-slower">Slower</button>
+      <button id="btn-faster">Faster</button> <br /><br />
 
       Ethics beyond Earth:
       <a href="https://www.spaceethics.org/">Spaceethics.org</a>
@@ -76,14 +77,13 @@
       Dev: A.Normier - J.Justman - V.Nakache <br />
       Data: J. McDowell :
       <a href="https://planet4589.org/space/gcat/">GCAT</a> catalog <br />
-      Man-made objects in the Solar System:  <span id="current-date">?</span> 
+      Man-made objects in the Solar System: <span id="current-date">?</span>
       <br />
-      
     </div>
     <div class="credits">
-     
-      <a href="https://www.spaceethics.org/" target="_blank"><img src="./Logo manifesto.png"></a>
-
+      <a href="https://www.spaceethics.org/" target="_blank"
+        ><img src="./Logo manifesto.png"
+      /></a>
     </div>
 
     <div class="Nav">
@@ -91,7 +91,6 @@
       <button id="btn-moon">Moon</button>
       <button id="btn-mars">Mars</button>
       <button id="btn-system">System</button>
-
     </div>
 
     <div id="main-container"></div>
