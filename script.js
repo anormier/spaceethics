@@ -1,3 +1,5 @@
+// TO SUPPRESS IN GITHUB: app.js, sytle.css
+
 import allObjects from "./spatial-objects.js";
 import { checkIfVisible, getTransformObjects } from "./utils.js";
 
@@ -281,3 +283,98 @@ document.getElementById("btn-moon").onclick = function () {
     }
   }, 20);
 }
+
+
+//  BOUNDARIES CHECk
+// the observable universe is more than 46 billion light-years = 2.909086e+15UA in any direction from Earth
+// fillParticles(farParticlesCount, 2.909086e+15, 2.909086e+15, farPositions);
+
+const surfacePositions = [];
+const nearPositions = [];
+const farPositions = [];
+const surfaceParticlesCount = 1000;
+const nearParticlesCount = 10000;
+const farParticlesCount = 1000;
+const particleSize = 0;
+
+// 1= 1UA unité astronomique. NASA estimates the galaxy at 100,000 light-years across. 
+// 1 ly = 63241,1LY largeur galaxy en UA: 6,32411e+9 bilan les échelles vont au bout.
+//fillParticles(surfaceParticlesCount, 6.32411e+9, 6.32411e+9, surfacePositions);
+fillParticles(surfaceParticlesCount, 6.32411e+9, 6.32412e+9, surfacePositions);
+
+// Laniakea est le superamas  dont fait partie la Voie lactée, et donc la Terre.r= 250 e6ly =1.581025e+13AU
+// fillParticles(nearParticlesCount, 1.581025e+13, 1.581025e+13, nearPositions);
+fillParticles(nearParticlesCount, 1.581025e+13, 1.581026e+13, nearPositions);
+
+// the observable universe is more than 46 billion light-years = 2.909086e+15UA in any direction from Earth
+// fillParticles(farParticlesCount, 2.909086e+15, 2.909086e+15, farPositions);
+fillParticles(farParticlesCount, 2.909086e+15, 2.909087e+15, farPositions);
+viz.createStaticParticles('surface', surfacePositions, {
+  defaultColor: 'white',
+  size: particleSize,
+});
+viz.createStaticParticles('near', nearPositions, {
+  defaultColor: 'white',
+  size: particleSize,
+});
+viz.createStaticParticles('far', farPositions, {  defaultColor: 'white',
+  size: particleSize,});
+
+
+
+function fillParticles(count, minRange, maxRange, particles) {
+  for (let i = 0; i < count; i++) {
+    const newParticle = randomPosition(minRange, maxRange);
+    particles.push(newParticle);
+  }
+}
+
+function randomPosition(minRange, maxRange) {
+  const delta = maxRange - minRange;
+  let mag = 1;
+
+  if (delta > 0) {
+    mag = delta * Math.random() + minRange;
+  }
+
+  const ra = randomAngle(0, 2 * Math.PI);
+  const dec = randomAngle(-Math.PI / 2, Math.PI / 2);
+  const z = mag * Math.sin(dec);
+  const x = mag * Math.cos(dec) * Math.cos(ra);
+  const y = mag * Math.cos(dec) * Math.sin(ra);
+
+  return [x, y, z];
+}
+
+function randomAngle(min, max) {
+  const delta = max - min;
+  return min + Math.random() * delta;
+}
+
+
+
+// GALAXY 
+// STAR CHECK il semble que les "stars soient référencées seriusement en 3D"
+viz.createStars();
+// -----------------------------------------------------------
+// -----------------------------------------------------------
+// PROJET: 
+// IMPORTER LES ETOILES de la galaxie avec les coordonnées X,Y,Z, et la luminosité, puis les déplacer en fonciotn de leux vecteurs vitesse.
+
+import allStars from "./galaxy.js";
+const starPositions = [];
+viz.createStaticParticles('stars', starPositions, {
+  defaultColor: 'blue',
+  size: 20,
+});
+
+const transformedStars = getTransformObjects(allStars)
+
+transformedStars.forEach((point) => {
+  const z = rmed * Math.sin(dec);
+  const x = rmed * Math.cos(dec) * Math.cos(ra);
+  const y = rmed * Math.cos(dec) * Math.sin(ra);
+  particles.push([x, y, z]);
+
+});
+
