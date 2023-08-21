@@ -2,6 +2,7 @@
 
 import allObjects from "./spatial-objects.js";
 import { checkIfVisible, getTransformObjects } from "./utils.js";
+import allStars from "./galaxy.js";
 
 const viz = new Spacekit.Simulation(document.getElementById("main-container"), {
   basePath: "https://typpo.github.io/spacekit/src",
@@ -317,8 +318,10 @@ viz.createStaticParticles('near', nearPositions, {
   defaultColor: 'white',
   size: particleSize,
 });
-viz.createStaticParticles('far', farPositions, {  defaultColor: 'white',
-  size: particleSize,});
+viz.createStaticParticles('far', farPositions, {
+  defaultColor: 'white',
+  size: particleSize,
+});
 
 
 
@@ -361,20 +364,30 @@ viz.createStars();
 // PROJET: 
 // IMPORTER LES ETOILES de la galaxie avec les coordonnées X,Y,Z, et la luminosité, puis les déplacer en fonciotn de leux vecteurs vitesse.
 
-import allStars from "./galaxy.js";
 const starPositions = [];
+
 viz.createStaticParticles('stars', starPositions, {
   defaultColor: 'blue',
   size: 20,
 });
 
-const transformedStars = getTransformObjects(allStars)
 
-transformedStars.forEach((point) => {
-  const z = rmed * Math.sin(dec);
-  const x = rmed * Math.cos(dec) * Math.cos(ra);
-  const y = rmed * Math.cos(dec) * Math.sin(ra);
-  particles.push([x, y, z]);
+// const transformedStars = getTransformObjects(allStars)
 
+allStars.forEach((star) => {
+  const z = star.rmed * Math.sin(star.dec);
+  const x = star.rmed * Math.cos(star.dec) * Math.cos(star.ra);
+  const y = star.rmed * Math.cos(star.dec) * Math.sin(star.ra);
+  // particles.push([x, y, z]);
+  starPositions.push([x, y, z])
 });
+
+console.log("STARS POSITION", starPositions)
+
+// viz.createStaticParticles('surface', starPositions, {
+//   defaultColor: 'white',
+//   size: 20,
+// });
+
+
 
