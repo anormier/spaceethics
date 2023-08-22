@@ -15,7 +15,7 @@ const viz = new Spacekit.Simulation(document.getElementById("main-container"), {
 });
 
 // Create a background
-const skybox = viz.createSkybox(Spacekit.SkyboxPresets.ESO_GIGAGALAXY);
+// const skybox = viz.createSkybox(Spacekit.SkyboxPresets.ESO_GIGAGALAXY);
 
 // Set simulation speed
 viz.setJdDelta(viz.getJdDelta() * 0.02);
@@ -293,15 +293,15 @@ document.getElementById("btn-moon").onclick = function () {
 const surfacePositions = [];
 const nearPositions = [];
 const farPositions = [];
-const surfaceParticlesCount = 1000;
-const nearParticlesCount = 10000;
-const farParticlesCount = 1000;
-const particleSize = 0;
+const surfaceParticlesCount = 100;
+const nearParticlesCount = 100;
+const farParticlesCount = 100;
+const particleSize = 1;
 
 // 1= 1UA unité astronomique. NASA estimates the galaxy at 100,000 light-years across. 
 // 1 ly = 63241,1LY largeur galaxy en UA: 6,32411e+9 bilan les échelles vont au bout.
-//fillParticles(surfaceParticlesCount, 6.32411e+9, 6.32411e+9, surfacePositions);
-fillParticles(surfaceParticlesCount, 6.32411e+9, 6.32412e+9, surfacePositions);
+//fillParticles(surfaceParticlesCount, 0, 6.32411e+9, surfacePositions);
+fillParticles(surfaceParticlesCount, 6.32411e+8, 6.32412e+9, surfacePositions);
 
 // Laniakea est le superamas  dont fait partie la Voie lactée, et donc la Terre.r= 250 e6ly =1.581025e+13AU
 // fillParticles(nearParticlesCount, 1.581025e+13, 1.581025e+13, nearPositions);
@@ -357,8 +357,10 @@ function randomAngle(min, max) {
 
 
 // GALAXY 
-// STAR CHECK il semble que les "stars soient référencées seriusement en 3D"
-viz.createStars();
+
+// STAR CHECK REACTIVER POUR AVOIR LES ETOILES PRECONF
+// viz.createStars();
+
 // -----------------------------------------------------------
 // -----------------------------------------------------------
 // PROJET: 
@@ -366,28 +368,21 @@ viz.createStars();
 
 const starPositions = [];
 
-viz.createStaticParticles('stars', starPositions, {
-  defaultColor: 'blue',
-  size: 20,
-});
-
-
-// const transformedStars = getTransformObjects(allStars)
+// Scales imports GAIA: pc. Conversions in script.js pc to UA 1 pc = 206264.806 au
 
 allStars.forEach((star) => {
-  const z = star.rmed * Math.sin(star.dec);
-  const x = star.rmed * Math.cos(star.dec) * Math.cos(star.ra);
-  const y = star.rmed * Math.cos(star.dec) * Math.sin(star.ra);
+  const z = 206264.806 * star.rmed * Math.sin(star.dec);
+  const x = 206264.806 * star.rmed * Math.cos(star.dec) * Math.cos(star.ra);
+  const y = 206264.806 * star.rmed * Math.cos(star.dec) * Math.sin(star.ra);
   // particles.push([x, y, z]);
   starPositions.push([x, y, z])
 });
 
-console.log("STARS POSITION", starPositions)
 
-// viz.createStaticParticles('surface', starPositions, {
-//   defaultColor: 'white',
-//   size: 20,
-// });
+viz.createStaticParticles('stars', starPositions, {
+   defaultColor: 'white',
+   size: 5,
+ });
 
 
 
