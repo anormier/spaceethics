@@ -384,5 +384,8 @@ viz.createStaticParticles('stars', starPositions, {
    size: 5,
  });
 
-
+ document.getElementById("btn-local").onclick = function () {
+  viz.getViewer().followObject(sun, [1e6, 1e6, 1e6]);
+  viz.zoomToFit(sun, 1e6);
+};
 
