@@ -4,7 +4,7 @@ import { checkIfVisible, getTransformObjects } from "./utils.js";
 import allStars from "./galaxy.js";
 
 const viz = new Spacekit.Simulation(document.getElementById("main-container"), {
-  basePath: "https://github.com/anormier/spacekit/blob/da5071e6b6c1d6d7b65db60dd8a6813e453ad225/src",
+  basePath: "https://typpo.github.io/spacekit/src",
   startDate: Date.now(),
   unitsPerAu: 1.0,
   camera: {
@@ -23,7 +23,7 @@ function drawline() {
 
 
 // Create a background
-// const skybox = viz.createSkybox(Spacekit.SkyboxPresets.ESO_GIGAGALAXY);
+ const skybox = viz.createSkybox(Spacekit.SkyboxPresets.ESO_GIGAGALAXY);
 
 // Set simulation speed
 viz.setJdDelta(viz.getJdDelta() * 0.02);
