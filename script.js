@@ -5,7 +5,7 @@ import { checkIfVisible, getTransformObjects } from "./utils.js";
 import allStars from "./galaxy.js";
 
 const viz = new Spacekit.Simulation(document.getElementById("main-container"), {
-  basePath: "https://typpo.github.io/spacekit/src",
+  basePath: "https://anormier.github.io/spacekit/src",
   startDate: Date.now(),
   unitsPerAu: 1.0,
   camera: {
