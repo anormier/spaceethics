@@ -1,4 +1,3 @@
-// TO SUPPRESS IN GITHUB: app.js, sytle.css
 
 import allObjects from "./spatial-objects.js";
 import { checkIfVisible, getTransformObjects } from "./utils.js";
@@ -24,7 +23,7 @@ function drawline() {
 
 
 // Create a background
-const skybox = viz.createSkybox(Spacekit.SkyboxPresets.ESO_GIGAGALAXY);
+// const skybox = viz.createSkybox(Spacekit.SkyboxPresets.ESO_GIGAGALAXY);
 
 // Set simulation speed
 viz.setJdDelta(viz.getJdDelta() * 0.02);
