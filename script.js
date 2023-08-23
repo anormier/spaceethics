@@ -2,7 +2,7 @@
 
 import allObjects from "./spatial-objects.js";
 import { checkIfVisible, getTransformObjects } from "./utils.js";
-import allStars from "./galaxy.js";
+import allStars from "./stars-proximate.js";
 
 const viz = new Spacekit.Simulation(document.getElementById("main-container"), {
   basePath: "https://typpo.github.io/spacekit/src",
@@ -14,8 +14,17 @@ const viz = new Spacekit.Simulation(document.getElementById("main-container"), {
   },
 });
 
+
+function drawline() {
+  return [
+    getAxis(new THREE.Vector3(0, 0, 0), new THREE.Vector3(3, 0, 0), 0xff0000),
+  ];
+};
+
+
+
 // Create a background
-// const skybox = viz.createSkybox(Spacekit.SkyboxPresets.ESO_GIGAGALAXY);
+const skybox = viz.createSkybox(Spacekit.SkyboxPresets.ESO_GIGAGALAXY);
 
 // Set simulation speed
 viz.setJdDelta(viz.getJdDelta() * 0.02);
@@ -108,12 +117,22 @@ yearSlider.addEventListener("input", (event) => {
   viz.setDate(new Date(`${selectedYear}-01-01`));
 });
 
+const decSlider = document.getElementById("DECSLIDER");
+
+const dec = 0
+
+decSlider.addEventListener("input", (event) => {
+   dec = parseInt(event.target.value);
+});
+
 // NATURAL OBJECTS
 const sun = viz.createObject("sun", Spacekit.SpaceObjectPresets.SUN);
 viz.createAmbientLight();
 viz.createLight([0, 0, 0]);
-viz.createLight([(50 * 6440 * 10) ^ 9, 0, 0]);
-viz.createLight([10000, 0, 0]);
+
+
+
+
 
 // planets.forEach(planet => {
 //   viz.createObject(planet.name, planet);
@@ -286,74 +305,74 @@ document.getElementById("btn-moon").onclick = function () {
 }
 
 
-//  BOUNDARIES CHECk
-// the observable universe is more than 46 billion light-years = 2.909086e+15UA in any direction from Earth
-// fillParticles(farParticlesCount, 2.909086e+15, 2.909086e+15, farPositions);
+// //  BOUNDARIES CHECk
+// // the observable universe is more than 46 billion light-years = 2.909086e+15UA in any direction from Earth
+// // fillParticles(farParticlesCount, 2.909086e+15, 2.909086e+15, farPositions);
 
-const surfacePositions = [];
-const nearPositions = [];
-const farPositions = [];
-const surfaceParticlesCount = 100;
-const nearParticlesCount = 100;
-const farParticlesCount = 100;
-const particleSize = 1;
+// const surfacePositions = [];
+// const nearPositions = [];
+// const farPositions = [];
+// const surfaceParticlesCount = 1e4;
+// const nearParticlesCount = 100;
+// const farParticlesCount = 100;
+// const particleSize = 5;
 
-// 1= 1UA unité astronomique. NASA estimates the galaxy at 100,000 light-years across. 
-// 1 ly = 63241,1LY largeur galaxy en UA: 6,32411e+9 bilan les échelles vont au bout.
-//fillParticles(surfaceParticlesCount, 0, 6.32411e+9, surfacePositions);
-fillParticles(surfaceParticlesCount, 6.32411e+8, 6.32412e+9, surfacePositions);
+// // 1= 1UA unité astronomique. NASA estimates the galaxy at 100,000 light-years across. 
+// // 1 ly = 63241,1LY largeur galaxy en UA: 6,32411e+9 bilan les échelles vont au bout.
+// //fillParticles(surfaceParticlesCount, 0, 6.32411e+9, surfacePositions);
+// fillParticles(surfaceParticlesCount, 6.32411e+8, 6.32412e+9, surfacePositions);
 
-// Laniakea est le superamas  dont fait partie la Voie lactée, et donc la Terre.r= 250 e6ly =1.581025e+13AU
-// fillParticles(nearParticlesCount, 1.581025e+13, 1.581025e+13, nearPositions);
-fillParticles(nearParticlesCount, 1.581025e+13, 1.581026e+13, nearPositions);
+// // Laniakea est le superamas  dont fait partie la Voie lactée, et donc la Terre.r= 250 e6ly =1.581025e+13AU
+// // fillParticles(nearParticlesCount, 1.581025e+13, 1.581025e+13, nearPositions);
+// fillParticles(nearParticlesCount, 1.581025e+13, 1.581026e+13, nearPositions);
 
-// the observable universe is more than 46 billion light-years = 2.909086e+15UA in any direction from Earth
-// fillParticles(farParticlesCount, 2.909086e+15, 2.909086e+15, farPositions);
-fillParticles(farParticlesCount, 2.909086e+15, 2.909087e+15, farPositions);
-viz.createStaticParticles('surface', surfacePositions, {
-  defaultColor: 'white',
-  size: particleSize,
-});
-viz.createStaticParticles('near', nearPositions, {
-  defaultColor: 'white',
-  size: particleSize,
-});
-viz.createStaticParticles('far', farPositions, {
-  defaultColor: 'white',
-  size: particleSize,
-});
+// // the observable universe is more than 46 billion light-years = 2.909086e+15UA in any direction from Earth
+// // fillParticles(farParticlesCount, 2.909086e+15, 2.909086e+15, farPositions);
+
+// fillParticles(farParticlesCount, 2.909086e+15, 2.909087e+15, farPositions);
+// viz.createStaticParticles('surface', surfacePositions, {
+//   defaultColor: 'white',
+//   size: particleSize,
+// });
+// viz.createStaticParticles('near', nearPositions, {
+//   defaultColor: 'white',
+//   size: particleSize,
+// });
+// viz.createStaticParticles('far', farPositions, {
+//   defaultColor: 'white',
+//   size: particleSize,
+// });
 
 
 
-function fillParticles(count, minRange, maxRange, particles) {
-  for (let i = 0; i < count; i++) {
-    const newParticle = randomPosition(minRange, maxRange);
-    particles.push(newParticle);
-  }
-}
+// function fillParticles(count, minRange, maxRange, particles) {
+//   for (let i = 0; i < count; i++) {
+//     const newParticle = randomPosition(minRange, maxRange);
+//     particles.push(newParticle);
+//   }
+// }
 
-function randomPosition(minRange, maxRange) {
-  const delta = maxRange - minRange;
-  let mag = 1;
+// function randomPosition(minRange, maxRange) {
+//   const delta = maxRange - minRange;
+//   let mag = 1;
 
-  if (delta > 0) {
-    mag = delta * Math.random() + minRange;
-  }
+//   if (delta > 0) {
+//     mag = delta * Math.random() + minRange;
+//   }
 
-  const ra = randomAngle(0, 2 * Math.PI);
-  const dec = randomAngle(-Math.PI / 2, Math.PI / 2);
-  const z = mag * Math.sin(dec);
-  const x = mag * Math.cos(dec) * Math.cos(ra);
-  const y = mag * Math.cos(dec) * Math.sin(ra);
+//   const ra = randomAngle(0, 2 * Math.PI);
+//   const dec = randomAngle(-Math.PI / 2, Math.PI / 2);
+//   const z = mag * Math.sin(dec);
+//   const x = 5 * mag * Math.cos(dec) * Math.cos(ra) ;
+//   const y = 5 * mag * Math.cos(dec) * Math.sin(ra);
 
-  return [x, y, z];
-}
+//   return [x, y, z];
+// }
 
-function randomAngle(min, max) {
-  const delta = max - min;
-  return min + Math.random() * delta;
-}
-
+// function randomAngle(min, max) {
+//   const delta = max - min;
+//   return min + Math.random() * delta;
+// }
 
 
 // GALAXY 
@@ -369,14 +388,16 @@ function randomAngle(min, max) {
 const starPositions = [];
 
 // Scales imports GAIA: pc. Conversions in script.js pc to UA 1 pc = 206264.806 au
+// Conversion DEG TO RAD REQUIRED ?????
 
 allStars.forEach((star) => {
-  const z = 206264.806 * star.rmed * Math.sin(star.dec);
-  const x = 206264.806 * star.rmed * Math.cos(star.dec) * Math.cos(star.ra);
-  const y = 206264.806 * star.rmed * Math.cos(star.dec) * Math.sin(star.ra);
+  const x = 206264.806 * star.rmed * Math.cos((star.dec + dec) * Math.PI/180) * Math.cos((star.ra + 10) * Math.PI/180);
+  const y = 206264.806 * star.rmed * Math.cos((star.dec + dec) * Math.PI/180) * Math.sin((star.ra + 10) * Math.PI/180);
+  const z = -206264.806 * star.rmed * Math.sin((star.dec + dec) * Math.PI/180);
   // particles.push([x, y, z]);
   starPositions.push([x, y, z])
 });
+
 
 
 viz.createStaticParticles('stars', starPositions, {
@@ -388,4 +409,8 @@ viz.createStaticParticles('stars', starPositions, {
   viz.getViewer().followObject(sun, [1e6, 1e6, 1e6]);
   viz.zoomToFit(sun, 1e6);
 };
+
+////
+
+
 
