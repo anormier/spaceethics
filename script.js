@@ -2,7 +2,7 @@
 
 import allObjects from "./spatial-objects.js";
 import { checkIfVisible, getTransformObjects } from "./utils.js";
-import allStars from "./stars-proximate.js";
+import allStars from "./galaxy.js";
 
 const viz = new Spacekit.Simulation(document.getElementById("main-container"), {
   basePath: "https://typpo.github.io/spacekit/src",
@@ -411,6 +411,4 @@ viz.createStaticParticles('stars', starPositions, {
 };
 
 ////
-
-
 
