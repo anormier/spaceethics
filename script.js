@@ -116,12 +116,24 @@ yearSlider.addEventListener("input", (event) => {
 });
 
 const decSlider = document.getElementById("DECSLIDER");
+const raSlider = document.getElementById("RASLIDER");
 
-const dec = 0
-const ra = 0
 
+let dec = 0
+let ra = 0
+
+let starPositions = [];
+
+// Dès que le slider DEC est modifié, on actualise la variable dec et on repositionne les étoiles
 decSlider.addEventListener("input", (event) => {
-   dec = parseInt(event.target.value);
+  dec = parseInt(event.target.value);
+  placeStars(allStars)
+});
+
+// Dès que le slider RA est modifié, on actualise la variable dec et on repositionne les étoiles
+raSlider.addEventListener("input", (event) => {
+  ra = parseInt(event.target.value);
+  placeStars(allStars)
 });
 
 // NATURAL OBJECTS
@@ -383,22 +395,6 @@ document.getElementById("btn-moon").onclick = function () {
 // PROJET: 
 // IMPORTER LES ETOILES de la galaxie avec les coordonnées X,Y,Z, et la luminosité, puis les déplacer en fonciotn de leux vecteurs vitesse.
 
-const starPositions = [];
-
-// Scales imports GAIA: pc. Conversions in script.js pc to UA 1 pc = 206264.806 au
-// Conversion DEG TO RAD REQUIRED ?????
-
-allStars.forEach((star) => {
-  const x = 206264.806 * star.rmed * Math.cos((star.dec + dec) * Math.PI/180) * Math.cos((star.ra + 10) * Math.PI/180);
-  const y = 206264.806 * star.rmed * Math.cos((star.dec + dec) * Math.PI/180) * Math.sin((star.ra + 10) * Math.PI/180);
-  const z = -206264.806 * star.rmed * Math.sin((star.dec + dec) * Math.PI/180);
-  starPositions.push([x, y, z])
-});
-
-viz.createStaticParticles('stars', starPositions, {
-   defaultColor: 'white',
-   size: 5,
- });
 
 
 
@@ -467,3 +463,30 @@ viz.createStaticParticles('mx', mxPositions, {
 
 ////
 
+
+let staticParticles = undefined;
+
+function placeStars(stars) {
+  starPositions = []
+
+  if (staticParticles) {
+    viz.removeObject(staticParticles)
+  }
+
+  const placeStar = (star) => {
+    const x = 206264.806 * star.rmed * Math.cos((star.dec + dec) * Math.PI / 180) * Math.cos((star.ra + ra) * Math.PI / 180);
+    const y = 206264.806 * star.rmed * Math.cos((star.dec + dec) * Math.PI / 180) * Math.sin((star.ra + ra) * Math.PI / 180);
+    const z = 206264.806 * star.rmed * Math.sin((star.dec + dec) * Math.PI / 180);
+    starPositions.push([x, y, z])
+  }
+
+  stars.forEach(star => placeStar(star));
+
+  staticParticles = viz.createStaticParticles('stars', starPositions, {
+    defaultColor: 'white',
+    size: 5,
+  });
+};
+
+// au premier chargement de la page, on positionne les étoiles
+placeStars(allStars)
