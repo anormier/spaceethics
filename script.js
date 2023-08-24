@@ -1,6 +1,6 @@
 
 import allObjects from "./spatial-objects.js";
-import { checkIfVisible, getTransformObjects } from "./utils.js";
+import { checkIfVisible } from "./utils.js";
 import allStars from "./galaxy.js";
 import allMessages from "./messages.js";
 
@@ -44,16 +44,13 @@ viz.setJdDelta(viz.getJdDelta() * 0.02);
 //show date
 const dateElt = document.getElementById("current-date");
 
-const transformedObjects = getTransformObjects(allObjects)
-
-
 viz.onTick = function () {
   var d = viz.getDate();
   dateElt.innerHTML = d.toLocaleDateString();
 
   const date = d.getTime();
 
-  transformedObjects.forEach((point) => {
+  allObjects.forEach((point) => {
     const pointShouldAppear = checkIfVisible(point, date);
 
     if (!pointShouldAppear) {

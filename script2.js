@@ -1,5 +1,5 @@
 import allObjects from "./spatial-objects.js";
-import { checkIfVisible, getTransformObjects } from "./utils.js";
+import { checkIfVisible } from "./utils.js";
 import allStars from "./galaxy.js";
 
 const viz = new Spacekit.Simulation(document.getElementById("main-container"), {
@@ -18,7 +18,6 @@ function drawline() {
     getAxis(new THREE.Vector3(0, 0, 0), new THREE.Vector3(3, 0, 0), 0xff0000),
   ];
 };
-
 
 
 // Create a background
@@ -41,16 +40,13 @@ viz.setJdDelta(viz.getJdDelta() * 0.02);
 //show date
 const dateElt = document.getElementById("current-date");
 
-const transformedObjects = getTransformObjects(allObjects)
-
-
 viz.onTick = function () {
   var d = viz.getDate();
   dateElt.innerHTML = d.toLocaleDateString();
 
   const date = d.getTime();
 
-  transformedObjects.forEach((point) => {
+  allObjects.forEach((point) => {
     const pointShouldAppear = checkIfVisible(point, date);
 
     if (!pointShouldAppear) {
@@ -111,8 +107,6 @@ document.getElementById("btn-local").onclick = function () {
 //   viz.setDate(Date.now());
 // };
 
-
-// CHAT GPT HERE
 const yearSlider = document.getElementById("year-slider");
 
 yearSlider.addEventListener("input", (event) => {
@@ -395,10 +389,16 @@ document.getElementById("btn-moon").onclick = function () {
 // Scales imports GAIA: pc. Conversions in script.js pc to UA 1 pc = 206264.806 au
 // Conversion DEG TO RAD REQUIRED ?????
 
+let staticParticles = undefined;
+
 function placeStars(stars) {
   starPositions = []
 
-  function placeStar(star) {
+  if (staticParticles) {
+    viz.removeObject(staticParticles)
+  }
+
+  const placeStar = (star) => {
     const x = 206264.806 * star.rmed * Math.cos((star.dec + dec) * Math.PI / 180) * Math.cos((star.ra + 10) * Math.PI / 180);
     const y = 206264.806 * star.rmed * Math.cos((star.dec + dec) * Math.PI / 180) * Math.sin((star.ra + 10) * Math.PI / 180);
     const z = -206264.806 * star.rmed * Math.sin((star.dec + dec) * Math.PI / 180);
@@ -407,10 +407,10 @@ function placeStars(stars) {
 
   stars.forEach(star => placeStar(star));
 
-  viz.createStaticParticles('stars', starPositions, {
+  staticParticles = viz.createStaticParticles('stars', starPositions, {
     defaultColor: 'white',
     size: 5,
-  });  
+  });
 };
 
 // au premier chargement de la page, on positionne les étoiles
