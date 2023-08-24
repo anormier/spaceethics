@@ -342,7 +342,41 @@ document.getElementById("btn-moon").onclick = function () {
 //   size: particleSize,
 // });
 
+const Ray1 = [];
+const Ray2 = [];
+const Ray3 = [];
+const Ray4 = [];
 
+
+// 1 particule par UA
+const particuleCountRay = 1e4;
+const particleSize = 20;
+//sgr A*
+fillray(particuleCountRay, 266, -29, Ray1);
+fillray(particuleCountRay, 70, 5, Ray2);
+fillray(particuleCountRay, 12, -70, Ray3);
+fillray(particuleCountRay, 100, 30, Ray4);
+
+viz.createStaticParticles('ray1', Ray1, { defaultColor: 'red',size: particleSize,});
+viz.createStaticParticles('ray2', Ray2, { defaultColor: 'red', size: particleSize,});
+viz.createStaticParticles('ray3', Ray3, { defaultColor: 'red', size: particleSize,});
+viz.createStaticParticles('ray4', Ray4, { defaultColor: 'red', size: particleSize,});
+
+
+function fillray(count, ra, de, particles) {
+  for (let i = 0; i < count; i++) {
+    const newParticle = raypart(ra,de,i);
+    particles.push(newParticle);
+  }
+}
+
+function raypart(ra,de,i) {
+//ra et dec en degrés
+  const z = 5*i * Math.sin(de * Math.PI/180);
+  const x = 5*i * Math.cos(de* Math.PI/180) * Math.cos(ra* Math.PI/180) ;
+  const y = - 5*i * Math.cos(de* Math.PI/180) * Math.sin(ra* Math.PI/180);
+  return [x, y, z];
+}
 
 // function fillParticles(count, minRange, maxRange, particles) {
 //   for (let i = 0; i < count; i++) {
@@ -393,7 +427,6 @@ allStars.forEach((star) => {
   const x = 206264.806 * star.rmed * Math.cos((star.dec + dec) * Math.PI/180) * Math.cos((star.ra + 10) * Math.PI/180);
   const y = 206264.806 * star.rmed * Math.cos((star.dec + dec) * Math.PI/180) * Math.sin((star.ra + 10) * Math.PI/180);
   const z = -206264.806 * star.rmed * Math.sin((star.dec + dec) * Math.PI/180);
-  // particles.push([x, y, z]);
   starPositions.push([x, y, z])
 });
 
@@ -405,8 +438,8 @@ viz.createStaticParticles('stars', starPositions, {
  });
 
  document.getElementById("btn-local").onclick = function () {
-  viz.getViewer().followObject(sun, [1e6, 1e6, 1e6]);
-  viz.zoomToFit(sun, 1e6);
+  viz.getViewer().followObject(sun, [1e2, 1e2, 1e2]);
+  viz.zoomToFit(sun, 1e2);
 };
 
 ////
