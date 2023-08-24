@@ -1,8 +1,9 @@
-// TO SUPPRESS IN GITHUB: app.js, sytle.css
 
 import allObjects from "./spatial-objects.js";
 import { checkIfVisible, getTransformObjects } from "./utils.js";
 import allStars from "./galaxy.js";
+import allMessages from "./messages.js";
+
 
 const viz = new Spacekit.Simulation(document.getElementById("main-container"), {
   basePath: "https://typpo.github.io/spacekit/src",
@@ -24,7 +25,7 @@ function drawline() {
 
 
 // Create a background
-const skybox = viz.createSkybox(Spacekit.SkyboxPresets.ESO_GIGAGALAXY);
+ const skybox = viz.createSkybox(Spacekit.SkyboxPresets.ESO_GIGAGALAXY);
 
 // Set simulation speed
 viz.setJdDelta(viz.getJdDelta() * 0.02);
@@ -120,6 +121,7 @@ yearSlider.addEventListener("input", (event) => {
 const decSlider = document.getElementById("DECSLIDER");
 
 const dec = 0
+const ra = 0
 
 decSlider.addEventListener("input", (event) => {
    dec = parseInt(event.target.value);
@@ -344,7 +346,6 @@ document.getElementById("btn-moon").onclick = function () {
 // });
 
 
-
 // function fillParticles(count, minRange, maxRange, particles) {
 //   for (let i = 0; i < count; i++) {
 //     const newParticle = randomPosition(minRange, maxRange);
@@ -394,20 +395,77 @@ allStars.forEach((star) => {
   const x = 206264.806 * star.rmed * Math.cos((star.dec + dec) * Math.PI/180) * Math.cos((star.ra + 10) * Math.PI/180);
   const y = 206264.806 * star.rmed * Math.cos((star.dec + dec) * Math.PI/180) * Math.sin((star.ra + 10) * Math.PI/180);
   const z = -206264.806 * star.rmed * Math.sin((star.dec + dec) * Math.PI/180);
-  // particles.push([x, y, z]);
   starPositions.push([x, y, z])
 });
-
-
 
 viz.createStaticParticles('stars', starPositions, {
    defaultColor: 'white',
    size: 5,
  });
 
+
+
+//messages doted lines
+const mxDotPositions = [];
+// Scales imports messages: pc. Conversions in script.js Ly to UA 1 ly = 63241.16 au
+
+allMessages.forEach((mx) => {
+  const count=1000
+  for (let i = 1; i < count; i++) {
+    const x = i * (63241.16 * mx.dist)/count  * Math.cos((mx.dec + dec) * Math.PI/180) * Math.cos((mx.ra + ra) * Math.PI/180);
+    const y = i * (63241.16 * mx.dist)/count  * Math.cos((mx.dec + dec) * Math.PI/180) * Math.sin((mx.ra + ra) * Math.PI/180);
+    const z = -i * (63241.16 * mx.dist)/count  * Math.sin((mx.dec + dec) * Math.PI/180);
+    mxDotPositions.push([x, y, z])
+  }
+});
+
+allMessages.forEach((mx) => {
+  const count=1000
+  for (let i = 1; i < count; i++) {
+    const x = i * (63241.16 * mx.dist)/(100 * count)  * Math.cos((mx.dec + dec) * Math.PI/180) * Math.cos((mx.ra + ra) * Math.PI/180);
+    const y = i * (63241.16 * mx.dist)/(100 * count)   * Math.cos((mx.dec + dec) * Math.PI/180) * Math.sin((mx.ra + ra) * Math.PI/180);
+    const z = -i * (63241.16 * mx.dist)/(100 * count)   * Math.sin((mx.dec + dec) * Math.PI/180);
+    mxDotPositions.push([x, y, z])
+  }
+});
+
+allMessages.forEach((mx) => {
+  const count=1000
+  for (let i = 1; i < count; i++) {
+    const x = i * (63241.16 * mx.dist)/(1000 * count)  * Math.cos((mx.dec + dec) * Math.PI/180) * Math.cos((mx.ra + ra) * Math.PI/180);
+    const y = i * (63241.16 * mx.dist)/(1000 * count)   * Math.cos((mx.dec + dec) * Math.PI/180) * Math.sin((mx.ra + ra) * Math.PI/180);
+    const z = -i * (63241.16 * mx.dist)/(1000 * count)   * Math.sin((mx.dec + dec) * Math.PI/180);
+    mxDotPositions.push([x, y, z])
+  }
+});
+
+viz.createStaticParticles('mx', mxDotPositions, {
+   defaultColor: 'red',
+   size: 5,
+ });
+
+
+//messages destinations
+
+ const mxPositions = [];
+
+allMessages.forEach((mx) => {
+  const x = 63241.16 * mx.dist * Math.cos((mx.dec + dec) * Math.PI/180) * Math.cos((mx.ra + ra) * Math.PI/180);
+  const y = 63241.16 * mx.dist * Math.cos((mx.dec + dec) * Math.PI/180) * Math.sin((mx.ra + ra) * Math.PI/180);
+  const z = -63241.16 * mx.dist * Math.sin((mx.dec + dec) * Math.PI/180);
+  mxPositions.push([x, y, z])
+});
+
+viz.createStaticParticles('mx', mxPositions, {
+   defaultColor: 'red',
+   size: 20,
+ });
+
+///SEPARATor///SEPARATor///SEPARATor///SEPARATor///SEPARATor///SEPARATor
+
  document.getElementById("btn-local").onclick = function () {
-  viz.getViewer().followObject(sun, [1e6, 1e6, 1e6]);
-  viz.zoomToFit(sun, 1e6);
+  viz.getViewer().followObject(sun, [1e2, 1e2, 1e2]);
+  viz.zoomToFit(sun, 1e2);
 };
 
 ////
