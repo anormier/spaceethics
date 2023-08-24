@@ -2,6 +2,8 @@
 import allObjects from "./spatial-objects.js";
 import { checkIfVisible, getTransformObjects } from "./utils.js";
 import allStars from "./galaxy.js";
+import allMessages from "./messages.js";
+
 
 const viz = new Spacekit.Simulation(document.getElementById("main-container"), {
   basePath: "https://typpo.github.io/spacekit/src",
@@ -119,6 +121,7 @@ yearSlider.addEventListener("input", (event) => {
 const decSlider = document.getElementById("DECSLIDER");
 
 const dec = 0
+const ra = 0
 
 decSlider.addEventListener("input", (event) => {
    dec = parseInt(event.target.value);
@@ -342,41 +345,6 @@ document.getElementById("btn-moon").onclick = function () {
 //   size: particleSize,
 // });
 
-const Ray1 = [];
-const Ray2 = [];
-const Ray3 = [];
-const Ray4 = [];
-
-
-// 1 particule par UA
-const particuleCountRay = 1e4;
-const particleSize = 20;
-//sgr A*
-fillray(particuleCountRay, 266, -29, Ray1);
-fillray(particuleCountRay, 70, 5, Ray2);
-fillray(particuleCountRay, 12, -70, Ray3);
-fillray(particuleCountRay, 100, 30, Ray4);
-
-viz.createStaticParticles('ray1', Ray1, { defaultColor: 'red',size: particleSize,});
-viz.createStaticParticles('ray2', Ray2, { defaultColor: 'red', size: particleSize,});
-viz.createStaticParticles('ray3', Ray3, { defaultColor: 'red', size: particleSize,});
-viz.createStaticParticles('ray4', Ray4, { defaultColor: 'red', size: particleSize,});
-
-
-function fillray(count, ra, de, particles) {
-  for (let i = 0; i < count; i++) {
-    const newParticle = raypart(ra,de,i);
-    particles.push(newParticle);
-  }
-}
-
-function raypart(ra,de,i) {
-//ra et dec en degrés
-  const z = 5*i * Math.sin(de * Math.PI/180);
-  const x = 5*i * Math.cos(de* Math.PI/180) * Math.cos(ra* Math.PI/180) ;
-  const y = - 5*i * Math.cos(de* Math.PI/180) * Math.sin(ra* Math.PI/180);
-  return [x, y, z];
-}
 
 // function fillParticles(count, minRange, maxRange, particles) {
 //   for (let i = 0; i < count; i++) {
@@ -430,12 +398,70 @@ allStars.forEach((star) => {
   starPositions.push([x, y, z])
 });
 
-
-
 viz.createStaticParticles('stars', starPositions, {
    defaultColor: 'white',
    size: 5,
  });
+
+
+
+//messages doted lines
+const mxDotPositions = [];
+// Scales imports messages: pc. Conversions in script.js Ly to UA 1 ly = 63241.16 au
+
+allMessages.forEach((mx) => {
+  const count=1000
+  for (let i = 1; i < count; i++) {
+    const x = i * (63241.16 * mx.dist)/count  * Math.cos((mx.dec + dec) * Math.PI/180) * Math.cos((mx.ra + ra) * Math.PI/180);
+    const y = i * (63241.16 * mx.dist)/count  * Math.cos((mx.dec + dec) * Math.PI/180) * Math.sin((mx.ra + ra) * Math.PI/180);
+    const z = -i * (63241.16 * mx.dist)/count  * Math.sin((mx.dec + dec) * Math.PI/180);
+    mxDotPositions.push([x, y, z])
+  }
+});
+
+allMessages.forEach((mx) => {
+  const count=1000
+  for (let i = 1; i < count; i++) {
+    const x = i * (63241.16 * mx.dist)/(100 * count)  * Math.cos((mx.dec + dec) * Math.PI/180) * Math.cos((mx.ra + ra) * Math.PI/180);
+    const y = i * (63241.16 * mx.dist)/(100 * count)   * Math.cos((mx.dec + dec) * Math.PI/180) * Math.sin((mx.ra + ra) * Math.PI/180);
+    const z = -i * (63241.16 * mx.dist)/(100 * count)   * Math.sin((mx.dec + dec) * Math.PI/180);
+    mxDotPositions.push([x, y, z])
+  }
+});
+
+allMessages.forEach((mx) => {
+  const count=1000
+  for (let i = 1; i < count; i++) {
+    const x = i * (63241.16 * mx.dist)/(1000 * count)  * Math.cos((mx.dec + dec) * Math.PI/180) * Math.cos((mx.ra + ra) * Math.PI/180);
+    const y = i * (63241.16 * mx.dist)/(1000 * count)   * Math.cos((mx.dec + dec) * Math.PI/180) * Math.sin((mx.ra + ra) * Math.PI/180);
+    const z = -i * (63241.16 * mx.dist)/(1000 * count)   * Math.sin((mx.dec + dec) * Math.PI/180);
+    mxDotPositions.push([x, y, z])
+  }
+});
+
+viz.createStaticParticles('mx', mxDotPositions, {
+   defaultColor: 'red',
+   size: 5,
+ });
+
+
+//messages destinations
+
+ const mxPositions = [];
+
+allMessages.forEach((mx) => {
+  const x = 63241.16 * mx.dist * Math.cos((mx.dec + dec) * Math.PI/180) * Math.cos((mx.ra + ra) * Math.PI/180);
+  const y = 63241.16 * mx.dist * Math.cos((mx.dec + dec) * Math.PI/180) * Math.sin((mx.ra + ra) * Math.PI/180);
+  const z = -63241.16 * mx.dist * Math.sin((mx.dec + dec) * Math.PI/180);
+  mxPositions.push([x, y, z])
+});
+
+viz.createStaticParticles('mx', mxPositions, {
+   defaultColor: 'red',
+   size: 20,
+ });
+
+///SEPARATor///SEPARATor///SEPARATor///SEPARATor///SEPARATor///SEPARATor
 
  document.getElementById("btn-local").onclick = function () {
   viz.getViewer().followObject(sun, [1e2, 1e2, 1e2]);
