@@ -1,6 +1,8 @@
 
 import allObjects from "./spatial-objects.js";
 import { checkIfVisible } from "./utils.js";
+import { radecToXYZ } from "./utils.js";
+
 import allStars from "./galaxy.js";
 import allMessages from "./messages.js";
 
@@ -428,7 +430,7 @@ allMessages.forEach((mx) => {
     const x = i * (63241.16 * mx.dist)/(1000 * count)  * Math.cos((mx.dec + dec) * Math.PI/180) * Math.cos((mx.ra + ra) * Math.PI/180);
     const y = i * (63241.16 * mx.dist)/(1000 * count)   * Math.cos((mx.dec + dec) * Math.PI/180) * Math.sin((mx.ra + ra) * Math.PI/180);
     const z = -i * (63241.16 * mx.dist)/(1000 * count)   * Math.sin((mx.dec + dec) * Math.PI/180);
-    mxDotPositions.push([x, y, z])
+    mxDotPositions.push(radecToXYZ(mx.ra + ra,mx.dec + dec,63241.16 * mx.dist)/(1000 * count))
   }
 });
 
@@ -442,11 +444,8 @@ viz.createStaticParticles('mx', mxDotPositions, {
 
  const mxPositions = [];
 
-allMessages.forEach((mx) => {
-  const x = 63241.16 * mx.dist * Math.cos((mx.dec + dec) * Math.PI/180) * Math.cos((mx.ra + ra) * Math.PI/180);
-  const y = 63241.16 * mx.dist * Math.cos((mx.dec + dec) * Math.PI/180) * Math.sin((mx.ra + ra) * Math.PI/180);
-  const z = -63241.16 * mx.dist * Math.sin((mx.dec + dec) * Math.PI/180);
-  mxPositions.push([x, y, z])
+allMessages.forEach((mx) => {  
+  mxPositions.push(radecToXYZ(mx.ra + ra,mx.dec + dec,63241.16 * mx.dist))
 });
 
 viz.createStaticParticles('mx', mxPositions, {
@@ -469,15 +468,10 @@ let staticParticles = undefined;
 function placeStars(stars) {
   starPositions = []
 
-  if (staticParticles) {
-    viz.removeObject(staticParticles)
-  }
+  if (staticParticles) { viz.removeObject(staticParticles)}
 
   const placeStar = (star) => {
-    const x = 206264.806 * star.rmed * Math.cos((star.dec + dec) * Math.PI / 180) * Math.cos((star.ra + ra) * Math.PI / 180);
-    const y = 206264.806 * star.rmed * Math.cos((star.dec + dec) * Math.PI / 180) * Math.sin((star.ra + ra) * Math.PI / 180);
-    const z = 206264.806 * star.rmed * Math.sin((star.dec + dec) * Math.PI / 180);
-    starPositions.push([x, y, z])
+starPositions.push(radecToXYZ(star.ra+ra,star.dec+dec,star.rmed))
   }
 
   stars.forEach(star => placeStar(star));
