@@ -333,17 +333,18 @@ let staticParticles = undefined;
 
 
 function placeStars(stars,date) {
-// // anything that has r(UA),ra(deg),dec(deg),epoch,vr(km/s),vra(deg.s-1),vdec(deg.s-1)
+// // REWRITE: anything that has r(UA),ra(deg),dec(deg),epoch,vr(km/s),vra(deg.s-1),vdec(deg.s-1)
   starPositions = []
 
   if (staticParticles) { viz.removeObject(staticParticles)}
+    // source_id | parallax_over_error | teff_gspphot (K) | distance_gspphot (pc) | ra (deg) | radial_velocity (km.s**-1) | dec (deg) | pmra (mas.yr**-1) | pmdec (mas.yr**-1)
 
   const placeStar = (star) => {
-    const timeDifference = date - new Date('1990-09-05').getTime();
-    const adjustedRA = star.ra + ra + star.vra * timeDifference;
-    const adjustedDec = star.dec + dec + star.vdec * timeDifference;
-    const adjustedRmed = star.rmed + star.vrmed * timeDifference;
-
+    const timeDifference = date - new Date(star.eopch).getTime();
+    const adjustedRA = star.ra + ra + star.vra * timeDifference * 8.78e-15;
+    const adjustedDec = star.dec + dec + star.vdec * timeDifference * 8.78e-15;
+    const adjustedRmed = 206265*star.rmed + (6.68459e-9* star.vrmed) * timeDifference/1000;
+//
     starPositions.push(radecToXYZ(adjustedRA, adjustedDec, adjustedRmed));
 }
 //
