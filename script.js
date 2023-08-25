@@ -43,8 +43,6 @@ viz.onTick = function () {
   const date = d.getTime();
 
   placeStars(allStars,date);
-  placeDynamic(allVoyagers,date);
-
 
   allObjects.forEach((point) => {
     const pointShouldAppear = checkIfVisible(point, date);
