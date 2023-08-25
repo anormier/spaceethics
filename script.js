@@ -2,9 +2,10 @@
 import allObjects from "./spatial-objects.js";
 import { checkIfVisible } from "./utils.js";
 import { radecToXYZ } from "./utils.js";
-
 import allStars from "./galaxy.js";
 import allMessages from "./messages.js";
+import allVoyagers from "./voyagers.js";
+
 
 
 const viz = new Spacekit.Simulation(document.getElementById("main-container"), {
@@ -25,32 +26,25 @@ function drawline() {
 };
 
 
-
 // Create a background
  const skybox = viz.createSkybox(Spacekit.SkyboxPresets.ESO_GIGAGALAXY);
 
 // Set simulation speed
 viz.setJdDelta(viz.getJdDelta() * 0.02);
 
-// Set Controls
-// document.getElementById('btn-start').onclick = function () {
-//   viz.start();
-// };
-// document.getElementById('btn-stop').onclick = function () {
-//   viz.stop();
-//};
-//document.getElementById('btn-set-time').onclick = function () {
-//viz.setDate(new Date(prompt('Enter a date (YYYY-mm-dd)')));
-//};
-
 //show date
 const dateElt = document.getElementById("current-date");
 
+// simulation ontick
 viz.onTick = function () {
   var d = viz.getDate();
   dateElt.innerHTML = d.toLocaleDateString();
 
   const date = d.getTime();
+
+  placeStars(allStars,date);
+  placeDynamic(allVoyagers,date);
+
 
   allObjects.forEach((point) => {
     const pointShouldAppear = checkIfVisible(point, date);
@@ -67,51 +61,18 @@ viz.onTick = function () {
   });
 };
 
+//faster button
 document.getElementById("btn-faster").onclick = function () {
   viz.setJdDelta(viz.getJdDelta() * 1.5);
 };
 
+//slower button
 document.getElementById("btn-slower").onclick = function () {
   viz.setJdDelta(viz.getJdDelta() * 0.5);
 };
 
-// document.getElementById("1950").onclick = function () {
-//   viz.setDate(new Date("1950-01-01"));
-// };
 
-// document.getElementById("1960").onclick = function () {
-//   viz.setDate(new Date("1960-01-01"));
-// };
-
-// document.getElementById("1970").onclick = function () {
-//   viz.setDate(new Date("1970-01-01"));
-// };
-
-// document.getElementById("1980").onclick = function () {
-//   viz.setDate(new Date("1980-01-01"));
-// };
-
-
-// document.getElementById("1990").onclick = function () {
-//   viz.setDate(new Date("1990-01-01"));
-// };
-
-// document.getElementById("2000").onclick = function () {
-//   viz.setDate(new Date("2000-01-01"));
-// };
-
-// document.getElementById("2010").onclick = function () {
-//   viz.setDate(new Date("2010-01-01"));
-// };
-
-// document.getElementById("Today").onclick = function () {
-//   viz.setDate(Date.now());
-// };
-
-
-// CHAT GPT HERE
 const yearSlider = document.getElementById("year-slider");
-
 yearSlider.addEventListener("input", (event) => {
   const selectedYear = parseInt(event.target.value);
   viz.setDate(new Date(`${selectedYear}-01-01`));
@@ -119,19 +80,14 @@ yearSlider.addEventListener("input", (event) => {
 
 const decSlider = document.getElementById("DECSLIDER");
 const raSlider = document.getElementById("RASLIDER");
-
-
 let dec = 0
 let ra = 0
-
 let starPositions = [];
-
 // Dès que le slider DEC est modifié, on actualise la variable dec et on repositionne les étoiles
 decSlider.addEventListener("input", (event) => {
   dec = parseInt(event.target.value);
   placeStars(allStars)
 });
-
 // Dès que le slider RA est modifié, on actualise la variable dec et on repositionne les étoiles
 raSlider.addEventListener("input", (event) => {
   ra = parseInt(event.target.value);
@@ -143,14 +99,6 @@ const sun = viz.createObject("sun", Spacekit.SpaceObjectPresets.SUN);
 viz.createAmbientLight();
 viz.createLight([0, 0, 0]);
 
-
-
-
-
-// planets.forEach(planet => {
-//   viz.createObject(planet.name, planet);
-// })
-// // Then add some planets
 viz.createObject("mercury", {
   labelText: "Mercury",
   ephem: Spacekit.EphemPresets.MERCURY,
@@ -275,14 +223,12 @@ const jupiter3 = viz.createSphere("jupiter3", {
   },
 });
 
-// ARTIFICIAL OBJECTS
 
 
 document.getElementById("btn-system").onclick = function () {
   viz.getViewer().followObject(sun, [2, 2, 2]);
   viz.zoomToFit(sun, 2);
 };
-
 
 document.getElementById("btn-earth").onclick = function () {
   viz.getViewer().followObject(sun, [-0.75, -0.75, 0.5]);
@@ -316,86 +262,6 @@ document.getElementById("btn-moon").onclick = function () {
     }
   }, 20);
 }
-
-
-// //  BOUNDARIES CHECk
-// // the observable universe is more than 46 billion light-years = 2.909086e+15UA in any direction from Earth
-// // fillParticles(farParticlesCount, 2.909086e+15, 2.909086e+15, farPositions);
-
-// const surfacePositions = [];
-// const nearPositions = [];
-// const farPositions = [];
-// const surfaceParticlesCount = 1e4;
-// const nearParticlesCount = 100;
-// const farParticlesCount = 100;
-// const particleSize = 5;
-
-// // 1= 1UA unité astronomique. NASA estimates the galaxy at 100,000 light-years across. 
-// // 1 ly = 63241,1LY largeur galaxy en UA: 6,32411e+9 bilan les échelles vont au bout.
-// //fillParticles(surfaceParticlesCount, 0, 6.32411e+9, surfacePositions);
-// fillParticles(surfaceParticlesCount, 6.32411e+8, 6.32412e+9, surfacePositions);
-
-// // Laniakea est le superamas  dont fait partie la Voie lactée, et donc la Terre.r= 250 e6ly =1.581025e+13AU
-// // fillParticles(nearParticlesCount, 1.581025e+13, 1.581025e+13, nearPositions);
-// fillParticles(nearParticlesCount, 1.581025e+13, 1.581026e+13, nearPositions);
-
-// // the observable universe is more than 46 billion light-years = 2.909086e+15UA in any direction from Earth
-// // fillParticles(farParticlesCount, 2.909086e+15, 2.909086e+15, farPositions);
-
-// fillParticles(farParticlesCount, 2.909086e+15, 2.909087e+15, farPositions);
-// viz.createStaticParticles('surface', surfacePositions, {
-//   defaultColor: 'white',
-//   size: particleSize,
-// });
-// viz.createStaticParticles('near', nearPositions, {
-//   defaultColor: 'white',
-//   size: particleSize,
-// });
-// viz.createStaticParticles('far', farPositions, {
-//   defaultColor: 'white',
-//   size: particleSize,
-// });
-
-
-// function fillParticles(count, minRange, maxRange, particles) {
-//   for (let i = 0; i < count; i++) {
-//     const newParticle = randomPosition(minRange, maxRange);
-//     particles.push(newParticle);
-//   }
-// }
-
-// function randomPosition(minRange, maxRange) {
-//   const delta = maxRange - minRange;
-//   let mag = 1;
-
-//   if (delta > 0) {
-//     mag = delta * Math.random() + minRange;
-//   }
-
-//   const ra = randomAngle(0, 2 * Math.PI);
-//   const dec = randomAngle(-Math.PI / 2, Math.PI / 2);
-//   const z = mag * Math.sin(dec);
-//   const x = 5 * mag * Math.cos(dec) * Math.cos(ra) ;
-//   const y = 5 * mag * Math.cos(dec) * Math.sin(ra);
-
-//   return [x, y, z];
-// }
-
-// function randomAngle(min, max) {
-//   const delta = max - min;
-//   return min + Math.random() * delta;
-// }
-
-
-// GALAXY 
-
-// STAR CHECK REACTIVER POUR AVOIR LES ETOILES PRECONF
-// viz.createStars();
-
-// -----------------------------------------------------------
-// -----------------------------------------------------------
-// PROJET: 
-// IMPORTER LES ETOILES de la galaxie avec les coordonnées X,Y,Z, et la luminosité, puis les déplacer en fonciotn de leux vecteurs vitesse.
 
 
 
@@ -462,18 +328,25 @@ viz.createStaticParticles('mx', mxPositions, {
 
 ////
 
-
 let staticParticles = undefined;
 
-function placeStars(stars) {
+
+
+function placeStars(stars,date) {
+// // anything that has r(UA),ra(deg),dec(deg),epoch,vr(km/s),vra(deg.s-1),vdec(deg.s-1)
   starPositions = []
 
   if (staticParticles) { viz.removeObject(staticParticles)}
 
   const placeStar = (star) => {
-starPositions.push(radecToXYZ(star.ra+ra,star.dec+dec,star.rmed))
-  }
+    const timeDifference = date - new Date('1990-09-05').getTime();
+    const adjustedRA = star.ra + ra + star.vra * timeDifference;
+    const adjustedDec = star.dec + dec + star.vdec * timeDifference;
+    const adjustedRmed = star.rmed + star.vrmed * timeDifference;
 
+    starPositions.push(radecToXYZ(adjustedRA, adjustedDec, adjustedRmed));
+}
+//
   stars.forEach(star => placeStar(star));
 
   staticParticles = viz.createStaticParticles('stars', starPositions, {
@@ -482,5 +355,24 @@ starPositions.push(radecToXYZ(star.ra+ra,star.dec+dec,star.rmed))
   });
 };
 
-// au premier chargement de la page, on positionne les étoiles
-placeStars(allStars)
+
+// // ESSAI
+// let objs = undefined;
+// function placeDynamic(objs,date) {
+// // anything that has r(UA),ra(deg),dec(deg),epoch,vr(km/s),vra(deg.s-1),vdec(deg.s-1)
+
+//   objsPositions = []
+
+//   if (objs) { viz.removeObject(objs)}
+
+//   const placeObj = (obj) => {
+//     objPositions.push(radecToXYZ(obj.ra + ra, obj.dec + dec, obj.r + vr*T(date - epoch)/1e3));
+//   }
+//   objs.forEach(obj => placeStar(obj));
+
+//   staticParticles = viz.createStaticParticles('stars', objPositions, {
+//     defaultColor: 'white',
+//     size: 5,
+//   });
+// };
+
