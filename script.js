@@ -35,9 +35,13 @@ viz.onTick = function () {
   }
   const date = d.getTime();
 
-  // Assuming placeStars is defined elsewhere
+  // Update stars
   placeStars(allStars, date);
+  
+  // Update voyagers
+  placeObjects(allVoyagers, date, './assets/Red_Circle_full.png');
 
+  // Update other spatial objects
   allObjects.forEach((point) => {
     const pointShouldAppear = checkIfVisible(point, date);
 
@@ -394,3 +398,32 @@ document.getElementById('fullscreen-btn').addEventListener('click', function() {
       }
   }
 });
+
+// A list to keep track of previously added objects.
+let previouslyAddedObjects = [];
+
+function placeObjects(objects, date, textureUrl) {
+  // Remove previously added objects and clear the list.
+  previouslyAddedObjects.forEach(viz.removeObject);
+  previouslyAddedObjects = [];
+  
+  objects.forEach(obj => {
+    const timeDifference = date - new Date(obj.epoch).getTime();
+    const adjustedRA = obj.ra + obj.vra * timeDifference * 8.78e-15;
+    const adjustedDec = obj.dec + obj.vdec * timeDifference * 8.78e-15;
+    const adjustedR =  obj.r + (6.68459e-9 * obj.vr) * timeDifference / 1000;
+    const position = radecToXYZ(adjustedRA, adjustedDec, adjustedR);
+
+    const singleObject = viz.createObject(obj.id, {
+      position: position,
+      scale: [1, 1, 1],
+      particleSize: 5,
+      labelText: obj.id,
+      textureUrl:textureUrl
+    });
+
+    previouslyAddedObjects.push(singleObject);
+  });
+}
+
+
