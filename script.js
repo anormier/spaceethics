@@ -1,21 +1,17 @@
-
+//BELOW: The file script.JS
 import allObjects from "./spatial-objects.js";
-import { checkIfVisible } from "./utils.js";
-import { radecToXYZ } from "./utils.js";
+import { checkIfVisible, radecToXYZ } from "./utils.js";
 import allStars from "./galaxy.js";
 import allMessages from "./messages.js";
 import allVoyagers from "./voyagers.js";
-
-
 
 const viz = new Spacekit.Simulation(document.getElementById("main-container"), {
   basePath: "https://typpo.github.io/spacekit/src",
   startDate: Date.now(),
   unitsPerAu: 1.0,
-  startPaused: true,
-  unitsPerAu: 1.0,
+  startPaused: false,
   maxNumParticles: 2**16,
-    camera: {
+  camera: {
     enableDrift: false,
     initialPosition: [2, -2, 1],
   },
@@ -26,100 +22,17 @@ const viz = new Spacekit.Simulation(document.getElementById("main-container"), {
   },
 });
 
-
-function drawline() {
-  return [
-    getAxis(new THREE.Vector3(0, 0, 0), new THREE.Vector3(3, 0, 0), 0xff0000),
-  ];
-};
-
-
-// Create a background
- const skybox = viz.createSkybox(Spacekit.SkyboxPresets.ESO_GIGAGALAXY);
-
-// Set simulation speed
+const skybox = viz.createSkybox(Spacekit.SkyboxPresets.ESO_GIGAGALAXY);
 viz.setJdDelta(viz.getJdDelta() * 0.02);
 
-//show date
-const dateElt = document.getElementById("current-date");
-
-// START-PAUSE
-let isSimulationRunning = false;
-let btn = document.getElementById("btn-start-stop");
-
-// Initially set the button's text
-document.addEventListener("DOMContentLoaded", function() {
-
-  let isSimulationRunning = false;
-  let btn = document.getElementById("btn-start-stop");
-
-  // Function to update button text based on simulation state
-  function updateButtonText() {
-    btn.innerText = isSimulationRunning ? "Stop" : "Start";
-  }
-
-  // Initially set the button's text
-  updateButtonText();
-
-  btn.onclick = function() {
-    if (isSimulationRunning) {
-        viz.stop();
-        isSimulationRunning = false;
-    } else {
-        viz.start();
-        isSimulationRunning = true;
-    }
-    updateButtonText();
-  }
-
-});
-
-// FASTER-SLOWER PAUSE APPEAR WEN RUNNING
-document.addEventListener("DOMContentLoaded", function() {
-
-  let isSimulationRunning = false;
-  let btn = document.getElementById("btn-start-stop");
-  let btnFaster = document.getElementById("btn-faster");
-  let btnSlower = document.getElementById("btn-slower");
-
-  // Function to update button text and visibility based on simulation state
-  function updateControls() {
-    btn.innerText = isSimulationRunning ? "Stop" : "Start";
-    if (isSimulationRunning) {
-        btnFaster.style.display = "inline";
-        btnSlower.style.display = "inline";
-    } else {
-        btnFaster.style.display = "none";
-        btnSlower.style.display = "none";
-    }
-  }
-
-  // Initially set the button's text and visibility
-  updateControls();
-
-  btn.onclick = function() {
-    if (isSimulationRunning) {
-        viz.stop();
-        isSimulationRunning = false;
-    } else {
-        viz.start();
-        isSimulationRunning = true;
-    }
-    updateControls();
-  }
-});
-
-
-// simulation ontick
 viz.onTick = function () {
-  
-
-  var d = viz.getDate();
+  const d = viz.getDate();
   dateElt.innerHTML = d.toLocaleDateString();
 
   const date = d.getTime();
 
-  placeStars(allStars,date);
+  // Assuming placeStars is defined elsewhere
+  placeStars(allStars, date);
 
   allObjects.forEach((point) => {
     const pointShouldAppear = checkIfVisible(point, date);
@@ -136,22 +49,15 @@ viz.onTick = function () {
   });
 };
 
-//faster button
-document.getElementById("btn-faster").onclick = function () {
-  viz.setJdDelta(viz.getJdDelta() * 1.5);
-};
+const dateElt = document.getElementById("current-date");
+const speedDisplay = document.getElementById('speed-display');
+const speedSlider = document.getElementById('speed-slider');
+const initialSpeed = viz.getJdDelta();
 
-//slower button
-document.getElementById("btn-slower").onclick = function () {
-  viz.setJdDelta(viz.getJdDelta() * 0.5);
-};
-
-//start-stop button
-document.getElementById("btn-start-stop").addEventListener("click", function() {
-  isSimulationRunning = !isSimulationRunning; // Toggle the state
-
-  // Optional: Change the text of the button based on the state
-  this.innerText = isSimulationRunning ? "Stop" : "Start";
+speedSlider.addEventListener("input", function(event) {
+  const speedFactor = parseFloat(event.target.value);
+  viz.setJdDelta(initialSpeed * speedFactor);
+  speedDisplay.textContent = `Speed: ${speedFactor}x`;
 });
 
 const yearSlider = document.getElementById("year-slider");

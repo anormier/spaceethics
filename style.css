@@ -84,3 +84,24 @@ button {
 .extra-info {
   margin: 1rem 0;
 }
+
+/* Other styles */
+
+#current-date {
+  font-size: 36px;             /* Making the font larger */
+  color: rgba(255, 255, 255, 0.8);  /* White color with 80% transparency */
+  font-family: 'Arial', sans-serif; /* For demonstration purposes, but consider importing a more trendy font */
+  text-shadow: 2px 2px 4px #000;   /* Giving a subtle shadow to make it stand out on any background */
+}
+
+#current-date {
+  font-size: 36px;
+  color: rgba(255, 255, 255, 0.8);
+  font-family: 'Roboto', sans-serif;
+  text-shadow: 2px 2px 4px #000;
+}
+
+
+
+
+
