@@ -369,3 +369,28 @@ function placeStars(stars,date) {
 //   });
 // };
 
+document.getElementById('fullscreen-btn').addEventListener('click', function() {
+  if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement && !document.msFullscreenElement) {
+      // If not in fullscreen mode, enter it
+      if (document.documentElement.requestFullscreen) {
+          document.documentElement.requestFullscreen();
+      } else if (document.documentElement.mozRequestFullScreen) {
+          document.documentElement.mozRequestFullScreen();
+      } else if (document.documentElement.webkitRequestFullscreen) {
+          document.documentElement.webkitRequestFullscreen();
+      } else if (document.documentElement.msRequestFullscreen) {
+          document.documentElement.msRequestFullscreen();
+      }
+  } else {
+      // If in fullscreen mode, exit it
+      if (document.exitFullscreen) {
+          document.exitFullscreen();
+      } else if (document.mozCancelFullScreen) {
+          document.mozCancelFullScreen();
+      } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+      } else if (document.msExitFullscreen) {
+          document.msExitFullscreen();
+      }
+  }
+});

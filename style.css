@@ -101,7 +101,20 @@ button {
   text-shadow: 2px 2px 4px #000;
 }
 
+.fullscreen-btn {
+  padding: 5px 10px;
+  font-size: 1rem;
+  background-color: #333;
+  color: #a89b9b;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
 
+.fullscreen-btn:hover {
+  background-color: #555;
+}
 
 
 
