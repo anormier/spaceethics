@@ -12,9 +12,17 @@ const viz = new Spacekit.Simulation(document.getElementById("main-container"), {
   basePath: "https://typpo.github.io/spacekit/src",
   startDate: Date.now(),
   unitsPerAu: 1.0,
-  camera: {
+  startPaused: true,
+  unitsPerAu: 1.0,
+  maxNumParticles: 2**16,
+    camera: {
     enableDrift: false,
     initialPosition: [2, -2, 1],
+  },
+  debug: {
+    showAxes: false,
+    showGrid: false,
+    showStats: false,
   },
 });
 
@@ -35,8 +43,16 @@ viz.setJdDelta(viz.getJdDelta() * 0.02);
 //show date
 const dateElt = document.getElementById("current-date");
 
+// start-pause
+let isSimulationRunning = true;
+document.getElementById("btn-start-stop").innerText = isSimulationRunning ? "Stop" : "Start";
+
+
 // simulation ontick
 viz.onTick = function () {
+  
+  if (!isSimulationRunning) return; // This will stop further code execution if simulation is paused
+
   var d = viz.getDate();
   dateElt.innerHTML = d.toLocaleDateString();
 
@@ -69,6 +85,13 @@ document.getElementById("btn-slower").onclick = function () {
   viz.setJdDelta(viz.getJdDelta() * 0.5);
 };
 
+//start-stop button
+document.getElementById("btn-start-stop").addEventListener("click", function() {
+  isSimulationRunning = !isSimulationRunning; // Toggle the state
+
+  // Optional: Change the text of the button based on the state
+  this.innerText = isSimulationRunning ? "Stop" : "Start";
+});
 
 const yearSlider = document.getElementById("year-slider");
 yearSlider.addEventListener("input", (event) => {
@@ -331,7 +354,7 @@ let staticParticles = undefined;
 
 
 function placeStars(stars,date) {
-// // REWRITE: anything that has r(UA),ra(deg),dec(deg),epoch,vr(km/s),vra(deg.s-1),vdec(deg.s-1)
+// // Anything that has r(PC),ra(deg),dec(deg),epoch,vr(km/s),vra(deg.s-1),vdec(deg.s-1)
   starPositions = []
 
   if (staticParticles) { viz.removeObject(staticParticles)}
