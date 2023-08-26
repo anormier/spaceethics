@@ -28,7 +28,11 @@ viz.setJdDelta(viz.getJdDelta() * 0.02);
 viz.onTick = function () {
   const d = viz.getDate();
   dateElt.innerHTML = d.toLocaleDateString();
-
+  // Check if date has reached 1st January 2030
+  if (d >= new Date('2030-01-01')) {
+    viz.setDate(new Date('1950-01-01')); // Reset to 1950
+    return;  // Return here to skip further operations for this tick
+  }
   const date = d.getTime();
 
   // Assuming placeStars is defined elsewhere
