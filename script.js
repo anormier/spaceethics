@@ -350,7 +350,7 @@ function placeStars(stars,date) {
 
   staticParticles = viz.createStaticParticles('stars', starPositions, {
     defaultColor: 'white',
-    size: 1,
+    size: 5,
   });
 };
 
