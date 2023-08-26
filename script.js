@@ -43,15 +43,76 @@ viz.setJdDelta(viz.getJdDelta() * 0.02);
 //show date
 const dateElt = document.getElementById("current-date");
 
-// start-pause
-let isSimulationRunning = true;
-document.getElementById("btn-start-stop").innerText = isSimulationRunning ? "Stop" : "Start";
+// START-PAUSE
+let isSimulationRunning = false;
+let btn = document.getElementById("btn-start-stop");
+
+// Initially set the button's text
+document.addEventListener("DOMContentLoaded", function() {
+
+  let isSimulationRunning = false;
+  let btn = document.getElementById("btn-start-stop");
+
+  // Function to update button text based on simulation state
+  function updateButtonText() {
+    btn.innerText = isSimulationRunning ? "Stop" : "Start";
+  }
+
+  // Initially set the button's text
+  updateButtonText();
+
+  btn.onclick = function() {
+    if (isSimulationRunning) {
+        viz.stop();
+        isSimulationRunning = false;
+    } else {
+        viz.start();
+        isSimulationRunning = true;
+    }
+    updateButtonText();
+  }
+
+});
+
+// FASTER-SLOWER PAUSE APPEAR WEN RUNNING
+document.addEventListener("DOMContentLoaded", function() {
+
+  let isSimulationRunning = false;
+  let btn = document.getElementById("btn-start-stop");
+  let btnFaster = document.getElementById("btn-faster");
+  let btnSlower = document.getElementById("btn-slower");
+
+  // Function to update button text and visibility based on simulation state
+  function updateControls() {
+    btn.innerText = isSimulationRunning ? "Stop" : "Start";
+    if (isSimulationRunning) {
+        btnFaster.style.display = "inline";
+        btnSlower.style.display = "inline";
+    } else {
+        btnFaster.style.display = "none";
+        btnSlower.style.display = "none";
+    }
+  }
+
+  // Initially set the button's text and visibility
+  updateControls();
+
+  btn.onclick = function() {
+    if (isSimulationRunning) {
+        viz.stop();
+        isSimulationRunning = false;
+    } else {
+        viz.start();
+        isSimulationRunning = true;
+    }
+    updateControls();
+  }
+});
 
 
 // simulation ontick
 viz.onTick = function () {
   
-  if (!isSimulationRunning) return; // This will stop further code execution if simulation is paused
 
   var d = viz.getDate();
   dateElt.innerHTML = d.toLocaleDateString();
