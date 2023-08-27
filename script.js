@@ -1,6 +1,6 @@
 //BELOW: The file script.JS
 import allObjects from "./spatial-objects.js";
-import { checkIfVisible, radecToXYZ, isDesktop, toggleFullScreen } from "./utils.js";
+import { checkIfVisible, radecToXYZ, isDesktop } from "./utils.js";
 import stars100LY3K45K from "./stars100LY3K45K.js";
 import stars100LY45K6K from "./stars100LY45K6K.js";
 import stars100LY6Kmore from "./stars100LY6Kmore.js";
@@ -435,6 +435,32 @@ function placeStars3(stars,date,size,color) {
 //     size: 5,
 //   });
 // };
+
+document.getElementById('fullscreen-btn').addEventListener('click', function() {
+  if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement && !document.msFullscreenElement) {
+      // If not in fullscreen mode, enter it
+      if (document.documentElement.requestFullscreen) {
+          document.documentElement.requestFullscreen();
+      } else if (document.documentElement.mozRequestFullScreen) {
+          document.documentElement.mozRequestFullScreen();
+      } else if (document.documentElement.webkitRequestFullscreen) {
+          document.documentElement.webkitRequestFullscreen();
+      } else if (document.documentElement.msRequestFullscreen) {
+          document.documentElement.msRequestFullscreen();
+      }
+  } else {
+      // If in fullscreen mode, exit it
+      if (document.exitFullscreen) {
+          document.exitFullscreen();
+      } else if (document.mozCancelFullScreen) {
+          document.mozCancelFullScreen();
+      } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+      } else if (document.msExitFullscreen) {
+          document.msExitFullscreen();
+      }
+  }
+});
 
 // A list to keep track of previously added objects.
 let previouslyAddedObjects = [];
