@@ -116,5 +116,57 @@ button {
   background-color: #555;
 }
 
+.control-btn {
+  background-color: #4CAF50; /* Green background */
+  border: none; 
+  color: white; /* White text */
+  padding: 6px 10px; 
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 14px;
+  margin: 2px 2px;
+  cursor: pointer;
+  border-radius: 4px;
+}
 
+.control-btn:hover {
+  background-color: #45a049; /* Darker green on hover */
+}
 
+.btn-container {
+  display: flex;
+  align-items: center; /* This ensures vertical alignment */
+  gap: 5px; /* Reducing the space between buttons, can be adjusted */
+}
+
+.control-btn, .fullscreen-btn {
+  /* Add uniform styling here to ensure buttons are of the same dimensions */
+  padding: 10px 15px; /* Example padding */
+  border: none;
+  background-color: #333; /* Example background color */
+  color: #fff; /* Example text color */
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s; /* Smooth transition for hover effect */
+}
+
+.control-btn:hover, .fullscreen-btn:hover {
+  background-color: #555; /* Example hover background color */
+}
+
+.Nav button {
+  padding: 8px 12px;  /* Padding around the text */
+  margin: 5px;       /* Space around each button */
+  border: none;      /* Removes default borders */
+  background-color: #333;  /* Dark background */
+  color: #fff;      /* White text color */
+  font-size: 16px;  /* Text size */
+  cursor: pointer;  /* Hand cursor on hover */
+  border-radius: 4px;  /* Rounded corners */
+  transition: background-color 0.3s; /* Smooth color transition on hover */
+}
+
+.Nav button:hover {
+  background-color: #555;  /* Slightly lighter background on hover */
+}

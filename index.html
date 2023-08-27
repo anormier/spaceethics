@@ -7,6 +7,7 @@
     <script src="https://typpo.github.io/spacekit/src/lib/three.r98.min.js"></script>
     <script src="https://typpo.github.io/spacekit/src/lib/TrackballControls.js"></script>
     <script src="https://typpo.github.io/spacekit/build/spacekit.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -21,8 +22,10 @@
       <span id="speed-display">Change Simulation Speed</span>
       <br />
       <br />
-      <button id="fullscreen-btn" class="fullscreen-btn">Toggle Fullscreen</button>
-      <br />
+      <div class="btn-container">
+        <button id="start-stop-btn" class="control-btn"><i class="fas fa-pause"></i></button>
+        <button id="fullscreen-btn" class="fullscreen-btn"><i class="fas fa-expand"></i></button>
+    </div>  <br />
       <br />
       <div class="menu-container">
         More...
@@ -37,6 +40,10 @@
           <div class="debug">
             DEBUG:
             <div class="slider-container">
+              <div class="slider-container">
+                <input type="checkbox" id="debugAxesCheckbox">
+                <label for="debugAxesCheckbox">Show Debug Axes</label>
+            </div>
               <input
                 type="range"
                 id="DECSLIDER"

@@ -7,6 +7,16 @@ import stars100LY6Kmore from "./stars100LY6Kmore.js";
 import allMessages from "./messages.js";
 import allVoyagers from "./voyagers.js";
 
+const LY_TO_AU = 63241.16; 
+const debugAxesCheckbox = document.getElementById('debugAxesCheckbox');
+debugAxesCheckbox.addEventListener('change', (event) => {
+    const isChecked = event.target.checked;
+    viz.setDebugOptions({
+        showAxes: isChecked
+    });
+});
+let debugAxesInitialStatus = debugAxesCheckbox.checked;
+
 
 const viz = new Spacekit.Simulation(document.getElementById("main-container"), {
   basePath: "https://typpo.github.io/spacekit/src",
@@ -20,9 +30,9 @@ const viz = new Spacekit.Simulation(document.getElementById("main-container"), {
     initialPosition: [2, -2, 1],
   },
   debug: {
-    showAxes: false,
-    showGrid: false,
-    showStats: false,
+    showAxes: debugAxesInitialStatus,
+    showGrid: debugAxesInitialStatus,
+    showStats: debugAxesInitialStatus,
   },
 });
 
@@ -44,12 +54,9 @@ viz.onTick = function () {
   if (isDesktop()) { 
   placeStars3(stars100LY3K45K, date,8,'white');
   placeStars(stars100LY45K6K, date,10,'white');
-  } 
-  placeStars2(stars100LY6Kmore, date,15,'white');
+  placeStars2(stars100LY6Kmore, date,15,'white'); } 
 
 
-
-  
   
   // Update voyagers
   placeObjects(allVoyagers, date, './assets/Red_Circle_full.png');
@@ -103,174 +110,131 @@ raSlider.addEventListener("input", (event) => {
   placeStars(stars100LY3K45K)
 });
 
+
+
 // NATURAL OBJECTS
 const sun = viz.createObject("sun", Spacekit.SpaceObjectPresets.SUN);
 viz.createAmbientLight();
 viz.createLight([0, 0, 0]);
 
-viz.createObject("mercury", {
-  labelText: "Mercury",
-  ephem: Spacekit.EphemPresets.MERCURY,
-});
-viz.createObject("venus", {
-  labelText: "Venus",
-  ephem: Spacekit.EphemPresets.VENUS,
-});
-viz.createObject("mars", {
-  labelText: "Mars",
-  ephem: Spacekit.EphemPresets.MARS,
-});
-viz.createObject("uranus", {
-  labelText: "Uranus",
-  ephem: Spacekit.EphemPresets.URANUS,
-});
-viz.createObject("saturn", {
-  labelText: "Saturn",
-  ephem: Spacekit.EphemPresets.SATURN,
-});
-viz.createObject("naptune", {
-  labelText: "Neptune",
-  ephem: Spacekit.EphemPresets.NEPTUNE,
-});
-viz.createObject("jupiter", {
-  labelText: "Jupiter",
-  ephem: Spacekit.EphemPresets.JUPITER,
-});
+function createSpaceObject(name, label) {
+  return viz.createObject(name, {
+    labelText: label,
+    ephem: Spacekit.EphemPresets[name.toUpperCase()]
+  });
+}
 
-const moon = viz.createObject("moon", {
-  labelText: "moon",
-  ephem: Spacekit.EphemPresets.MOON,
-});
+const planetData = [
+  { name: "mercury", label: "Mercury" },
+  { name: "venus", label: "Venus" },
+  { name: "mars", label: "Mars" },
+  { name: "uranus", label: "Uranus" },
+  { name: "saturn", label: "Saturn" },
+  { name: "neptune", label: "Neptune" },
+  { name: "jupiter", label: "Jupiter" }
+];
 
-const earth = viz.createObject("earth", {
-  labelText: "Earth",
-  ephem: Spacekit.EphemPresets.EARTH,
-});
+planetData.forEach(planet => createSpaceObject(planet.name, planet.label));
+
+const moon = createSpaceObject("moon", "moon");
+const earth = createSpaceObject("earth", "Earth");
 
 moon.orbitAround(earth);
 
-const earthV = viz.createSphere("earthV", {
-  textureUrl:
-    "https://raw.githubusercontent.com/typpo/spacekit/master/examples/planet/eso_earth.jpg",
-  radius: 6371 / 149598000,
-  ephem: Spacekit.EphemPresets.EARTH,
-  levelsOfDetail: [
-    { radii: 0, segments: 64 },
-    { radii: 30, segments: 16 },
-    { radii: 60, segments: 8 },
-  ],
-  atmosphere: {
-    enable: true,
-    color: 0xc7c1a8,
-  },
-  rotation: {
-    enable: true,
-    speed: 0.3,
-  },
+function createCelestialSphere(id, options) {
+  return viz.createSphere(id, {
+    textureUrl: options.textureUrl,
+    radius: options.radius / 149598000,
+    ephem: Spacekit.EphemPresets[options.ephem],
+    levelsOfDetail: [
+      { radii: 0, segments: 64 },
+      { radii: 30, segments: 16 },
+      { radii: 60, segments: 8 },
+    ],
+    atmosphere: {
+      enable: options.atmosphere,
+      color: 0xc7c1a8,
+    },
+    rotation: {
+      enable: true,
+      speed: options.rotationSpeed,
+    },
+  });
+}
+
+const earthV = createCelestialSphere("earthV", {
+  textureUrl: "https://raw.githubusercontent.com/typpo/spacekit/master/examples/planet/eso_earth.jpg",
+  radius: 6371,
+  ephem: "EARTH",
+  rotationSpeed: 0.3,
+  atmosphere:'true'
 });
 
-const marsV = viz.createSphere("marsV", {
-  textureUrl:
-    "./maps/Mars.png",
-  radius: 3389 / 149598000,
-  ephem: Spacekit.EphemPresets.MARS,
-  levelsOfDetail: [
-    { radii: 0, segments: 64 },
-    { radii: 30, segments: 16 },
-    { radii: 60, segments: 8 },
-  ],
-  atmosphere: {
-    enable: true,
-    color: 0xc7c1a8,
-  },
-  rotation: {
-    enable: true,
-    speed: 0.1,
-  },
+const marsV = createCelestialSphere("marsV", {
+  textureUrl: "./maps/Mars.png",
+  radius: 3389,
+  ephem: "MARS",
+  rotationSpeed: 0.1,
+  atmosphere:'true'
 });
 
-const moonV = viz.createSphere("moonV", {
-  textureUrl:
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Moon_map_grid_showing_artificial_objects_on_moon.PNG/1280px-Moon_map_grid_showing_artificial_objects_on_moon.PNG",
-  radius: 1737 / 149598000,
-  ephem: Spacekit.EphemPresets.MOON,
-  levelsOfDetail: [
-    { radii: 0, segments: 64 },
-    { radii: 30, segments: 16 },
-    { radii: 60, segments: 8 },
-  ],
-  atmosphere: {
-    enable: true,
-    color: 0xc7c1a8,
-  },
-  rotation: {
-    enable: true,
-    speed: 0.01,
-  },
+const moonV = createCelestialSphere("moonV", {
+  textureUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Moon_map_grid_showing_artificial_objects_on_moon.PNG/1280px-Moon_map_grid_showing_artificial_objects_on_moon.PNG",
+  radius: 1737,
+  ephem: "MOON",
+  rotationSpeed: 0.01,
+  atmosphere:'False'
 });
-moonV.orbitAround(earth);
+moonV.orbitAround(earthV);
 
-//JUPITER
-const jupiter3 = viz.createSphere("jupiter3", {
-  textureUrl:
-    "https://raw.githubusercontent.com/typpo/spacekit/master/examples/jupiter_in_the_solar_system/jupiter2_4k.jpg",
-  radius: 71492 / 149598000, // radius in AU, so jupiter is shown to scale
-  // radius: 0.1, // Exxagerate Jupiter's size
-  ephem: Spacekit.EphemPresets.JUPITER,
-  levelsOfDetail: [
-    { radii: 0, segments: 64 },
-    { radii: 30, segments: 16 },
-    { radii: 60, segments: 8 },
-  ],
-  atmosphere: {
-    enable: true,
-    color: 0xc7c1a8,
-  },
-  rotation: {
-    enable: true,
-    speed: 2,
-  },
+const jupiter3 = createCelestialSphere("jupiter3", {
+  textureUrl: "https://raw.githubusercontent.com/typpo/spacekit/master/examples/jupiter_in_the_solar_system/jupiter2_4k.jpg",
+  radius: 71492,
+  ephem: "JUPITER",
+  rotationSpeed: 2,
+  atmosphere:'true'
 });
 
 
+function setupButton(id, obj1, params1, zoom1, obj2, params2, zoom2) {
+  document.getElementById(id).onclick = function () {
+    const viewer = viz.getViewer();
+    viewer.followObject(obj1, params1);
+    viz.zoomToFit(obj1, zoom1);
+    
+    if (obj2 && params2 && zoom2) {
+      setTimeout(() => {
+        viewer.followObject(obj2, params2);
+        viz.zoomToFit(obj2, zoom2);
+      }, 20);
+    }
+  }
+}
 
-document.getElementById("btn-system").onclick = function () {
-  viz.getViewer().followObject(sun, [2, 2, 2]);
-  viz.zoomToFit(sun, 2);
+// Assigning actions to the buttons
+setupButton("btn-system", sun, [2, 2, 2], 2);
+setupButton("btn-earth", sun, [-0.75, -0.75, 0.5], 10000, earthV, [2, 0, 0], 0.00003);
+setupButton("btn-mars", sun, [-0.75, -0.75, 0.5], 10000, marsV, [2, 0, 0], 0.00001);
+setupButton("btn-moon", sun, [-0.75, -0.75, 0.5], 10000, moonV, [2, 0, 0], 0.003);
+
+
+let isPaused = false; // Initially, the simulation is running, so isPaused is set to false
+
+const startStopButton = document.getElementById('start-stop-btn');
+startStopButton.onclick = function () {
+    if (isPaused) {
+        viz.start();
+        startStopButton.textContent = 'Pause';
+    } else {
+        viz.stop();
+        startStopButton.textContent = 'Play';
+    }
+    isPaused = !isPaused;
 };
 
-document.getElementById("btn-earth").onclick = function () {
-  viz.getViewer().followObject(sun, [-0.75, -0.75, 0.5]);
-  viz.zoomToFit(sun, 10000);
-  setTimeout(() => {
-    {
-      viz.getViewer().followObject(earthV, [2, 0, 0]);
-      viz.zoomToFit(earth, 0.00003);
-    }
-  }, 20);
-}
 
-document.getElementById("btn-mars").onclick = function () {
-  viz.getViewer().followObject(sun, [-0.75, -0.75, 0.5]);
-  viz.zoomToFit(sun, 10000);
-  setTimeout(() => {
-    {
-      viz.getViewer().followObject(marsV, [2, 0, 0]);
-      viz.zoomToFit(marsV, 0.00001);
-    }
-  }, 20);
-}
 
-document.getElementById("btn-moon").onclick = function () {
-  viz.getViewer().followObject(sun, [-0.75, -0.75, 0.5]);
-  viz.zoomToFit(sun, 10000);
-  setTimeout(() => {
-    {
-      viz.getViewer().followObject(moonV, [2, 0, 0]);
-      viz.zoomToFit(moonV, 0.003);
-    }
-  }, 20);
-}
+
 
 
 
@@ -416,26 +380,6 @@ function placeStars3(stars,date,size,color) {
 };
 
 
-// // ESSAI
-// let objs = undefined;
-// function placeDynamic(objs,date) {
-// // anything that has r(UA),ra(deg),dec(deg),epoch,vr(km/s),vra(deg.s-1),vdec(deg.s-1)
-
-//   objsPositions = []
-
-//   if (objs) { viz.removeObject(objs)}
-
-//   const placeObj = (obj) => {
-//     objPositions.push(radecToXYZ(obj.ra + ra, obj.dec + dec, obj.r + vr*T(date - epoch)/1e3));
-//   }
-//   objs.forEach(obj => placeStar(obj));
-
-//   staticParticles = viz.createStaticParticles('stars', objPositions, {
-//     defaultColor: 'white',
-//     size: 5,
-//   });
-// };
-
 document.getElementById('fullscreen-btn').addEventListener('click', function() {
   if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement && !document.msFullscreenElement) {
       // If not in fullscreen mode, enter it
@@ -488,5 +432,4 @@ function placeObjects(objects, date, textureUrl) {
     previouslyAddedObjects.push(singleObject);
   });
 }
-
 
