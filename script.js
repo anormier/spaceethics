@@ -1,19 +1,15 @@
 //BELOW: The file script.JS
 import allObjects from "./spatial-objects.js";
-import { checkIfVisible, radecToXYZ, isDesktop } from "./utils.js";
-import stars100LY3K45K from "./stars100LY3K45K.js";
-import stars100LY45K6K from "./stars100LY45K6K.js";
-import stars100LY6Kmore from "./stars100LY6Kmore.js";
+import { checkIfVisible, radecToXYZ } from "./utils.js";
+import allStars from "./galaxy.js";
 import allMessages from "./messages.js";
 import allVoyagers from "./voyagers.js";
-
 
 const viz = new Spacekit.Simulation(document.getElementById("main-container"), {
   basePath: "https://typpo.github.io/spacekit/src",
   startDate: Date.now(),
   unitsPerAu: 1.0,
   startPaused: false,
-  renderOnlyInViewport: true,
   maxNumParticles: 2**16,
   camera: {
     enableDrift: false,
@@ -25,7 +21,6 @@ const viz = new Spacekit.Simulation(document.getElementById("main-container"), {
     showStats: false,
   },
 });
-
 
 const skybox = viz.createSkybox(Spacekit.SkyboxPresets.ESO_GIGAGALAXY);
 viz.setJdDelta(viz.getJdDelta() * 0.02);
@@ -41,15 +36,7 @@ viz.onTick = function () {
   const date = d.getTime();
 
   // Update stars
-  if (isDesktop()) { 
-  placeStars3(stars100LY3K45K, date,8,'white');
-  placeStars(stars100LY45K6K, date,10,'white');
-  } 
-  placeStars2(stars100LY6Kmore, date,15,'white');
-
-
-
-  
+  placeStars(allStars, date);
   
   // Update voyagers
   placeObjects(allVoyagers, date, './assets/Red_Circle_full.png');
@@ -95,12 +82,12 @@ let starPositions = [];
 // Dès que le slider DEC est modifié, on actualise la variable dec et on repositionne les étoiles
 decSlider.addEventListener("input", (event) => {
   dec = parseInt(event.target.value);
-  placeStars(stars100LY3K45K)
+  placeStars(allStars)
 });
 // Dès que le slider RA est modifié, on actualise la variable dec et on repositionne les étoiles
 raSlider.addEventListener("input", (event) => {
   ra = parseInt(event.target.value);
-  placeStars(stars100LY3K45K)
+  placeStars(allStars)
 });
 
 // NATURAL OBJECTS
@@ -339,7 +326,9 @@ viz.createStaticParticles('mx', mxPositions, {
 
 let staticParticles = undefined;
 
-function placeStars(stars,date,size,color) {
+
+
+function placeStars(stars,date) {
 // // Anything that has r(PC),ra(deg),dec(deg),epoch,vr(km/s),vra(deg.s-1),vdec(deg.s-1)
   starPositions = []
 
@@ -358,60 +347,8 @@ function placeStars(stars,date,size,color) {
   stars.forEach(star => placeStar(star));
 
   staticParticles = viz.createStaticParticles('stars', starPositions, {
-    defaultColor: color,
-    size: size,
-  });
-};
-
-let staticParticles2 = undefined;
-
-function placeStars2(stars,date,size,color) {
-// // Anything that has r(PC),ra(deg),dec(deg),epoch,vr(km/s),vra(deg.s-1),vdec(deg.s-1)
-  starPositions = []
-
-  if (staticParticles2) { viz.removeObject(staticParticles2)}
-    // source_id | parallax_over_error | teff_gspphot (K) | distance_gspphot (pc) | ra (deg) | radial_velocity (km.s**-1) | dec (deg) | pmra (mas.yr**-1) | pmdec (mas.yr**-1)
-
-  const placeStar = (star) => {
-    const timeDifference = date - new Date(star.eopch).getTime();
-    const adjustedRA = star.ra + ra + star.vra * timeDifference * 8.78e-15;
-    const adjustedDec = star.dec + dec + star.vdec * timeDifference * 8.78e-15;
-    const adjustedRmed = 206265*star.rmed + (6.68459e-9* star.vrmed) * timeDifference/1000;
-//
-    starPositions.push(radecToXYZ(adjustedRA, adjustedDec, adjustedRmed));
-}
-//
-  stars.forEach(star => placeStar(star));
-
-  staticParticles2 = viz.createStaticParticles('stars', starPositions, {
-    defaultColor: color,
-    size: size,
-  });
-};
-
-let staticParticles3 = undefined;
-
-function placeStars3(stars,date,size,color) {
-// // Anything that has r(PC),ra(deg),dec(deg),epoch,vr(km/s),vra(deg.s-1),vdec(deg.s-1)
-  starPositions = []
-
-  if (staticParticles3) { viz.removeObject(staticParticles3)}
-    // source_id | parallax_over_error | teff_gspphot (K) | distance_gspphot (pc) | ra (deg) | radial_velocity (km.s**-1) | dec (deg) | pmra (mas.yr**-1) | pmdec (mas.yr**-1)
-
-  const placeStar = (star) => {
-    const timeDifference = date - new Date(star.eopch).getTime();
-    const adjustedRA = star.ra + ra + star.vra * timeDifference * 8.78e-15;
-    const adjustedDec = star.dec + dec + star.vdec * timeDifference * 8.78e-15;
-    const adjustedRmed = 206265*star.rmed + (6.68459e-9* star.vrmed) * timeDifference/1000;
-//
-    starPositions.push(radecToXYZ(adjustedRA, adjustedDec, adjustedRmed));
-}
-//
-  stars.forEach(star => placeStar(star));
-
-  staticParticles3 = viz.createStaticParticles('stars', starPositions, {
-    defaultColor: color,
-    size: size,
+    defaultColor: 'white',
+    size: 5,
   });
 };
 
