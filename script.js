@@ -41,8 +41,10 @@ viz.onTick = function () {
   const date = d.getTime();
 
   // Update stars
-  if (isDesktop()) { placeStars3(stars100LY3K45K, date,8,'white');  } 
+  if (isDesktop()) { 
+  placeStars3(stars100LY3K45K, date,8,'white');
   placeStars(stars100LY45K6K, date,10,'white');
+  } 
   placeStars2(stars100LY6Kmore, date,15,'white');
 
 
