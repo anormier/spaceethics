@@ -13,6 +13,7 @@ const viz = new Spacekit.Simulation(document.getElementById("main-container"), {
   startDate: Date.now(),
   unitsPerAu: 1.0,
   startPaused: false,
+  renderOnlyInViewport: true,
   maxNumParticles: 2**16,
   camera: {
     enableDrift: false,
@@ -24,6 +25,7 @@ const viz = new Spacekit.Simulation(document.getElementById("main-container"), {
     showStats: false,
   },
 });
+
 
 const skybox = viz.createSkybox(Spacekit.SkyboxPresets.ESO_GIGAGALAXY);
 viz.setJdDelta(viz.getJdDelta() * 0.02);
