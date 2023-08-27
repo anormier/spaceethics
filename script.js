@@ -40,12 +40,12 @@ viz.onTick = function () {
   }
   const date = d.getTime();
 
-  // Update stars
+  // Update stars if desktop
   if (isDesktop()) { 
   placeStars3(stars100LY3K45K, date,8,'white');
   placeStars(stars100LY45K6K, date,10,'white');
-  } 
   placeStars2(stars100LY6Kmore, date,15,'white');
+  } 
 
 
 
@@ -69,6 +69,12 @@ viz.onTick = function () {
     }
   });
 };
+
+if (!isDesktop()) { 
+  placeStars3(stars100LY3K45K, date,8,'white');
+  placeStars(stars100LY45K6K, date,10,'white');
+  placeStars2(stars100LY6Kmore, date,15,'white');
+  } 
 
 const dateElt = document.getElementById("current-date");
 const speedDisplay = document.getElementById('speed-display');
