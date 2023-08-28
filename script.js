@@ -237,55 +237,25 @@ startStopButton.onclick = function () {
 };
 
 
-
-
-
-
-
-
-
-
-
-
-//messages doted lines
 const mxDotPositions = [];
-// Scales imports messages: pc. Conversions in script.js Ly to UA 1 ly = 63241.16 au
-
-allMessages.forEach((mx) => {
-  const count=1000
+// Function to calculate and push positions using radecToXYZ
+function calculatePositions(mx, multiplier) {
+  const count = 1000;
   for (let i = 1; i < count; i++) {
-    const x = i * (63241.16 * mx.dist)/count  * Math.cos((mx.dec + dec) * Math.PI/180) * Math.cos((mx.ra + ra) * Math.PI/180);
-    const y = i * (63241.16 * mx.dist)/count  * Math.cos((mx.dec + dec) * Math.PI/180) * Math.sin((mx.ra + ra) * Math.PI/180);
-    const z = -i * (63241.16 * mx.dist)/count  * Math.sin((mx.dec + dec) * Math.PI/180);
-    mxDotPositions.push([x, y, z])
+    const r = i * (LY_TO_AU * mx.dist) / (count * multiplier);
+    const position = radecToXYZ(mx.ra + ra, mx.dec + dec, r);
+    mxDotPositions.push(position);
   }
+}
+allMessages.forEach(mx => {
+  calculatePositions(mx, 1);
+  calculatePositions(mx, 100);
+  calculatePositions(mx, 1000);
 });
-
-allMessages.forEach((mx) => {
-  const count=1000
-  for (let i = 1; i < count; i++) {
-    const x = i * (63241.16 * mx.dist)/(100 * count)  * Math.cos((mx.dec + dec) * Math.PI/180) * Math.cos((mx.ra + ra) * Math.PI/180);
-    const y = i * (63241.16 * mx.dist)/(100 * count)   * Math.cos((mx.dec + dec) * Math.PI/180) * Math.sin((mx.ra + ra) * Math.PI/180);
-    const z = -i * (63241.16 * mx.dist)/(100 * count)   * Math.sin((mx.dec + dec) * Math.PI/180);
-    mxDotPositions.push([x, y, z])
-  }
-});
-
-allMessages.forEach((mx) => {
-  const count=1000
-  for (let i = 1; i < count; i++) {
-    const x = i * (63241.16 * mx.dist)/(1000 * count)  * Math.cos((mx.dec + dec) * Math.PI/180) * Math.cos((mx.ra + ra) * Math.PI/180);
-    const y = i * (63241.16 * mx.dist)/(1000 * count)   * Math.cos((mx.dec + dec) * Math.PI/180) * Math.sin((mx.ra + ra) * Math.PI/180);
-    const z = -i * (63241.16 * mx.dist)/(1000 * count)   * Math.sin((mx.dec + dec) * Math.PI/180);
-    mxDotPositions.push(radecToXYZ(mx.ra + ra,mx.dec + dec,63241.16 * mx.dist)/(1000 * count))
-  }
-});
-
 viz.createStaticParticles('mx', mxDotPositions, {
    defaultColor: 'red',
    size: 5,
- });
-
+});
 
 //messages destinations
 
