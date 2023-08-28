@@ -64,8 +64,7 @@ if (isDesktop()) {
 
 
   
-  // Update voyagers
-  placeObjects(allVoyagers, date, './assets/Red_Circle_full.png');
+ 
 
   // Update other spatial objects
   allObjects.forEach((point) => {
@@ -80,6 +79,8 @@ if (isDesktop()) {
       point.visible = true;
       point.newObject = viz.createObject(point.name, point.characteristics);
     }
+       // Update voyagers
+  placeObjects(allVoyagers, date, './assets/Red_Circle_full.png');
   });
 };
 
