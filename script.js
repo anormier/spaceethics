@@ -58,8 +58,8 @@ viz.onTick = function () {
 if (isDesktop()) { 
   unifiedPlaceStars(stars100LY3K45K, date, 8, 'white', 'stars1');
   unifiedPlaceStars(stars100LY45K6K, date, 10, 'white', 'stars2');
-  unifiedPlaceStars(stars100LY6Kmore, date, 15, 'white', 'stars3');
 } 
+unifiedPlaceStars(stars100LY6Kmore, date, 15, 'white', 'stars3');
 
 
 
@@ -244,7 +244,12 @@ startStopButton.onclick = function () {
 const mxDotPositions = [];
 // Function to calculate and push positions using radecToXYZ
 function calculatePositions(mx, multiplier) {
-  const count = 1000;
+  let count;
+  if (isDesktop()) {
+      count = 1000;
+  } else {
+      count = 100;
+  }
   for (let i = 1; i < count; i++) {
     const r = i * (LY_TO_AU * mx.dist) / (count * multiplier);
     const position = radecToXYZ(mx.ra + ra, mx.dec + dec, r);
@@ -253,8 +258,8 @@ function calculatePositions(mx, multiplier) {
 }
 allMessages.forEach(mx => {
   calculatePositions(mx, 1);
- // calculatePositions(mx, 100);
- // calculatePositions(mx, 1000);
+// calculatePositions(mx, 100);
+// calculatePositions(mx, 1000);
 });
 viz.createStaticParticles('mx', mxDotPositions, {
    defaultColor: 'red',
