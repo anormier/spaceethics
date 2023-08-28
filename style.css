@@ -173,15 +173,19 @@ button {
 
 .info-box {
   position: absolute; 
-  bottom: 700px; /* Assuming 50px is the height of the nav buttons. Adjust as needed */
-  left: 20;
+  bottom: 70px; /* Assuming 50px is the height of the nav buttons. Adjust as needed */
+  left: 20px;
   background-color: rgba(128, 128, 128, 0.7); 
   color: lightgrey;
-  padding: 10px;
+  padding: 8px 12px;
   border-radius: 5px;
+  margin: 5px;       /* Space around each button */
   display: none; 
   z-index: 1000;
+font-size: 16px;
   width: 200px; /* Set a fixed width for the box */
+  max-height: calc(100% - 100px); /* Assuming the space you want to leave at the top is 100px. Adjust as needed. */
+  overflow-y: auto; /* Make it scrollable when content overflows */
 }
 
 

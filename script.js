@@ -377,8 +377,6 @@ function placeObjects(objects, date, textureUrl) {
 
 const infoBox = document.getElementById('info-box');
 const closeBtn = document.getElementById('close-btn');
-let isDragging = false;
-let offsetX, offsetY;
 
 const navInfo = {
   'btn-earth': 'On Earth, human impact is evident. Earths capabilities include satellites, launch bases, and radars. Our actions have left indelible marks on our home planet.',
@@ -391,7 +389,7 @@ const navInfo = {
   
   'btn-local': 'Far Probes cover missions that have traveled great distances, like the Voyager probes. These ambassadors carry our message into the interstellar void.',
   
-  'btn-Messages': 'Messages sent to the stars trace our hopes and dreams. These signals, beamed into space, travel vast distances, aiming to communicate with potential extraterrestrial civilizations.'
+  'btn-Messages': 'Messages sent to the stars trace our hopes and dreams. These signals, beamed into space, travel lightyears away, aiming to communicate with potential extraterrestrial civilizations.'
 };
 
 // Function to show info on click
@@ -407,24 +405,6 @@ function showInfoOnClick(event) {
 function closeInfoBox() {
     infoBox.style.display = 'none';
 }
-
-// Drag and drop functionality
-infoBox.addEventListener('mousedown', function(event) {
-    isDragging = true;
-    offsetX = event.clientX - infoBox.getBoundingClientRect().left;
-    offsetY = event.clientY - infoBox.getBoundingClientRect().top;
-});
-
-document.addEventListener('mouseup', function() {
-    isDragging = false;
-});
-
-document.addEventListener('mousemove', function(event) {
-    if (isDragging) {
-        infoBox.style.left = (event.clientX - offsetX) + 'px';
-        infoBox.style.bottom = (window.innerHeight - event.clientY - offsetY) + 'px';
-    }
-});
 
 // Attach event listeners to nav buttons
 for (let key in navInfo) {
