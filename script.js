@@ -83,9 +83,10 @@ const speedSlider = document.getElementById('speed-slider');
 const initialSpeed = viz.getJdDelta();
 
 speedSlider.addEventListener("input", function(event) {
-  const speedFactor = parseFloat(event.target.value);
-  viz.setJdDelta(initialSpeed * speedFactor);
-  speedDisplay.textContent = `Speed: ${speedFactor}x`;
+    const logValue = parseFloat(event.target.value);
+    const speedFactor = Math.pow(10, logValue);
+    viz.setJdDelta(initialSpeed * speedFactor);
+    speedDisplay.textContent = `Speed: ${speedFactor.toFixed(3)}x`;
 });
 
 const yearSlider = document.getElementById("year-slider");
