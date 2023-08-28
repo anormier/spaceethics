@@ -55,10 +55,12 @@ viz.onTick = function () {
   const date = d.getTime();
 
   // Update stars
-  if (isDesktop()) { 
-  placeStars3(stars100LY3K45K, date,8,'white');
-  placeStars(stars100LY45K6K, date,10,'white');
-  placeStars2(stars100LY6Kmore, date,15,'white'); } 
+if (isDesktop()) { 
+  unifiedPlaceStars(stars100LY3K45K, date, 8, 'white', 'stars1');
+  unifiedPlaceStars(stars100LY45K6K, date, 10, 'white', 'stars2');
+  unifiedPlaceStars(stars100LY6Kmore, date, 15, 'white', 'stars3');
+} 
+
 
 
   
@@ -279,84 +281,6 @@ viz.createStaticParticles('mx', mxPositions, {
 
 ////
 
-let staticParticles = undefined;
-
-function placeStars(stars,date,size,color) {
-// // Anything that has r(PC),ra(deg),dec(deg),epoch,vr(km/s),vra(deg.s-1),vdec(deg.s-1)
-  starPositions = []
-
-  if (staticParticles) { viz.removeObject(staticParticles)}
-    // source_id | parallax_over_error | teff_gspphot (K) | distance_gspphot (pc) | ra (deg) | radial_velocity (km.s**-1) | dec (deg) | pmra (mas.yr**-1) | pmdec (mas.yr**-1)
-
-  const placeStar = (star) => {
-    const timeDifference = date - new Date(star.eopch).getTime();
-    const adjustedRA = star.ra + ra + star.vra * timeDifference * 8.78e-15;
-    const adjustedDec = star.dec + dec + star.vdec * timeDifference * 8.78e-15;
-    const adjustedRmed = 206265*star.rmed + (6.68459e-9* star.vrmed) * timeDifference/1000;
-//
-    starPositions.push(radecToXYZ(adjustedRA, adjustedDec, adjustedRmed));
-}
-//
-  stars.forEach(star => placeStar(star));
-
-  staticParticles = viz.createStaticParticles('stars', starPositions, {
-    defaultColor: color,
-    size: size,
-  });
-};
-
-let staticParticles2 = undefined;
-
-function placeStars2(stars,date,size,color) {
-// // Anything that has r(PC),ra(deg),dec(deg),epoch,vr(km/s),vra(deg.s-1),vdec(deg.s-1)
-  starPositions = []
-
-  if (staticParticles2) { viz.removeObject(staticParticles2)}
-    // source_id | parallax_over_error | teff_gspphot (K) | distance_gspphot (pc) | ra (deg) | radial_velocity (km.s**-1) | dec (deg) | pmra (mas.yr**-1) | pmdec (mas.yr**-1)
-
-  const placeStar = (star) => {
-    const timeDifference = date - new Date(star.eopch).getTime();
-    const adjustedRA = star.ra + ra + star.vra * timeDifference * 8.78e-15;
-    const adjustedDec = star.dec + dec + star.vdec * timeDifference * 8.78e-15;
-    const adjustedRmed = 206265*star.rmed + (6.68459e-9* star.vrmed) * timeDifference/1000;
-//
-    starPositions.push(radecToXYZ(adjustedRA, adjustedDec, adjustedRmed));
-}
-//
-  stars.forEach(star => placeStar(star));
-
-  staticParticles2 = viz.createStaticParticles('stars', starPositions, {
-    defaultColor: color,
-    size: size,
-  });
-};
-
-let staticParticles3 = undefined;
-
-function placeStars3(stars,date,size,color) {
-// // Anything that has r(PC),ra(deg),dec(deg),epoch,vr(km/s),vra(deg.s-1),vdec(deg.s-1)
-  starPositions = []
-
-  if (staticParticles3) { viz.removeObject(staticParticles3)}
-    // source_id | parallax_over_error | teff_gspphot (K) | distance_gspphot (pc) | ra (deg) | radial_velocity (km.s**-1) | dec (deg) | pmra (mas.yr**-1) | pmdec (mas.yr**-1)
-
-  const placeStar = (star) => {
-    const timeDifference = date - new Date(star.eopch).getTime();
-    const adjustedRA = star.ra + ra + star.vra * timeDifference * 8.78e-15;
-    const adjustedDec = star.dec + dec + star.vdec * timeDifference * 8.78e-15;
-    const adjustedRmed = 206265*star.rmed + (6.68459e-9* star.vrmed) * timeDifference/1000;
-//
-    starPositions.push(radecToXYZ(adjustedRA, adjustedDec, adjustedRmed));
-}
-//
-  stars.forEach(star => placeStar(star));
-
-  staticParticles3 = viz.createStaticParticles('stars', starPositions, {
-    defaultColor: color,
-    size: size,
-  });
-};
-
 
 document.getElementById('fullscreen-btn').addEventListener('click', function() {
   if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement && !document.msFullscreenElement) {
@@ -384,6 +308,36 @@ document.getElementById('fullscreen-btn').addEventListener('click', function() {
   }
 });
 
+let starParticleObjects = {};
+
+function unifiedPlaceStars(stars, date, size, color, particleName) {
+  let starPositions = [];
+
+  if (starParticleObjects[particleName]) {
+    viz.removeObject(starParticleObjects[particleName]);
+  }
+
+  const placeStar = (star) => {
+    const timeDifference = date - new Date(star.eopch).getTime();
+    const adjustedRA = star.ra + ra + star.vra * timeDifference * 8.78e-15;
+    const adjustedDec = star.dec + dec + star.vdec * timeDifference * 8.78e-15;
+    const adjustedRmed = 206265*star.rmed + (6.68459e-9* star.vrmed) * timeDifference/1000;
+
+    starPositions.push(radecToXYZ(adjustedRA, adjustedDec, adjustedRmed));
+  };
+
+  stars.forEach(star => placeStar(star));
+
+  starParticleObjects[particleName] = viz.createStaticParticles(particleName, starPositions, {
+    defaultColor: color,
+    size: size,
+  });
+};
+
+
+
+
+//////////////
 // A list to keep track of previously added objects.
 let previouslyAddedObjects = [];
 
