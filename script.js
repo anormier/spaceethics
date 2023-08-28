@@ -138,7 +138,9 @@ const planetData = [
   { name: "uranus", label: "Uranus" },
   { name: "saturn", label: "Saturn" },
   { name: "neptune", label: "Neptune" },
-  { name: "jupiter", label: "Jupiter" }
+  { name: "jupiter", label: "Jupiter" },
+  { name: "pluto", label: "Pluto" }
+
 ];
 
 planetData.forEach(planet => createSpaceObject(planet.name, planet.label));
@@ -251,8 +253,8 @@ function calculatePositions(mx, multiplier) {
 }
 allMessages.forEach(mx => {
   calculatePositions(mx, 1);
-  calculatePositions(mx, 100);
-  calculatePositions(mx, 1000);
+ // calculatePositions(mx, 100);
+ // calculatePositions(mx, 1000);
 });
 viz.createStaticParticles('mx', mxDotPositions, {
    defaultColor: 'red',
