@@ -36,13 +36,17 @@ const viz = new Spacekit.Simulation(document.getElementById("main-container"), {
   },
 });
 
-
 const skybox = viz.createSkybox(Spacekit.SkyboxPresets.ESO_GIGAGALAXY);
 viz.setJdDelta(viz.getJdDelta() * 0.02);
 
 viz.onTick = function () {
   const d = viz.getDate();
   dateElt.innerHTML = d.toLocaleDateString();
+
+ // Calculate the current year fractionally
+  const fractionalYear = d.getFullYear() + (d.getMonth() / 12) + (d.getDate() / 365.25);
+  yearSlider.value = fractionalYear;
+
   // Check if date has reached 1st January 2030
   if (d >= new Date('2030-01-01')) {
     viz.setDate(new Date('1950-01-01')); // Reset to 1950
