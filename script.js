@@ -168,6 +168,7 @@ function createCelestialSphere(id, options) {
       enable: true,
       speed: options.rotationSpeed,
     },
+    occludeLabels: true
   });
 }
 
@@ -192,7 +193,7 @@ const moonV = createCelestialSphere("moonV", {
   radius: 1737,
   ephem: "MOON",
   rotationSpeed: 0.01,
-  atmosphere:'False'
+  atmosphere: false
 });
 moonV.orbitAround(earthV);
 
