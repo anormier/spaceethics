@@ -170,3 +170,24 @@ button {
 .Nav button:hover {
   background-color: #555;  /* Slightly lighter background on hover */
 }
+
+.info-box {
+  position: absolute; 
+  bottom: 700px; /* Assuming 50px is the height of the nav buttons. Adjust as needed */
+  left: 20;
+  background-color: rgba(128, 128, 128, 0.7); 
+  color: lightgrey;
+  padding: 10px;
+  border-radius: 5px;
+  display: none; 
+  z-index: 1000;
+  width: 200px; /* Set a fixed width for the box */
+}
+
+
+.close-btn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  cursor: pointer;
+}

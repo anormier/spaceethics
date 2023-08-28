@@ -375,3 +375,64 @@ function placeObjects(objects, date, textureUrl) {
   });
 }
 
+const infoBox = document.getElementById('info-box');
+const closeBtn = document.getElementById('close-btn');
+let isDragging = false;
+let offsetX, offsetY;
+
+const navInfo = {
+  'btn-earth': 'On Earth, human impact is evident. Earths capabilities include satellites, launch bases, and radars. Our actions have left indelible marks on our home planet.',
+  
+  'btn-moon': 'The Moon, Earth’s natural satellite, bears the scars of our exploration. There are artificial impact craters, remnants of landers, rovers, and artificial satellites left behind by various missions.',
+  
+  'btn-mars': 'Mars, the Red Planet, has also felt our touch. We have sent landers, rovers, and artificial satellites, all aiming to understand this intriguing world better.',
+  
+  'btn-system': 'Throughout the Solar System, our presence is felt. There are probes exploring distant worlds, debris left behind by missions, and byproducts like despin weights that have been jettisoned.',
+  
+  'btn-local': 'Far Probes cover missions that have traveled great distances, like the Voyager probes. These ambassadors carry our message into the interstellar void.',
+  
+  'btn-Messages': 'Messages sent to the stars trace our hopes and dreams. These signals, beamed into space, travel vast distances, aiming to communicate with potential extraterrestrial civilizations.'
+};
+
+// Function to show info on click
+function showInfoOnClick(event) {
+    if (navInfo[event.target.id]) {
+        infoBox.textContent = navInfo[event.target.id] + " ";
+        infoBox.appendChild(closeBtn); // Ensure the close button remains
+        infoBox.style.display = 'block';
+    }
+}
+
+// Function to close the info box
+function closeInfoBox() {
+    infoBox.style.display = 'none';
+}
+
+// Drag and drop functionality
+infoBox.addEventListener('mousedown', function(event) {
+    isDragging = true;
+    offsetX = event.clientX - infoBox.getBoundingClientRect().left;
+    offsetY = event.clientY - infoBox.getBoundingClientRect().top;
+});
+
+document.addEventListener('mouseup', function() {
+    isDragging = false;
+});
+
+document.addEventListener('mousemove', function(event) {
+    if (isDragging) {
+        infoBox.style.left = (event.clientX - offsetX) + 'px';
+        infoBox.style.bottom = (window.innerHeight - event.clientY - offsetY) + 'px';
+    }
+});
+
+// Attach event listeners to nav buttons
+for (let key in navInfo) {
+    const btn = document.getElementById(key);
+    if (btn) {
+        btn.addEventListener('click', showInfoOnClick);
+    }
+}
+
+// Close the info box when the close button is clicked
+closeBtn.addEventListener('click', closeInfoBox);
