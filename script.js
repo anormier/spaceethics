@@ -218,19 +218,22 @@ setupButton("btn-mars", sun, [-0.75, -0.75, 0.5], 10000, marsV, [2, 0, 0], 0.000
 setupButton("btn-moon", sun, [-0.75, -0.75, 0.5], 10000, moonV, [2, 0, 0], 0.003);
 
 
-let isPaused = false; // Initially, the simulation is running, so isPaused is set to false
+let isPaused = false; 
 
 const startStopButton = document.getElementById('start-stop-btn');
+const startIcon = document.getElementById('start-icon');
+const pauseIcon = document.getElementById('pause-icon');
+
 startStopButton.onclick = function () {
-    if (isPaused) {
-        viz.start();
-        startStopButton.textContent = 'Pause';
-    } else {
-        viz.stop();
-        startStopButton.textContent = 'Play';
-    }
+    isPaused ? viz.start() : viz.stop();
+    startIcon.style.display = isPaused ? "inline-block" : "none";
+    pauseIcon.style.display = isPaused ? "none" : "inline-block";
     isPaused = !isPaused;
 };
+
+
+
+
 
 
 
