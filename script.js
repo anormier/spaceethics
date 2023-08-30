@@ -391,6 +391,15 @@ const navInfo = {
   
   'btn-Messages': '<span style="color:red;">Messages</span> sent to the stars encapsulate our hopes and dreams. These <span style="color:red;">signals</span>, beamed into space, travel lightyears away, aiming to communicate with potential extraterrestrial civilizations.'
 };
+This should render the specified text in red when displayed in an HTML context that supports inline styling. The span tag with style="color:red;" will set the text color to red for the enclosed text.
+
+Let me know if you have further questions or requirements!
+
+
+
+
+
+
 
 // Function to show info on click
 function showInfoOnClick(event) {
