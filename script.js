@@ -379,17 +379,17 @@ const infoBox = document.getElementById('info-box');
 const closeBtn = document.getElementById('close-btn');
 
 const navInfo = {
-  'btn-earth': 'Human impact is evident on Earth. Our Species is to propagating this impact beyond earth. Through space technologies. Here we will display <span style="color:red;">launch bases</span>,  and facilities such as <span style="color:red;">radar astronomy telescopes</span> , being used for sending messages to space. We'll also display <span style="color:red;">satellites</span> around earth',
+  'btn-earth': 'Human impact is evident on Earth. Our species is propagating this impact beyond Earth through space technologies. Here we will display <span style="color:red;">launch bases</span>, and facilities such as <span style="color:red;">radar astronomy telescopes</span>, used for sending <span style="color:red;">messages</span> to space. We\'ll also display <span style="color:red;">satellites</span> around Earth.',
   
-  'btn-moon': 'The Moon, Earth’s natural satellite, bears the scars of our exploration. There are artificial impact craters, remnants of landers, rovers, and artificial satellites left behind by various missions.',
+  'btn-moon': 'The Moon, Earth’s natural satellite, reflects our journey into space. There are <span style="color:red;">artificial impact craters</span>, remnants of <span style="color:red;">landers</span>, <span style="color:red;">rovers</span>, and <span style="color:red;">artificial satellites</span> left behind by various missions.',
   
-  'btn-mars': 'Mars, the Red Planet, has also felt our touch. We have sent landers, rovers, and artificial satellites, all aiming to understand this intriguing world better.',
+  'btn-mars': 'Mars, the Red Planet, has also felt our presence. We have sent <span style="color:red;">landers</span>, <span style="color:red;">rovers</span>, and <span style="color:red;">artificial satellites</span>, all aiming to understand this intriguing world better.',
   
-  'btn-system': 'Throughout the Solar System, our presence is felt. There are probes exploring distant worlds, debris left behind by missions, and byproducts like despin weights that have been jettisoned.',
+  'btn-system': 'Throughout the Solar System, our presence is noticeable. There are <span style="color:red;">probes</span> exploring distant worlds, <span style="color:red;">debris</span> left behind by missions, and byproducts like despin weights that have been jettisoned.',
   
-  'btn-local': 'Far Probes cover missions that have traveled great distances, like the Voyager probes. These ambassadors carry our message into the interstellar void.',
+  'btn-local': '<span style="color:red;">Far ranging probes</span> cover missions that have traveled great distances, like the Voyager <span style="color:red;">probes</span>. These ambassadors carry our <span style="color:red;">messages</span> into the interstellar void.',
   
-  'btn-Messages': 'Messages sent to the stars trace our hopes and dreams. These signals, beamed into space, travel lightyears away, aiming to communicate with potential extraterrestrial civilizations.'
+  'btn-Messages': '<span style="color:red;">Messages</span> sent to the stars encapsulate our hopes and dreams. These <span style="color:red;">signals</span>, beamed into space, travel lightyears away, aiming to communicate with potential extraterrestrial civilizations.'
 };
 
 // Function to show info on click
