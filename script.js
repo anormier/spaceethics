@@ -379,7 +379,7 @@ const infoBox = document.getElementById('info-box');
 const closeBtn = document.getElementById('close-btn');
 
 const navInfo = {
-  'btn-earth': 'On Earth, human impact is evident. Earths capabilities include satellites, launch bases, and radars. Our actions have left indelible marks on our home planet.',
+  'btn-earth': 'Human impact is evident on Earth. Our Species is to propagating this impact beyond earth. Through space technologies. Here we will display <span style="color:red;">launch bases</span>,  and facilities such as <span style="color:red;">radar astronomy telescopes</span> , being used for sending messages to space. We'll also display <span style="color:red;">satellites</span> around earth',
   
   'btn-moon': 'The Moon, Earth’s natural satellite, bears the scars of our exploration. There are artificial impact craters, remnants of landers, rovers, and artificial satellites left behind by various missions.',
   
