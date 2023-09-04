@@ -1,4 +1,15 @@
 Here is the project structure: 
+
+Sources: 
+Earth lit at night: https://climate.nasa.gov/climate_resources/86/night-lights-big-cities/
+
+
+
+
+
+
+
+
 spaceethics-main/              (Project Root)
 ├── assets/                    (Global assets like images)
 ├── src/                       (Source code)

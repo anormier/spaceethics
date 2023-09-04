@@ -148,6 +148,7 @@ planetData.forEach(planet => createSpaceObject(planet.name, planet.label));
 const moon = createSpaceObject("moon", "moon");
 const earth = createSpaceObject("earth", "Earth");
 
+
 moon.orbitAround(earth);
 
 function createCelestialSphere(id, options) {
@@ -178,6 +179,14 @@ const earthV = createCelestialSphere("earthV", {
   ephem: "EARTH",
   rotationSpeed: 0.3,
   atmosphere:'true'
+});
+
+const earthLightsV = createCelestialSphere("earthLightsV", {
+  textureUrl: "./assets/maps/lightsFromNasa.png",
+  radius: 6380,
+  ephem: "EARTH",
+  rotationSpeed: 0.3,
+  atmosphere:'false'
 });
 
 const marsV = createCelestialSphere("marsV", {
