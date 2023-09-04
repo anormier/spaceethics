@@ -26,3 +26,27 @@ export function isDesktop() {
   // If there are no touch events and the screen width is above the threshold, it's probably a desktop
   return !hasTouch && window.innerWidth >= minWidth;
 }
+
+export function toggleFullscreen() {
+  if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement && !document.msFullscreenElement) {
+      if (document.documentElement.requestFullscreen) {
+          document.documentElement.requestFullscreen();
+      } else if (document.documentElement.mozRequestFullScreen) {
+          document.documentElement.mozRequestFullScreen();
+      } else if (document.documentElement.webkitRequestFullscreen) {
+          document.documentElement.webkitRequestFullscreen();
+      } else if (document.documentElement.msRequestFullscreen) {
+          document.documentElement.msRequestFullscreen();
+      }
+  } else {
+      if (document.exitFullscreen) {
+          document.exitFullscreen();
+      } else if (document.mozCancelFullScreen) {
+          document.mozCancelFullScreen();
+      } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+      } else if (document.msExitFullscreen) {
+          document.msExitFullscreen();
+      }
+  }
+}

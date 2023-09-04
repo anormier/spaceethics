@@ -1,11 +1,13 @@
 //BELOW: The file main.js
-import { checkIfVisible, radecToXYZ, isDesktop } from "./service/utils.js";
+import { checkIfVisible, radecToXYZ, isDesktop, toggleFullscreen } from "./service/utils.js";
 import allObjects from "./data/spatial-objects.js";
 import stars100LY3K45K from "./data/stars100LY3K45K.js";
 import stars100LY45K6K from "./data/stars100LY45K6K.js";
 import stars100LY6Kmore from "./data/stars100LY6Kmore.js";
 import allMessages from "./data/messages.js";
 import allVoyagers from "./data/voyagers.js";
+import { navInfo } from './textContents.js';
+
 
 const LY_TO_AU = 63241.16; 
 const debugAxesCheckbox = document.getElementById('debugAxesCheckbox');
@@ -300,33 +302,6 @@ viz.createStaticParticles('mx', mxPositions, {
 
 ////
 
-
-document.getElementById('fullscreen-btn').addEventListener('click', function() {
-  if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement && !document.msFullscreenElement) {
-      // If not in fullscreen mode, enter it
-      if (document.documentElement.requestFullscreen) {
-          document.documentElement.requestFullscreen();
-      } else if (document.documentElement.mozRequestFullScreen) {
-          document.documentElement.mozRequestFullScreen();
-      } else if (document.documentElement.webkitRequestFullscreen) {
-          document.documentElement.webkitRequestFullscreen();
-      } else if (document.documentElement.msRequestFullscreen) {
-          document.documentElement.msRequestFullscreen();
-      }
-  } else {
-      // If in fullscreen mode, exit it
-      if (document.exitFullscreen) {
-          document.exitFullscreen();
-      } else if (document.mozCancelFullScreen) {
-          document.mozCancelFullScreen();
-      } else if (document.webkitExitFullscreen) {
-          document.webkitExitFullscreen();
-      } else if (document.msExitFullscreen) {
-          document.msExitFullscreen();
-      }
-  }
-});
-
 let starParticleObjects = {};
 
 function unifiedPlaceStars(stars, date, size, color, particleName) {
@@ -352,8 +327,6 @@ function unifiedPlaceStars(stars, date, size, color, particleName) {
     size: size,
   });
 };
-
-
 
 
 //////////////
@@ -383,23 +356,10 @@ function placeObjects(objects, date, textureUrl) {
     previouslyAddedObjects.push(singleObject);
   });
 }
+// Import navInfo from textContents.js
 
 const infoBox = document.getElementById('info-box');
 const closeBtn = document.getElementById('close-btn');
-
-const navInfo = {
-  'btn-earth': 'Human impact is evident on Earth. Our species is propagating this impact beyond Earth through space technologies. Here we will display launch bases, and facilities such as radar astronomy telescopes, used for sending messages to space. We\'ll also display satellites around Earth.',
-  
-  'btn-moon': 'The Moon, Earth’s natural satellite, reflects our journey into space. There are artificial impact craters, remnants of landers, rovers, and artificial satellites left behind by various missions.',
-  
-  'btn-mars': 'Mars, the Red Planet, has also felt our presence. We have sent landers, rovers, and artificial satellites, all aiming to understand this intriguing world better.',
-  
-  'btn-system': 'Throughout the Solar System, our presence is noticeable. There are probes exploring distant worlds, debris left behind by missions, and byproducts like despin weights that have been jettisoned.',
-  
-  'btn-local': 'Far ranging probes cover missions that have traveled great distances, like the Voyager probes. These ambassadors carry our messages into the interstellar void.',
-  
-  'btn-Messages': 'Messages sent to the stars encapsulate our hopes and dreams. These signals, beamed into space, travel lightyears away, aiming to communicate with potential extraterrestrial civilizations.'
-};
 
 // Function to show info on click
 function showInfoOnClick(event) {
@@ -425,3 +385,5 @@ for (let key in navInfo) {
 
 // Close the info box when the close button is clicked
 closeBtn.addEventListener('click', closeInfoBox);
+
+document.getElementById('fullscreen-btn').addEventListener('click', toggleFullscreen);
