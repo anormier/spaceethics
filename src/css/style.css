@@ -1,0 +1,197 @@
+html,
+body,
+#main-container {
+  width: 100%;
+  height: 100%;
+  min-height: 500px;
+  background-color: transparent;
+  font-family: arial;
+  margin: 0;
+  overflow: hidden;
+}
+
+.sim-info {
+  position: absolute;
+  top: 0;
+  padding: 0.5em;
+  background-color: transparent;
+  color: grey;
+}
+
+.Nav {
+  position: absolute;
+  bottom: 0;
+  padding: 0.5em;
+  background-color: transparent;
+  color: grey;
+}
+
+.credits {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  padding: 0.5em;
+  background-color: transparent;
+  color: grey;
+}
+
+button {
+  background-color: transparent;
+  color: grey;
+  background-color: grey; /* Green */
+  border: none;
+  color: white;
+  padding: 5px 5px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 10 px;
+}
+
+.debug {
+  margin-top: 1rem;
+}
+
+.slider-container {
+  margin: 0.5rem 0;
+}
+
+.menu-container {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  border-radius: 0.5rem;
+  display: none;
+  position: absolute;
+  background-color: rgba(249, 249, 249, 0.8);
+  min-width: 250px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  padding: 12px 16px;
+  z-index: 1;
+  color: #161616;
+}
+
+.dropdown-content a {
+  color: inherit;
+}
+
+.menu-container:hover .dropdown-content {
+  display: block;
+}
+
+.extra-info {
+  margin: 1rem 0;
+}
+
+/* Other styles */
+
+#current-date {
+  font-size: 36px;             /* Making the font larger */
+  color: rgba(255, 255, 255, 0.8);  /* White color with 80% transparency */
+  font-family: 'Arial', sans-serif; /* For demonstration purposes, but consider importing a more trendy font */
+  text-shadow: 2px 2px 4px #000;   /* Giving a subtle shadow to make it stand out on any background */
+}
+
+#current-date {
+  font-size: 36px;
+  color: rgba(255, 255, 255, 0.8);
+  font-family: 'Roboto', sans-serif;
+  text-shadow: 2px 2px 4px #000;
+}
+
+.fullscreen-btn {
+  padding: 5px 10px;
+  font-size: 1rem;
+  background-color: #333;
+  color: #a89b9b;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.fullscreen-btn:hover {
+  background-color: #555;
+}
+
+.control-btn {
+  background-color: #4CAF50; /* Green background */
+  border: none; 
+  color: white; /* White text */
+  padding: 6px 10px; 
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 14px;
+  margin: 2px 2px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.control-btn:hover {
+  background-color: #45a049; /* Darker green on hover */
+}
+
+.btn-container {
+  display: flex;
+  align-items: center; /* This ensures vertical alignment */
+  gap: 5px; /* Reducing the space between buttons, can be adjusted */
+}
+
+.control-btn, .fullscreen-btn {
+  /* Add uniform styling here to ensure buttons are of the same dimensions */
+  padding: 10px 15px; /* Example padding */
+  border: none;
+  background-color: #333; /* Example background color */
+  color: #fff; /* Example text color */
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s; /* Smooth transition for hover effect */
+}
+
+.control-btn:hover, .fullscreen-btn:hover {
+  background-color: #555; /* Example hover background color */
+}
+
+.Nav button {
+  padding: 8px 12px;  /* Padding around the text */
+  margin: 5px;       /* Space around each button */
+  border: none;      /* Removes default borders */
+  background-color: #333;  /* Dark background */
+  color: #fff;      /* White text color */
+  font-size: 16px;  /* Text size */
+  cursor: pointer;  /* Hand cursor on hover */
+  border-radius: 4px;  /* Rounded corners */
+  transition: background-color 0.3s; /* Smooth color transition on hover */
+}
+
+.Nav button:hover {
+  background-color: #555;  /* Slightly lighter background on hover */
+}
+
+.info-box {
+  position: absolute; 
+  bottom: 70px; /* Assuming 50px is the height of the nav buttons. Adjust as needed */
+  left: 20px;
+  background-color: rgba(128, 128, 128, 0.7); 
+  color: lightgrey;
+  padding: 8px 12px;
+  border-radius: 5px;
+  margin: 5px;       /* Space around each button */
+  display: none; 
+  z-index: 1000;
+font-size: 16px;
+  width: 200px; /* Set a fixed width for the box */
+  max-height: calc(100% - 100px); /* Assuming the space you want to leave at the top is 100px. Adjust as needed. */
+  overflow-y: auto; /* Make it scrollable when content overflows */
+}
+
+
+.close-btn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  cursor: pointer;
+}
