@@ -71,42 +71,6 @@ if (isDesktop()) {
   });
 };
 
-// UI ELEMENTS
-const dateElt = document.getElementById("current-date");
-const speedDisplay = document.getElementById('speed-display');
-const speedSlider = document.getElementById('speed-slider');
-const initialSpeed = viz.getJdDelta();
-
-speedSlider.addEventListener("input", function(event) {
-    const logValue = parseFloat(event.target.value);
-    const speedFactor = Math.pow(10, logValue);
-    viz.setJdDelta(initialSpeed * speedFactor);
-    speedDisplay.textContent = `Speed: ${speedFactor.toFixed(3)}x`;
-});
-
-const yearSlider = document.getElementById("year-slider");
-yearSlider.addEventListener("input", (event) => {
-  const selectedYear = parseInt(event.target.value);
-  viz.setDate(new Date(`${selectedYear}-01-01`));
-});
-
-const decSlider = document.getElementById("DECSLIDER");
-const raSlider = document.getElementById("RASLIDER");
-let dec = 0
-let ra = 0
-let starPositions = [];
-// Dès que le slider DEC est modifié, on actualise la variable dec et on repositionne les étoiles
-decSlider.addEventListener("input", (event) => {
-  dec = parseInt(event.target.value);
-  placeStars(stars100LY3K45K)
-});
-// Dès que le slider RA est modifié, on actualise la variable dec et on repositionne les étoiles
-raSlider.addEventListener("input", (event) => {
-  ra = parseInt(event.target.value);
-  placeStars(stars100LY3K45K)
-});
-
-
 // NATURAL OBJECTS
 const sun = viz.createObject("sun", Spacekit.SpaceObjectPresets.SUN);
 viz.createAmbientLight();
@@ -202,6 +166,44 @@ const jupiter3 = createCelestialSphere("jupiter3", {
   atmosphere:'true'
 });
 
+
+// UI ELEMENTS
+const dateElt = document.getElementById("current-date");
+const speedDisplay = document.getElementById('speed-display');
+const speedSlider = document.getElementById('speed-slider');
+const initialSpeed = viz.getJdDelta();
+
+speedSlider.addEventListener("input", function(event) {
+    const logValue = parseFloat(event.target.value);
+    const speedFactor = Math.pow(10, logValue);
+    viz.setJdDelta(initialSpeed * speedFactor);
+    speedDisplay.textContent = `Speed: ${speedFactor.toFixed(3)}x`;
+});
+
+const yearSlider = document.getElementById("year-slider");
+yearSlider.addEventListener("input", (event) => {
+  const selectedYear = parseInt(event.target.value);
+  viz.setDate(new Date(`${selectedYear}-01-01`));
+});
+
+const decSlider = document.getElementById("DECSLIDER");
+const raSlider = document.getElementById("RASLIDER");
+let dec = 0
+let ra = 0
+let starPositions = [];
+// Dès que le slider DEC est modifié, on actualise la variable dec et on repositionne les étoiles
+decSlider.addEventListener("input", (event) => {
+  dec = parseInt(event.target.value);
+  placeStars(stars100LY3K45K)
+});
+// Dès que le slider RA est modifié, on actualise la variable dec et on repositionne les étoiles
+raSlider.addEventListener("input", (event) => {
+  ra = parseInt(event.target.value);
+  placeStars(stars100LY3K45K)
+});
+
+
+
 // UI ELEMENTS II
 //setup nav buttons
 
@@ -241,6 +243,43 @@ startStopButton.onclick = function () {
     pauseIcon.style.display = isPaused ? "none" : "inline-block";
     isPaused = !isPaused;
 };
+
+// UI ELEMENTS III
+const infoBox = document.getElementById('info-box');
+const closeBtn = document.getElementById('close-btn');
+
+// Function to show info on click
+
+function showInfoOnClick(event) {
+  if (navInfo[event.target.id]) {
+    infoBox.textContent = navInfo[event.target.id] + " ";
+    infoBox.appendChild(closeBtn);
+    infoBox.style.display = 'block';
+  }
+}
+
+// Function to close the info box
+function closeInfoBox() {
+    infoBox.style.display = 'none';
+}
+
+// Attach event listeners to nav buttons
+for (let key in navInfo) {
+    const btn = document.getElementById(key);
+    if (btn) {
+        btn.addEventListener('click', showInfoOnClick);
+    }
+}
+
+// Close the info box when the close button is clicked
+closeBtn.addEventListener('click', closeInfoBox);
+
+// fullscreen mode
+document.getElementById('fullscreen-btn').addEventListener('click', toggleFullscreen);
+
+
+
+
 
 // MOVING DATASETS: THREE FUNCTIONS: messages, stars, labeled obj (not working ok)
 
@@ -348,34 +387,4 @@ function placeObjects(objects, date, textureUrl) {
   });
 }
 
-// UI ELEMENTS III
-const infoBox = document.getElementById('info-box');
-const closeBtn = document.getElementById('close-btn');
 
-// Function to show info on click
-
-function showInfoOnClick(event) {
-  if (navInfo[event.target.id]) {
-    infoBox.textContent = navInfo[event.target.id] + " ";
-    infoBox.appendChild(closeBtn);
-    infoBox.style.display = 'block';
-  }
-}
-
-// Function to close the info box
-function closeInfoBox() {
-    infoBox.style.display = 'none';
-}
-
-// Attach event listeners to nav buttons
-for (let key in navInfo) {
-    const btn = document.getElementById(key);
-    if (btn) {
-        btn.addEventListener('click', showInfoOnClick);
-    }
-}
-
-// Close the info box when the close button is clicked
-closeBtn.addEventListener('click', closeInfoBox);
-
-document.getElementById('fullscreen-btn').addEventListener('click', toggleFullscreen);
