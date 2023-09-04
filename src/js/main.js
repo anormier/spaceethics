@@ -9,6 +9,7 @@ import allMessages from "./data/messages.js";
 import allVoyagers from "./data/voyagers.js";
 import {navInfo} from './textContents.js';
 
+
 // CONSTANTS
 const LY_TO_AU = 63241.16; 
 
@@ -134,7 +135,7 @@ const earthV = createCelestialSphere("earthV", {
 });
 
 const earthLightsV = createCelestialSphere("earthLightsV", {
-  textureUrl: "./assets/maps/lightsFromNasa.png",
+  textureUrl: "./assets/maps/lightsred.png",
   radius: 6380,
   ephem: "EARTH",
   rotationSpeed: 0.3,
@@ -166,63 +167,57 @@ const jupiter3 = createCelestialSphere("jupiter3", {
   atmosphere:'true'
 });
 
-
 // UI ELEMENTS
 const dateElt = document.getElementById("current-date");
 const speedDisplay = document.getElementById('speed-display');
 const speedSlider = document.getElementById('speed-slider');
 const initialSpeed = viz.getJdDelta();
 
-speedSlider.addEventListener("input", function(event) {
-    const logValue = parseFloat(event.target.value);
-    const speedFactor = Math.pow(10, logValue);
+speedSlider.addEventListener("input", (event) => {
+    const speedFactor = Math.pow(10, parseFloat(event.target.value));
     viz.setJdDelta(initialSpeed * speedFactor);
     speedDisplay.textContent = `Speed: ${speedFactor.toFixed(3)}x`;
 });
 
 const yearSlider = document.getElementById("year-slider");
 yearSlider.addEventListener("input", (event) => {
-  const selectedYear = parseInt(event.target.value);
-  viz.setDate(new Date(`${selectedYear}-01-01`));
+    viz.setDate(new Date(`${parseInt(event.target.value)}-01-01`));
 });
 
 const decSlider = document.getElementById("DECSLIDER");
 const raSlider = document.getElementById("RASLIDER");
-let dec = 0
-let ra = 0
-let starPositions = [];
-// Dès que le slider DEC est modifié, on actualise la variable dec et on repositionne les étoiles
+let dec = 0, ra = 0, starPositions = [];
+
+
 decSlider.addEventListener("input", (event) => {
-  dec = parseInt(event.target.value);
-  placeStars(stars100LY3K45K)
+    dec = parseInt(event.target.value);
+    updateStars();
 });
-// Dès que le slider RA est modifié, on actualise la variable dec et on repositionne les étoiles
+
 raSlider.addEventListener("input", (event) => {
-  ra = parseInt(event.target.value);
-  placeStars(stars100LY3K45K)
+    ra = parseInt(event.target.value);
+    updateStars();
 });
-
-
 
 // UI ELEMENTS II
-//setup nav buttons
+// Setup navigation buttons
 
 function setupButton(id, obj1, params1, zoom1, obj2, params2, zoom2) {
-  document.getElementById(id).onclick = function () {
-    const viewer = viz.getViewer();
-    viewer.followObject(obj1, params1);
-    viz.zoomToFit(obj1, zoom1);
-    
-    if (obj2 && params2 && zoom2) {
-      setTimeout(() => {
-        viewer.followObject(obj2, params2);
-        viz.zoomToFit(obj2, zoom2);
-      }, 20);
-    }
-  }
+    document.getElementById(id).onclick = function () {
+        const viewer = viz.getViewer();
+        viewer.followObject(obj1, params1);
+        viz.zoomToFit(obj1, zoom1);
+        
+        if (obj2 && params2 && zoom2) {
+            setTimeout(() => {
+                viewer.followObject(obj2, params2);
+                viz.zoomToFit(obj2, zoom2);
+            }, 20);
+        }
+    };
 }
 
-// Assigning actions to the buttons
+// Assign actions to buttons
 setupButton("btn-Messages", sun, [1, 2, 1], 1000000);
 setupButton("btn-local", sun, [2, 2, 2], 2);
 setupButton("btn-system", sun, [2, 2, 2], 2);
@@ -230,9 +225,7 @@ setupButton("btn-earth", sun, [-0.75, -0.75, 0.5], 10000, earthV, [2, 0, 0], 0.0
 setupButton("btn-mars", sun, [-0.75, -0.75, 0.5], 10000, marsV, [2, 0, 0], 0.00001);
 setupButton("btn-moon", sun, [-0.75, -0.75, 0.5], 10000, moonV, [2, 0, 0], 0.003);
 
-
-let isPaused = false; 
-
+let isPaused = false;
 const startStopButton = document.getElementById('start-stop-btn');
 const startIcon = document.getElementById('start-icon');
 const pauseIcon = document.getElementById('pause-icon');
@@ -248,20 +241,17 @@ startStopButton.onclick = function () {
 const infoBox = document.getElementById('info-box');
 const closeBtn = document.getElementById('close-btn');
 
-// Function to show info on click
+const showInfoOnClick = (event) => {
+    if (navInfo[event.target.id]) {
+        infoBox.textContent = navInfo[event.target.id] + " ";
+        infoBox.appendChild(closeBtn);
+        infoBox.style.display = 'block';
+    }
+};
 
-function showInfoOnClick(event) {
-  if (navInfo[event.target.id]) {
-    infoBox.textContent = navInfo[event.target.id] + " ";
-    infoBox.appendChild(closeBtn);
-    infoBox.style.display = 'block';
-  }
-}
-
-// Function to close the info box
-function closeInfoBox() {
+const closeInfoBox = () => {
     infoBox.style.display = 'none';
-}
+};
 
 // Attach event listeners to nav buttons
 for (let key in navInfo) {
@@ -271,17 +261,19 @@ for (let key in navInfo) {
     }
 }
 
-// Close the info box when the close button is clicked
+// Close info box on close button click
 closeBtn.addEventListener('click', closeInfoBox);
 
-// fullscreen mode
+// Fullscreen mode
 document.getElementById('fullscreen-btn').addEventListener('click', toggleFullscreen);
 
 
 
-
-
 // MOVING DATASETS: THREE FUNCTIONS: messages, stars, labeled obj (not working ok)
+
+const updateStars = () => {
+  placeStars(stars100LY3K45K);
+};
 
 // FUNCTION: PLACE MESSAGES
 const mxDotPositions = [];
@@ -322,14 +314,6 @@ viz.createStaticParticles('mx', mxPositions, {
    size: 20,
  });
 
-///SEPARATor///SEPARATor///SEPARATor///SEPARATor///SEPARATor///SEPARATor
-
- document.getElementById("btn-local").onclick = function () {
-  viz.getViewer().followObject(sun, [1e2, 1e2, 1e2]);
-  viz.zoomToFit(sun, 1e2);
-};
-
-////
 
 // FUNCTION: PLACE MOVING STARS (or PARTICULES)
 let starParticleObjects = {};
@@ -386,5 +370,3 @@ function placeObjects(objects, date, textureUrl) {
     previouslyAddedObjects.push(singleObject);
   });
 }
-
-
