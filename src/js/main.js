@@ -1,4 +1,5 @@
 //BELOW: The file main.js
+// IMPORTS
 import { checkIfVisible, radecToXYZ, isDesktop, toggleFullscreen } from "./service/utils.js";
 import allObjects from "./data/spatial-objects.js";
 import stars100LY3K45K from "./data/stars100LY3K45K.js";
@@ -6,20 +7,12 @@ import stars100LY45K6K from "./data/stars100LY45K6K.js";
 import stars100LY6Kmore from "./data/stars100LY6Kmore.js";
 import allMessages from "./data/messages.js";
 import allVoyagers from "./data/voyagers.js";
-import { navInfo } from './textContents.js';
+import {navInfo} from './textContents.js';
 
-
+// CONSTANTS
 const LY_TO_AU = 63241.16; 
-const debugAxesCheckbox = document.getElementById('debugAxesCheckbox');
-debugAxesCheckbox.addEventListener('change', (event) => {
-    const isChecked = event.target.checked;
-    viz.setDebugOptions({
-        showAxes: isChecked
-    });
-});
-let debugAxesInitialStatus = debugAxesCheckbox.checked;
 
-
+//INIT SIM
 const viz = new Spacekit.Simulation(document.getElementById("main-container"), {
   basePath: "https://typpo.github.io/spacekit/src",
   startDate: Date.now(),
@@ -31,16 +24,12 @@ const viz = new Spacekit.Simulation(document.getElementById("main-container"), {
     enableDrift: false,
     initialPosition: [2, -2, 1],
   },
-  debug: {
-    showAxes: debugAxesInitialStatus,
-    showGrid: debugAxesInitialStatus,
-    showStats: debugAxesInitialStatus,
-  },
 });
 
 const skybox = viz.createSkybox(Spacekit.SkyboxPresets.ESO_GIGAGALAXY);
 viz.setJdDelta(viz.getJdDelta() * 0.02);
 
+//SIM LOOP
 viz.onTick = function () {
   const d = viz.getDate();
   dateElt.innerHTML = d.toLocaleDateString();
@@ -63,9 +52,6 @@ if (isDesktop()) {
   unifiedPlaceStars(stars100LY6Kmore, date, 15, 'white', 'stars3');
 } 
 
-
-
-  
   // Update voyagers
   placeObjects(allVoyagers, date, './assets/symbols/Red_Circle_full.png');
 
@@ -85,6 +71,7 @@ if (isDesktop()) {
   });
 };
 
+// UI ELEMENTS
 const dateElt = document.getElementById("current-date");
 const speedDisplay = document.getElementById('speed-display');
 const speedSlider = document.getElementById('speed-slider');
@@ -118,7 +105,6 @@ raSlider.addEventListener("input", (event) => {
   ra = parseInt(event.target.value);
   placeStars(stars100LY3K45K)
 });
-
 
 
 // NATURAL OBJECTS
@@ -216,6 +202,8 @@ const jupiter3 = createCelestialSphere("jupiter3", {
   atmosphere:'true'
 });
 
+// UI ELEMENTS II
+//setup nav buttons
 
 function setupButton(id, obj1, params1, zoom1, obj2, params2, zoom2) {
   document.getElementById(id).onclick = function () {
@@ -254,7 +242,9 @@ startStopButton.onclick = function () {
     isPaused = !isPaused;
 };
 
+// MOVING DATASETS: THREE FUNCTIONS: messages, stars, labeled obj (not working ok)
 
+// FUNCTION: PLACE MESSAGES
 const mxDotPositions = [];
 // Function to calculate and push positions using radecToXYZ
 function calculatePositions(mx, multiplier) {
@@ -302,6 +292,7 @@ viz.createStaticParticles('mx', mxPositions, {
 
 ////
 
+// FUNCTION: PLACE MOVING STARS (or PARTICULES)
 let starParticleObjects = {};
 
 function unifiedPlaceStars(stars, date, size, color, particleName) {
@@ -329,7 +320,7 @@ function unifiedPlaceStars(stars, date, size, color, particleName) {
 };
 
 
-//////////////
+// FUNCTION: PLACE OBJECTS WITH LABELS - (NOT WORKING PROPERLY)
 // A list to keep track of previously added objects.
 let previouslyAddedObjects = [];
 
@@ -356,18 +347,19 @@ function placeObjects(objects, date, textureUrl) {
     previouslyAddedObjects.push(singleObject);
   });
 }
-// Import navInfo from textContents.js
 
+// UI ELEMENTS III
 const infoBox = document.getElementById('info-box');
 const closeBtn = document.getElementById('close-btn');
 
 // Function to show info on click
+
 function showInfoOnClick(event) {
-    if (navInfo[event.target.id]) {
-        infoBox.textContent = navInfo[event.target.id] + " ";
-        infoBox.appendChild(closeBtn); // Ensure the close button remains
-        infoBox.style.display = 'block';
-    }
+  if (navInfo[event.target.id]) {
+    infoBox.textContent = navInfo[event.target.id] + " ";
+    infoBox.appendChild(closeBtn);
+    infoBox.style.display = 'block';
+  }
 }
 
 // Function to close the info box
