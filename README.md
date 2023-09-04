@@ -3,7 +3,10 @@ Here is the project structure:
 Sources: 
 Earth lit at night: https://climate.nasa.gov/climate_resources/86/night-lights-big-cities/
 
-
+To update tree: 
+open terminal: 
+adri@Air-de-Normier spaceethics % cd /Users/adri/Desktop/spaceethics
+adri@Air-de-Normier spaceethics % find . > directory_tree.txt
 
 
 
