@@ -1,6 +1,8 @@
 //BELOW: The file main.js
 // IMPORTS
 import { checkIfVisible, radecToXYZ, isDesktop, toggleFullscreen } from "./service/utils.js";
+import { distToCam } from './service/simCalc.js'; 
+
 import allObjects from "./data/spatial-objects.js";
 import stars100LY3K45K from "./data/stars100LY3K45K.js";
 import stars100LY45K6K from "./data/stars100LY45K6K.js";
@@ -14,6 +16,7 @@ const THREE = Spacekit.THREE;
 
 // CONSTANTS
 const LY_TO_AU = 63241.16; 
+
 
 //INIT SIM
 const viz = new Spacekit.Simulation(document.getElementById("main-container"), {
@@ -56,27 +59,25 @@ if (isDesktop()) {
   unifiedPlaceStars(stars100LY6Kmore, date, 15, 'white', 'stars3');
 } 
 
+    // Getting camera position
+    const cameraPosition = viz.getViewer().get3jsCamera().position;
 
-// Only convert to LY and display if distance is greater than 100 AU
-const cameraPosition = viz.getViewer().get3jsCamera().position;
-const distanceFromSunInAU = Math.sqrt(
-  cameraPosition.x ** 2 +
-  cameraPosition.y ** 2 +
-  cameraPosition.z ** 2
-);
+    // Sun position is [0,0,0]
+    const sunPosition = [0, 0, 0];
+  
+    // Calculating the distance to Sun
+    const distanceToSunInAU = distToCam(cameraPosition, sunPosition);
+  
+    // Updating the display
+    if (distanceToSunInAU < 1000) {
+      // Display distance in AU if less than 1000 AU
+      document.getElementById("sunDistanceDisplay").innerHTML = `Distance from Sun: ${distanceToSunInAU.toFixed(1)} AU`;
+    } else {
+      // Display distance in LY if greater than or equal to 1000 AU
+      const distanceToSunInLY = distanceToSunInAU / LY_TO_AU;
+      document.getElementById("sunDistanceDisplay").innerHTML = `Distance from Sun: ${distanceToSunInLY.toFixed(1)} LY`;
+    }
 
-if (distanceFromSunInAU < 1000) {
-  // Display distance in AU if it's less than 1000 AU
-  document.getElementById("sunDistanceDisplay").innerHTML = `Distance from Sun: ${distanceFromSunInAU.toFixed(1)} AU`;
-} else {
-  // Display distance in LY if it's greater than or equal to 1000 AU
-  const distanceFromSunInLY = distanceFromSunInAU / LY_TO_AU;
-  document.getElementById("sunDistanceDisplay").innerHTML = `Distance from Sun: ${distanceFromSunInLY.toFixed(1)} LY`;
-}
-
-
-  // Update voyagers
-  placeObjects(allVoyagers, date, './assets/symbols/Red_Circle_full.png');
 
   // Update other spatial objects
   allObjects.forEach((point) => {
@@ -93,6 +94,10 @@ if (distanceFromSunInAU < 1000) {
     }
     
   });
+
+    // Update voyagers
+  placeObjects(allVoyagers, date, './assets/symbols/Red_Circle_full.png');
+
 };
 
 // NATURAL OBJECTS
