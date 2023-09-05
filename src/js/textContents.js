@@ -8,7 +8,7 @@ export const navInfo = {
     
     'btn-system': 'Throughout the Solar System, our presence is noticeable. There are probes exploring distant worlds, debris left behind by missions, and byproducts like despin weights that have been jettisoned.',
     
-    'btn-local': 'Far ranging probes cover missions that have traveled great distances, like the Voyager probes. These ambassadors carry our messages into the interstellar void.',
+    'btn-far': 'Far ranging probes cover missions that have traveled great distances, like the Voyager probes. These ambassadors carry our messages into the interstellar void.',
     
     'btn-Messages': 'Messages sent to the stars encapsulate our hopes and dreams. These signals, beamed into space, travel lightyears away, aiming to communicate with potential extraterrestrial civilizations.'
   };
