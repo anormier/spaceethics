@@ -77,8 +77,8 @@ viz.onTick = function () {
   if (isDesktop()) { 
     unifiedPlaceStars(stars100LY3K45K, dateInMilliseconds, 8, 'white', 'stars1');
     unifiedPlaceStars(stars100LY45K6K, dateInMilliseconds, 10, 'white', 'stars2');
-    unifiedPlaceStars(stars100LY6Kmore, dateInMilliseconds, 15, 'white', 'stars3');
   }
+  unifiedPlaceStars(stars100LY6Kmore, dateInMilliseconds, 15, 'white', 'stars3');
 
   // Update visibility of spatial objects based on distance limits
   const distVisFrom = 1;  // Lower limit in AU
@@ -87,8 +87,10 @@ viz.onTick = function () {
     updateVisibility(point, dateInMilliseconds, distanceToSunInAU, distVisFrom, distVisTo, viz);
   });
 
-  // Update voyagers
-  placeObjects(allVoyagers, dateInMilliseconds, './assets/symbols/Red_Circle_full.png');
+  if (distanceToSunInAU < 500) {
+    placeObjects(allVoyagers, dateInMilliseconds, './assets/symbols/Red_Circle_full.png');
+  }
+  
 };
 
 
@@ -303,7 +305,7 @@ function calculatePositions(mx, multiplier) {
   if (isDesktop()) {
       count = 1000;
   } else {
-      count = 100;
+      count = 10;
   }
   for (let i = 1; i < count; i++) {
     const r = i * (LY_TO_AU * mx.dist) / (count * multiplier);
