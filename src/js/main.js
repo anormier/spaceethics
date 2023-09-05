@@ -80,19 +80,21 @@ if (isDesktop()) {
 
 
   // Update other spatial objects
+  // Update other spatial objects
+  const distanceLimit = 300;
+
   allObjects.forEach((point) => {
     const pointShouldAppear = checkIfVisible(point, date);
-
-    if (!pointShouldAppear) {
-      point.visible = false;
-      viz.removeObject(point.newObject);
-      return;
-    }
-    if (!point.visible) {
+  
+    if (distanceToSunInAU >= distanceLimit || !pointShouldAppear) {
+      if (point.visible) {
+        point.visible = false;
+        viz.removeObject(point.newObject);
+      }
+    } else if (!point.visible && distanceToSunInAU < distanceLimit) {
       point.visible = true;
       point.newObject = viz.createObject(point.name, point.characteristics);
     }
-    
   });
 
     // Update voyagers
