@@ -1,7 +1,7 @@
 //BELOW: The file main.js
 
 // IMPORTS
-import { updateVisibility, checkIfVisible, radecToXYZ, isDesktop, toggleFullscreen } from "./service/utils.js";
+import { updateVisibility, checkIfVisible, radecToXYZ, isDesktop, toggleFullscreen, updateInfoBox } from "./service/utils.js";
 import { distToCam } from './service/simCalc.js'; 
 
 import allObjects from "./data/spatial-objects.js";
