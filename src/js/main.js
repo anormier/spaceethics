@@ -57,7 +57,6 @@ viz.onTick = function () {
   // Convert current date to time for other calculations
   const dateInMilliseconds = currentDate.getTime();
  
-
   // Get camera and sun positions
   const cameraPosition = viz.getViewer().get3jsCamera().position;
   const sunPosition = [0, 0, 0];
