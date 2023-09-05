@@ -1,4 +1,5 @@
 //BELOW: The file main.js
+
 // IMPORTS
 import { updateVisibility, checkIfVisible, radecToXYZ, isDesktop, toggleFullscreen } from "./service/utils.js";
 import { distToCam } from './service/simCalc.js'; 
@@ -17,6 +18,7 @@ const THREE = Spacekit.THREE;
 // CONSTANTS
 const LY_TO_AU = 63241.16; 
 
+document.addEventListener("DOMContentLoaded", function() {
 
 //INIT SIM
 const viz = new Spacekit.Simulation(document.getElementById("main-container"), {
@@ -391,3 +393,4 @@ function placeObjects(objects, date, textureUrl) {
     previouslyAddedObjects.push(singleObject);
   });
 }
+});
