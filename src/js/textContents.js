@@ -1,6 +1,6 @@
 // textContents.js
 export const navInfo = {
-    'btn-earth': 'Human impact is evident on Earth. Our species is propagating this impact beyond Earth through space technologies. Here we will display launch bases, and facilities such as radar astronomy telescopes, used for sending messages to space. We\'ll also display satellites around Earth.',
+    'btn-earth': 'Human impact is evident on Earth. Our species is propagating this impact beyond Earth through space technologies.  In red you see the bright lights of cities. Here we will display launch bases, and facilities such as radar astronomy telescopes, used for sending messages to space. We will also display satellites around Earth.',
     
     'btn-moon': 'The Moon, Earth’s natural satellite, reflects our journey into space. There are artificial impact craters, remnants of landers, rovers, and artificial satellites left behind by various missions.',
     
