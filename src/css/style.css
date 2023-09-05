@@ -191,7 +191,7 @@ font-size: 16px;
 
 .close-btn {
   position: absolute;
-  top: 5px;
+  top: 1px;
   right: 5px;
   cursor: pointer;
 }
@@ -199,14 +199,13 @@ font-size: 16px;
 /* Mobile View */
 @media screen and (max-width: 768px) {
   .info-box {
-    bottom: 15%; /* Adjusted to move the box higher and avoid overlapping */
+    bottom: 100px; /* Adjusted to move the box higher and avoid overlapping */
     left: 10%;
     width: 80%;
   }
   .close-btn {
-    font-size: 2em;
-    top: 0;
-    right: 0;
+    font-size: 2.5em;
+  
   }
   .Nav {
     bottom: 0;
