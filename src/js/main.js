@@ -93,7 +93,6 @@ viz.onTick = function () {
   
 };
 
-
 // NATURAL OBJECTS
 const sun = viz.createObject("sun", Spacekit.SpaceObjectPresets.SUN);
 viz.createAmbientLight();

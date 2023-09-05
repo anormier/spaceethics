@@ -43,6 +43,11 @@ export function isDesktop() {
 }
 
 export function toggleFullscreen() {
+  if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+    const infoText = "Fullscreen is not available on cellphones. Please connect with a laptop.";
+    document.getElementById('info-box').innerHTML = infoText;
+    document.getElementById('nav-info').innerHTML = infoText;
+  } else {
   if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement && !document.msFullscreenElement) {
       if (document.documentElement.requestFullscreen) {
           document.documentElement.requestFullscreen();
@@ -64,4 +69,5 @@ export function toggleFullscreen() {
           document.msExitFullscreen();
       }
   }
+}
 }
