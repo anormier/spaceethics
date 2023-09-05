@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "../.."
+		},
+		{
+			"path": "../../../spacekit-master"
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "spaceethics"
+	}
+}
