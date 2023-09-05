@@ -1,7 +1,7 @@
 //BELOW: The file main.js
 
 // IMPORTS
-import { updateVisibility, checkIfVisible, radecToXYZ, isDesktop, toggleFullscreen, updateInfoBox } from "./service/utils.js";
+import { updateVisibility, checkIfVisible, radecToXYZ, isDesktop, toggleFullscreen, updateInfoBox,isMobile } from "./service/utils.js";
 import { distToCam } from './service/simCalc.js'; 
 
 import allObjects from "./data/spatial-objects.js";
@@ -191,6 +191,10 @@ const jupiter3 = createCelestialSphere("jupiter3", {
 });
 
 // UI ELEMENTS
+// init Mobile:
+if (isMobile()) {
+  document.getElementById('fullscreen-btn').style.display = 'none';
+}
 const dateElt = document.getElementById("current-date");
 const speedDisplay = document.getElementById('speed-display');
 const speedSlider = document.getElementById('speed-slider');

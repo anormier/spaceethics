@@ -42,6 +42,11 @@ export function isDesktop() {
   return !hasTouch && window.innerWidth >= minWidth;
 }
 
+export function isMobile() {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
+
 export function toggleFullscreen() {
   if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
     const infoText = "Fullscreen is not available on cellphones. Please connect with a laptop.";
