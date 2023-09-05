@@ -1,5 +1,20 @@
 //This is: The file utils.JS
 
+
+export function updateVisibility(point, date, distanceToSunInAU, distVisFrom, distVisTo, viz) {
+    const pointShouldAppear = checkIfVisible(point, date);
+  
+    if (distanceToSunInAU < distVisFrom || distanceToSunInAU > distVisTo || !pointShouldAppear) {
+      if (point.visible) {
+        point.visible = false;
+        viz.removeObject(point.newObject);
+      }
+    } else if (!point.visible && distanceToSunInAU >= distVisFrom && distanceToSunInAU <= distVisTo) {
+      point.visible = true;
+      point.newObject = viz.createObject(point.name, point.characteristics);
+    }
+  }
+
 export function checkIfVisible(object, currentDate) {
   return currentDate > object.visibleFrom && currentDate < object.visibleUntil;
 }

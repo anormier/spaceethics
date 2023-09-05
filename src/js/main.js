@@ -1,6 +1,6 @@
 //BELOW: The file main.js
 // IMPORTS
-import { checkIfVisible, radecToXYZ, isDesktop, toggleFullscreen } from "./service/utils.js";
+import { updateVisibility, checkIfVisible, radecToXYZ, isDesktop, toggleFullscreen } from "./service/utils.js";
 import { distToCam } from './service/simCalc.js'; 
 
 import allObjects from "./data/spatial-objects.js";
@@ -36,71 +36,62 @@ const skybox = viz.createSkybox(Spacekit.SkyboxPresets.ESO_GIGAGALAXY);
 viz.setJdDelta(viz.getJdDelta() * 0.02);
 viz.renderOnlyInViewport();
 
-//SIM LOOP
+// SIM LOOP
 viz.onTick = function () {
-  const d = viz.getDate();
-  dateElt.innerHTML = d.toLocaleDateString();
+  // Get current date and update UI
+  const currentDate = viz.getDate();
+  dateElt.innerHTML = currentDate.toLocaleDateString();
 
- // Calculate the current year fractionally
-  const fractionalYear = d.getFullYear() + (d.getMonth() / 12) + (d.getDate() / 365.25);
+  // Calculate the fractional year
+  const fractionalYear = currentDate.getFullYear() 
+                          + (currentDate.getMonth() / 12) 
+                          + (currentDate.getDate() / 365.25);
   yearSlider.value = fractionalYear;
 
-  // Check if date has reached 1st January 2030
-  if (d >= new Date('2030-01-01')) {
-    viz.setDate(new Date('1950-01-01')); // Reset to 1950
-    return;  // Return here to skip further operations for this tick
+  // Check for date boundary and reset if needed
+  if (currentDate >= new Date('2030-01-01')) {
+    viz.setDate(new Date('1950-01-01'));
+    return;
   }
-  const date = d.getTime();
 
-  // Update stars
-if (isDesktop()) { 
-  unifiedPlaceStars(stars100LY3K45K, date, 8, 'white', 'stars1');
-  unifiedPlaceStars(stars100LY45K6K, date, 10, 'white', 'stars2');
-  unifiedPlaceStars(stars100LY6Kmore, date, 15, 'white', 'stars3');
-} 
+  // Convert current date to time for other calculations
+  const dateInMilliseconds = currentDate.getTime();
+ 
 
-    // Getting camera position
-    const cameraPosition = viz.getViewer().get3jsCamera().position;
+  // Get camera and sun positions
+  const cameraPosition = viz.getViewer().get3jsCamera().position;
+  const sunPosition = [0, 0, 0];
 
-    // Sun position is [0,0,0]
-    const sunPosition = [0, 0, 0];
-  
-    // Calculating the distance to Sun
-    const distanceToSunInAU = distToCam(cameraPosition, sunPosition);
-  
-    // Updating the display
-    if (distanceToSunInAU < 1000) {
-      // Display distance in AU if less than 1000 AU
-      document.getElementById("sunDistanceDisplay").innerHTML = `Distance from Sun: ${distanceToSunInAU.toFixed(1)} AU`;
-    } else {
-      // Display distance in LY if greater than or equal to 1000 AU
-      const distanceToSunInLY = distanceToSunInAU / LY_TO_AU;
-      document.getElementById("sunDistanceDisplay").innerHTML = `Distance from Sun: ${distanceToSunInLY.toFixed(1)} LY`;
-    }
+  // Calculate distance to sun in AU
+  const distanceToSunInAU = distToCam(cameraPosition, sunPosition);
 
+  // Update distance display in AU or LY
+  let distanceDisplay = document.getElementById("sunDistanceDisplay");
+  if (distanceToSunInAU < 1000) {
+    distanceDisplay.innerHTML = `Distance from Sun: ${distanceToSunInAU.toFixed(1)} AU`;
+  } else {
+    const distanceToSunInLY = distanceToSunInAU / LY_TO_AU;
+    distanceDisplay.innerHTML = `Distance from Sun: ${distanceToSunInLY.toFixed(1)} LY`;
+  }
+ // DATASET UPDATES ONTICK
+  // Update stars if on a desktop
+  if (isDesktop()) { 
+    unifiedPlaceStars(stars100LY3K45K, dateInMilliseconds, 8, 'white', 'stars1');
+    unifiedPlaceStars(stars100LY45K6K, dateInMilliseconds, 10, 'white', 'stars2');
+    unifiedPlaceStars(stars100LY6Kmore, dateInMilliseconds, 15, 'white', 'stars3');
+  }
 
-  // Update other spatial objects
-  // Update other spatial objects
-  const distanceLimit = 300;
-
+  // Update visibility of spatial objects based on distance limits
+  const distVisFrom = 1;  // Lower limit in AU
+  const distVisTo = 300;  // Upper limit in AU
   allObjects.forEach((point) => {
-    const pointShouldAppear = checkIfVisible(point, date);
-  
-    if (distanceToSunInAU >= distanceLimit || !pointShouldAppear) {
-      if (point.visible) {
-        point.visible = false;
-        viz.removeObject(point.newObject);
-      }
-    } else if (!point.visible && distanceToSunInAU < distanceLimit) {
-      point.visible = true;
-      point.newObject = viz.createObject(point.name, point.characteristics);
-    }
+    updateVisibility(point, dateInMilliseconds, distanceToSunInAU, distVisFrom, distVisTo, viz);
   });
 
-    // Update voyagers
-  placeObjects(allVoyagers, date, './assets/symbols/Red_Circle_full.png');
-
+  // Update voyagers
+  placeObjects(allVoyagers, dateInMilliseconds, './assets/symbols/Red_Circle_full.png');
 };
+
 
 // NATURAL OBJECTS
 const sun = viz.createObject("sun", Spacekit.SpaceObjectPresets.SUN);
