@@ -92,9 +92,10 @@ if (distanceToSunInAU < 7000) {  // Threshold set to 7000 AU
   });
 
   if (distanceToSunInAU < 500) {
-    placeObjects(allVoyagers, dateInMilliseconds, './assets/symbols/Red_Circle_full.png');
+    placeObjectsUnified(allVoyagers, dateInMilliseconds, './assets/symbols/Red_Circle_full.png');
   }
-  
+  placeObjectsUnified(updatedMessages, dateInMilliseconds, './assets/symbols/Red_Circle_full.png');
+
 };
 
 // NATURAL OBJECTS
@@ -434,4 +435,79 @@ function placeObjects(objects, date, textureUrl) {
   });
   
 }
+
+
+// FUNCTION: PLACE OBJECTS WITH LABELS - (NOT WORKING PROPERLY)
+// Global storage for object groups
+let objectGroups = {};
+
+// Function to generate a hash based on object IDs
+function hashObjectArray(objects) {
+  let ids = objects.map(obj => obj.id).sort().join(',');
+  return ids;
+}
+
+// Main function to place objects
+function placeObjectsUnified(objects, date, textureUrl) {
+  const groupName = hashObjectArray(objects);  // Generate unique groupName
+
+  // Remove previously added objects for this group
+  if (objectGroups[groupName]) {
+    objectGroups[groupName].forEach(obj => {
+      viz.removeObject(obj);
+    });
+  }
+
+  // Initialize or clear the array for this group
+  objectGroups[groupName] = [];
+
+  objects.forEach(obj => {
+    // Check if the 'dateSent' parameter exists
+    if ('dateSent' in obj) {
+      if (date < new Date(obj.dateSent).getTime()) {
+        return; // skip this iteration
+      }
+    }
+
+    // Check if the 'endDate' parameter exists
+    if ('endDate' in obj) {
+      if (date > new Date(obj.endDate).getTime()) {
+        return; // skip this iteration
+      }
+    }
+
+    // Calculate time difference
+    const timeDifference = date - new Date(obj.epoch).getTime();
+
+    // Calculate adjusted RA, Dec, and R
+    const adjustedRA = obj.ra + obj.vra * timeDifference * 8.78e-15;
+    const adjustedDec = obj.dec + obj.vdec * timeDifference * 8.78e-15;
+    const adjustedR = obj.r + (6.68459e-9 * obj.vr) * timeDifference / 1000;
+
+    // Convert RA and Dec to XYZ coordinates
+    const position = radecToXYZ(adjustedRA, adjustedDec, adjustedR);
+
+    if (adjustedR < 0) {
+      return; // skip this iteration
+    }
+
+    // Debugging: Log position if object ID is 'New Horizon'
+    if (obj.id === "New Horizon") {
+      console.log(adjustedR);
+    }
+
+    // Create and add object to visualization
+    const singleObject = viz.createObject(obj.id, {
+      position: position,
+      scale: [1, 1, 1],
+      particleSize: 5,
+      labelText: obj.id,
+      textureUrl: textureUrl
+    });
+
+    // Add to array of previously added objects for this group
+    objectGroups[groupName].push(singleObject);
+  });
+}
+
 });
