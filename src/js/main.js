@@ -129,7 +129,7 @@ const planetData = [
 planetData.forEach((planet) => {
   const object = createSpaceObject(planet.name, planet.label);
   planetObjects.push(object);
-});
+}); 
 
 const moon = createSpaceObject("moon", "moon");
 const earth = createSpaceObject("earth", "Earth");
