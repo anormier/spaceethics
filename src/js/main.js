@@ -376,7 +376,9 @@ let previouslyAddedObjects = [];
 
 function placeObjects(objects, date, textureUrl) {
   // Remove previously added objects and clear the list.
-  previouslyAddedObjects.forEach(viz.removeObject);
+  previouslyAddedObjects.forEach(obj => {
+    viz.removeObject(obj)
+  });
   previouslyAddedObjects = [];
   
   objects.forEach(obj => {
@@ -385,6 +387,11 @@ function placeObjects(objects, date, textureUrl) {
     const adjustedDec = obj.dec + obj.vdec * timeDifference * 8.78e-15;
     const adjustedR =  obj.r + (6.68459e-9 * obj.vr) * timeDifference / 1000;
     const position = radecToXYZ(adjustedRA, adjustedDec, adjustedR);
+
+    // pour tester dans la console
+    if (obj.id === "New Horizon") {
+      console.log(position)
+    }
 
     const singleObject = viz.createObject(obj.id, {
       position: position,
@@ -395,6 +402,7 @@ function placeObjects(objects, date, textureUrl) {
     });
 
     previouslyAddedObjects.push(singleObject);
+    // console.log(previouslyAddedObjects)
   });
 }
 });
