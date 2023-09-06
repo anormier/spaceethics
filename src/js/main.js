@@ -8,7 +8,7 @@ import allObjects from "./data/spatial-objects.js";
 import stars100LY3K45K from "./data/stars100LY3K45K.js";
 import stars100LY45K6K from "./data/stars100LY45K6K.js";
 import stars100LY6Kmore from "./data/stars100LY6Kmore.js";
-import allMessages from "./data/messages.js";
+import {updatedMessages, allMessages} from "./data/messages.js";
 import allVoyagers from "./data/voyagers.js";
 import {navInfo} from './textContents.js';
 

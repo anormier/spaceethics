@@ -7,8 +7,26 @@
 
 //extract: https://docs.google.com/spreadsheets/d/1JZJq8M9Yg2gfahe1NwU_fI7p-xS1J8Eub3L0Z_LCZgg/edit#gid=2136432496
 
+function addDefaultParams(messages) {
+    return messages.map(message => {
+        // If dateSent in the message is just a year, converting it to a full date string
+        const dateSent = new Date(`${message.dateSent}-01-01`);
+        return {
+            r: 1,
+            ra: 258,
+            dec: 12,
+            vra: 0,
+            vdec: 0,
+            dateSent: new Date("1977-09-05"), // Default value
+            vr: 3000000,
+            epoch: "2024-01-01",
+            ...message, // Spread the existing message properties
+            dateSent // Override the default value with the new Date object
+        };
+    });
+}
 
-const allMessages = [
+export const allMessages = [
 
     { id: 'RuBisCo Stars', dist: 16.8, ra: 3.745, dec: -9.773, dateSent: 2009 },
     { id: 'Sonar Caling 2', dist: 12.36, ra: 12.36, dec: 111.852, dateSent: 2018 },
@@ -43,4 +61,4 @@ const allMessages = [
 
 ]
 
-export default allMessages;
+export const updatedMessages = addDefaultParams(allMessages);
