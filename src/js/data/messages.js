@@ -20,7 +20,7 @@ function addDefaultParams(messages) {
         vra: 0,
         vdec: 0,
         dateSent: new Date("1977-09-05"), // Default value
-        vr: 3000000,
+        vr: 300000,
         epoch: "2024-01-01",
         ...message, // Spread the existing message properties
         dateSent, // Override the default value with the new Date object

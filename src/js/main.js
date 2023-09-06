@@ -232,6 +232,8 @@ raSlider.addEventListener("input", (event) => {
 // UI ELEMENTS II
 // Setup navigation buttons
 
+
+
 function setupButton(id, obj1, params1, zoom1, obj2, params2, zoom2) {
     document.getElementById(id).onclick = function () {
         const viewer = viz.getViewer();
