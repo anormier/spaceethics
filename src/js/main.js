@@ -66,14 +66,16 @@ viz.onTick = function () {
   // Calculate distance to sun in AU
   const distanceToSunInAU = distToCam(cameraPosition, sunPosition);
 
-  // Update distance display in AU or LY
-  let distanceDisplay = document.getElementById("sunDistanceDisplay");
-  if (distanceToSunInAU < 1000) {
-    distanceDisplay.innerHTML = `Distance from Sun: ${distanceToSunInAU.toFixed(1)} AU`;
-  } else {
-    const distanceToSunInLY = distanceToSunInAU / LY_TO_AU;
-    distanceDisplay.innerHTML = `Distance from Sun: ${distanceToSunInLY.toFixed(1)} LY`;
-  }
+// Update distance display in AU or LY
+let distanceDisplay = document.getElementById("sunDistanceDisplay");
+
+if (distanceToSunInAU < 7000) {  // Threshold set to 7000 AU
+  distanceDisplay.innerHTML = `Distance from Sun: ${distanceToSunInAU.toFixed(1)} AU`;
+} else {
+  const distanceToSunInLY = distanceToSunInAU / 63241.1;  // Convert AU to LY directly
+  distanceDisplay.innerHTML = `Distance from Sun: ${distanceToSunInLY.toFixed(1)} LY`;
+}
+
  // DATASET UPDATES ONTICK
   // Update stars if on a desktop
   if (isDesktop()) { 
