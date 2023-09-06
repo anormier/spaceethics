@@ -103,11 +103,15 @@ const sun = viz.createObject("sun", Spacekit.SpaceObjectPresets.SUN);
 viz.createAmbientLight();
 viz.createLight([0, 0, 0]);
 
+
+let planetObjects = [];
+
 function createSpaceObject(name, label) {
-  return viz.createObject(name, {
+  const object = viz.createObject(name, {
     labelText: label,
     ephem: Spacekit.EphemPresets[name.toUpperCase()]
   });
+  return object;
 }
 
 const planetData = [
@@ -122,7 +126,10 @@ const planetData = [
 
 ];
 
-planetData.forEach(planet => createSpaceObject(planet.name, planet.label));
+planetData.forEach((planet) => {
+  const object = createSpaceObject(planet.name, planet.label);
+  planetObjects.push(object);
+});
 
 const moon = createSpaceObject("moon", "moon");
 const earth = createSpaceObject("earth", "Earth");
@@ -194,6 +201,16 @@ const jupiter3 = createCelestialSphere("jupiter3", {
 });
 
 // UI ELEMENTS
+document.getElementById('parameters-btn').addEventListener('click', function() {
+  const menu = document.getElementById('parameters-menu');
+  menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+});
+
+document.getElementById('show-planet-labels').addEventListener('change', function(event) {
+  const showLabels = event.target.checked;
+  // Your code to toggle planet labels on/off
+});
+
 // init Mobile:
 if (isMobile()) {
   document.getElementById('fullscreen-btn').style.display = 'none';

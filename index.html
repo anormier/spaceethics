@@ -27,18 +27,20 @@
         <button id="start-stop-btn" class="control-btn">
           <i class="fas fa-pause" id="start-icon"></i>
           <i class="fas fa-play" id="pause-icon" style="display: none;"></i>
-          <button id="parameters-btn" class="control-btn">
-            <i class="fas fa-cog"></i>
-          </button>
-      </button>
-      <button id="fullscreen-btn" class="fullscreen-btn" onclick="toggleFullscreen()">
-        <i class="fas fa-expand"></i>
-      </button>   
-    </div>  <br />
-    <button id="toggleLabels">Toggle Labels</button>
+        </button>
+        <button id="parameters-btn" class="control-btn">
+          <i class="fas fa-cog"></i>
+        </button>
+
+
+        <button id="fullscreen-btn" class="fullscreen-btn" onclick="toggleFullscreen()">
+          <i class="fas fa-expand"></i>
+        </button>
+      </div>       <br />
+
       <br />
       <div id="sunDistanceDisplay"></div>
-
+     
       <div class="menu-container">
         More...
         <div class="dropdown-content">
@@ -83,6 +85,10 @@
             </div>
           </div>
         </div>
+      </div>
+      <div id="parameters-menu" class="parameters-menu">
+        <input type="checkbox" id="show-planet-labels">
+        <label for="show-planet-labels">Show Planet Labels</label>
       </div>
     </div>
 
