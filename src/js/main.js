@@ -216,6 +216,18 @@ const jupiter3 = createCelestialSphere("jupiter3", {
   atmosphere:'true'
 });
 
+// UI HTML
+function toggleManColor() {
+  var manIcon = document.getElementById("man-icon");
+  if (manIcon.classList.contains("active")) {
+      manIcon.classList.remove("active");
+  } else {
+      manIcon.classList.add("active");
+  }
+}
+document.getElementById("human-icon-btn").addEventListener("click", toggleManColor);
+
+
 // UI ELEMENTS
 document.getElementById('parameters-btn').addEventListener('click', function() {
   const menu = document.getElementById('parameters-menu');
