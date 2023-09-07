@@ -35,7 +35,7 @@ const viz = new Spacekit.Simulation(document.getElementById("main-container"), {
 });
 
 const skybox = viz.createSkybox(Spacekit.SkyboxPresets.ESO_GIGAGALAXY);
-viz.setJdDelta(viz.getJdDelta() * 0.02);
+viz.setJdPerSecond(30);
 viz.renderOnlyInViewport();
 
 // SIM LOOP
@@ -218,13 +218,33 @@ if (isMobile()) {
 const dateElt = document.getElementById("current-date");
 const speedDisplay = document.getElementById('speed-display');
 const speedSlider = document.getElementById('speed-slider');
-const initialSpeed = viz.getJdDelta();
+const initialSpeed = viz.getJdPerSecond();
 
 speedSlider.addEventListener("input", (event) => {
-    const speedFactor = Math.pow(10, parseFloat(event.target.value));
-    viz.setJdDelta(initialSpeed * speedFactor);
-    speedDisplay.textContent = `Speed: ${speedFactor.toFixed(3)}x`;
+  const speedFactor = Math.pow(10, parseFloat(event.target.value));
+  const daysPerSecond = initialSpeed * speedFactor; // Days per second
+
+  viz.setJdPerSecond(daysPerSecond);
+
+  let speedText;
+  if (daysPerSecond < 30) { // If less than a month
+      speedText = `Speed: ${daysPerSecond.toFixed(1)} day/sec`;
+  } else if (daysPerSecond < 365.25) { // If less than a year
+      const monthsPerSecond = daysPerSecond / 30.44; // Average days in a month
+      speedText = `Speed: ${monthsPerSecond.toFixed(1)} month/sec`;
+  } else {
+      const yearsPerSecond = daysPerSecond / 365.25;
+      speedText = `Speed: ${yearsPerSecond.toFixed(1)} year/sec`;
+  }
+
+  speedDisplay.textContent = speedText;
 });
+
+// Ensure the minimal value of speedSlider corresponds to one day per second
+if (speedSlider.min) {
+  speedSlider.min = Math.log10(1 / initialSpeed);
+}
+
 
 const yearSlider = document.getElementById("year-slider");
 yearSlider.addEventListener("input", (event) => {
