@@ -267,7 +267,7 @@ function getSpeedBasedOnDistance(distanceToSunInAU) {
   let speed;
   if (distanceToSunInAU < 100) {
     speed = 10;  // Whatever value you want
-  } else if (distanceToSunInAU < 600) {
+  } else if (distanceToSunInAU < 200) {
     speed = 500; // Adjust values as needed
   } else {
     speed = 600; // Adjust values as needed
@@ -281,7 +281,7 @@ function getDateBoundariesBasedOnDistance(distanceToSunInAU) {
   if (distanceToSunInAU < 100) {
       boundaryDate = new Date('2030-01-01');
       resetDate = new Date('1950-01-01');
-  } else if (distanceToSunInAU < 600) {
+  } else if (distanceToSunInAU < 200) {
       boundaryDate = new Date('2030-01-01');
       resetDate = new Date('1990-01-01');
   } else {
@@ -349,7 +349,7 @@ function setupButton(id, obj1, params1, zoom1, obj2, params2, zoom2) {
 
 // Assign actions to buttons
 setupButton("btn-Messages", sun, [1, 2, 1], 3000000);
-setupButton("btn-far", sun, [2, 2, 2], 300);
+setupButton("btn-far", sun, [2, 2, 2], 150);
 setupButton("btn-system", sun, [2, 2, 2], 2);
 setupButton("btn-earth", sun, [-0.75, -0.75, 0.5], 10000, earthV, [2, 0, 0], 0.00003);
 setupButton("btn-mars", sun, [-0.75, -0.75, 0.5], 10000, marsV, [2, 0, 0], 0.00001);
