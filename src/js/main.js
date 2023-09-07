@@ -58,11 +58,7 @@ viz.onTick = function () {
                           + (currentDate.getDate() / 365.25);
   yearSlider.value = fractionalYear;
 
-  // Check for date boundary and reset if needed
-  if (currentDate >= new Date('2030-01-01')) {
-    viz.setDate(new Date('1950-01-01'));
-    return;
-  }
+  
 
   // Convert current date to time for other calculations
   const dateInMilliseconds = currentDate.getTime();
@@ -74,6 +70,12 @@ viz.onTick = function () {
   // Calculate distance to sun in AU
   const distanceToSunInAU = distToCam(cameraPosition, sunPosition);
 
+  const { boundaryDate, resetDate } = getDateBoundariesBasedOnDistance(distanceToSunInAU);
+  // Check for date boundary and reset if needed
+  if (currentDate >= boundaryDate) {
+      viz.setDate(resetDate);
+      return;
+  }
 
 // Update distance display in AU or LY
 let distanceDisplay = document.getElementById("sunDistanceDisplay");
@@ -263,14 +265,31 @@ speedSlider.addEventListener("input", (event) => {
 
 function getSpeedBasedOnDistance(distanceToSunInAU) {
   let speed;
-  if (distanceToSunInAU < 200) {
+  if (distanceToSunInAU < 100) {
     speed = 10;  // Whatever value you want
-  } else if (distanceToSunInAU < 1000) {
+  } else if (distanceToSunInAU < 600) {
     speed = 500; // Adjust values as needed
   } else {
     speed = 600; // Adjust values as needed
   }
   return speed;
+}
+
+function getDateBoundariesBasedOnDistance(distanceToSunInAU) {
+  let boundaryDate, resetDate;
+
+  if (distanceToSunInAU < 100) {
+      boundaryDate = new Date('2030-01-01');
+      resetDate = new Date('1950-01-01');
+  } else if (distanceToSunInAU < 600) {
+      boundaryDate = new Date('2030-01-01');
+      resetDate = new Date('1970-01-01');
+  } else {
+      boundaryDate = new Date('2030-01-01');
+      resetDate = new Date('1974-01-01');
+  }
+
+  return { boundaryDate, resetDate };
 }
 
 function updateSpeedDisplay(daysPerSecond) {
