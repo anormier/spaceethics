@@ -283,10 +283,10 @@ function getDateBoundariesBasedOnDistance(distanceToSunInAU) {
       resetDate = new Date('1950-01-01');
   } else if (distanceToSunInAU < 600) {
       boundaryDate = new Date('2030-01-01');
-      resetDate = new Date('1970-01-01');
+      resetDate = new Date('1990-01-01');
   } else {
       boundaryDate = new Date('2030-01-01');
-      resetDate = new Date('1974-01-01');
+      resetDate = new Date('2000-01-01');
   }
 
   return { boundaryDate, resetDate };
