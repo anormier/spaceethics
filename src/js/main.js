@@ -18,6 +18,8 @@ const THREE = Spacekit.THREE;
 // CONSTANTS
 const LY_TO_AU = 63241.16; 
 let autoAdjustSpeed = true;
+let manIcon = document.getElementById("man-icon");
+
 
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -107,11 +109,15 @@ if (autoAdjustSpeed) {
     updateVisibility(point, dateInMilliseconds, distanceToSunInAU, distVisFrom, distVisTo, viz);
   });
 
-  if (distanceToSunInAU < 500) {
-    placeObjectsUnified(allVoyagers, dateInMilliseconds, './assets/symbols/Red_Circle_full.png');
+  if (!manIcon.classList.contains("active")) {
+    if (distanceToSunInAU < 500) {
+      placeObjectsUnified(allVoyagers, dateInMilliseconds, './assets/symbols/Red_Circle_full.png');
+    } else {
+      placeObjectsUnified(updatedMessages, dateInMilliseconds, './assets/symbols/Red_Circle_full.png');
+    }
+  } else {
+    unloadAllObjects();
   }
-  placeObjectsUnified(updatedMessages, dateInMilliseconds, './assets/symbols/Red_Circle_full.png');
-
 };
 
 // NATURAL OBJECTS
@@ -585,6 +591,19 @@ function placeObjectsUnified(objects, date, textureUrl) {
     // Add to array of previously added objects for this group
     objectGroups[groupName].push(singleObject);
   });
+}
+
+function unloadAllObjects() {
+  // Loop through all object groups
+  for (let group in objectGroups) {
+    // Remove each object from the visualization
+    objectGroups[group].forEach(obj => {
+      viz.removeObject(obj);
+    });
+
+    // Clear the array for this group
+    objectGroups[group] = [];
+  }
 }
 
 });
