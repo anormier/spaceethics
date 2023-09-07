@@ -348,8 +348,8 @@ function setupButton(id, obj1, params1, zoom1, obj2, params2, zoom2) {
 }
 
 // Assign actions to buttons
-setupButton("btn-Messages", sun, [1, 2, 1], 1000000);
-setupButton("btn-far", sun, [2, 2, 2], 100);
+setupButton("btn-Messages", sun, [1, 2, 1], 3000000);
+setupButton("btn-far", sun, [2, 2, 2], 300);
 setupButton("btn-system", sun, [2, 2, 2], 2);
 setupButton("btn-earth", sun, [-0.75, -0.75, 0.5], 10000, earthV, [2, 0, 0], 0.00003);
 setupButton("btn-mars", sun, [-0.75, -0.75, 0.5], 10000, marsV, [2, 0, 0], 0.00001);
