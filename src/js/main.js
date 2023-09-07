@@ -388,44 +388,44 @@ const updateStars = () => {
   placeStars(stars100LY3K45K);
 };
 
-// FUNCTION: PLACE MESSAGES
-const mxDotPositions = [];
-// Function to calculate and push positions using radecToXYZ
-function calculatePositions(mx, multiplier) {
-  let count;
-  if (isDesktop()) {
-      count = 1000;
-  } else {
-      count = 10;
-  }
-  for (let i = 1; i < count; i++) {
-    const r = i * (LY_TO_AU * mx.dist) / (count * multiplier);
-    const position = radecToXYZ(mx.ra + ra, mx.dec + dec, r);
-    mxDotPositions.push(position);
-  }
-}
-allMessages.forEach(mx => {
-  calculatePositions(mx, 1);
-// calculatePositions(mx, 100);
-// calculatePositions(mx, 1000);
-});
-viz.createStaticParticles('mx', mxDotPositions, {
-   defaultColor: 'red',
-   size: 5,
-});
+// // FUNCTION: PLACE MESSAGES
+// const mxDotPositions = [];
+// // Function to calculate and push positions using radecToXYZ
+// function calculatePositions(mx, multiplier) {
+//   let count;
+//   if (isDesktop()) {
+//       count = 1000;
+//   } else {
+//       count = 10;
+//   }
+//   for (let i = 1; i < count; i++) {
+//     const r = i * (LY_TO_AU * mx.dist) / (count * multiplier);
+//     const position = radecToXYZ(mx.ra + ra, mx.dec + dec, r);
+//     mxDotPositions.push(position);
+//   }
+// }
+// allMessages.forEach(mx => {
+//   calculatePositions(mx, 1);
+// // calculatePositions(mx, 100);
+// // calculatePositions(mx, 1000);
+// });
+// viz.createStaticParticles('mx', mxDotPositions, {
+//    defaultColor: 'red',
+//    size: 5,
+// });
 
-//messages destinations
+// //messages destinations
 
- const mxPositions = [];
+//  const mxPositions = [];
 
-allMessages.forEach((mx) => {  
-  mxPositions.push(radecToXYZ(mx.ra + ra,mx.dec + dec,63241.16 * mx.dist))
-});
+// allMessages.forEach((mx) => {  
+//   mxPositions.push(radecToXYZ(mx.ra + ra,mx.dec + dec,63241.16 * mx.dist))
+// });
 
-viz.createStaticParticles('mx', mxPositions, {
-   defaultColor: 'red',
-   size: 20,
- });
+// viz.createStaticParticles('mx', mxPositions, {
+//    defaultColor: 'red',
+//    size: 20,
+//  });
 
 
 // FUNCTION: PLACE MOVING STARS (or PARTICULES)
