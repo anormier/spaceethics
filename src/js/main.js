@@ -75,7 +75,6 @@ viz.onTick = function () {
   const distanceToSunInAU = distToCam(cameraPosition, sunPosition);
 
 
-
 // Update distance display in AU or LY
 let distanceDisplay = document.getElementById("sunDistanceDisplay");
 
@@ -264,12 +263,12 @@ speedSlider.addEventListener("input", (event) => {
 
 function getSpeedBasedOnDistance(distanceToSunInAU) {
   let speed;
-  if (distanceToSunInAU < 1000) {
-    speed = 1;  // Whatever value you want
-  } else if (distanceToSunInAU < 10000) {
-    speed = 10; // Adjust values as needed
+  if (distanceToSunInAU < 200) {
+    speed = 10;  // Whatever value you want
+  } else if (distanceToSunInAU < 1000) {
+    speed = 500; // Adjust values as needed
   } else {
-    speed = 100; // Adjust values as needed
+    speed = 600; // Adjust values as needed
   }
   return speed;
 }
