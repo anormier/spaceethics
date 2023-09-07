@@ -17,6 +17,8 @@ const THREE = Spacekit.THREE;
 
 // CONSTANTS
 const LY_TO_AU = 63241.16; 
+let autoAdjustSpeed = true;
+
 
 document.addEventListener("DOMContentLoaded", function() {
 
@@ -37,6 +39,10 @@ const viz = new Spacekit.Simulation(document.getElementById("main-container"), {
 const skybox = viz.createSkybox(Spacekit.SkyboxPresets.ESO_GIGAGALAXY);
 viz.setJdPerSecond(30);
 viz.renderOnlyInViewport();
+const camera = viz.getViewer().get3jsCamera();
+camera.addEventListener('change', function() {
+    autoAdjustSpeed = true;
+});
 
 // SIM LOOP
 viz.onTick = function () {
@@ -66,6 +72,8 @@ viz.onTick = function () {
   // Calculate distance to sun in AU
   const distanceToSunInAU = distToCam(cameraPosition, sunPosition);
 
+
+
 // Update distance display in AU or LY
 let distanceDisplay = document.getElementById("sunDistanceDisplay");
 
@@ -74,6 +82,14 @@ if (distanceToSunInAU < 7000) {  // Threshold set to 7000 AU
 } else {
   const distanceToSunInLY = distanceToSunInAU / 63241.1;  // Convert AU to LY directly
   distanceDisplay.innerHTML = `Distance from Sun: ${distanceToSunInLY.toFixed(1)} LY`;
+}
+
+if (autoAdjustSpeed) {
+  const desiredSpeed = getSpeedBasedOnDistance(distanceToSunInAU); // Assuming you have this function as per the previous code
+  viz.setJdPerSecond(desiredSpeed);
+  const speedFactor = desiredSpeed / initialSpeed;
+  speedSlider.value = Math.log10(speedFactor);
+  updateSpeedDisplay(desiredSpeed); // New function to handle updating the speed display text
 }
 
  // DATASET UPDATES ONTICK
@@ -221,16 +237,31 @@ const speedSlider = document.getElementById('speed-slider');
 const initialSpeed = viz.getJdPerSecond();
 
 speedSlider.addEventListener("input", (event) => {
+  autoAdjustSpeed = false; // set to false because user is manually adjusting
   const speedFactor = Math.pow(10, parseFloat(event.target.value));
-  const daysPerSecond = initialSpeed * speedFactor; // Days per second
-
+  const daysPerSecond = initialSpeed * speedFactor; 
   viz.setJdPerSecond(daysPerSecond);
+  updateSpeedDisplay(daysPerSecond);
+});
 
+function getSpeedBasedOnDistance(distanceToSunInAU) {
+  let speed;
+  if (distanceToSunInAU < 1000) {
+    speed = 1;  // Whatever value you want
+  } else if (distanceToSunInAU < 10000) {
+    speed = 10; // Adjust values as needed
+  } else {
+    speed = 100; // Adjust values as needed
+  }
+  return speed;
+}
+
+function updateSpeedDisplay(daysPerSecond) {
   let speedText;
-  if (daysPerSecond < 30) { // If less than a month
+  if (daysPerSecond < 30) {
       speedText = `Speed: ${daysPerSecond.toFixed(1)} day/sec`;
-  } else if (daysPerSecond < 365.25) { // If less than a year
-      const monthsPerSecond = daysPerSecond / 30.44; // Average days in a month
+  } else if (daysPerSecond < 365.25) {
+      const monthsPerSecond = daysPerSecond / 30.44;
       speedText = `Speed: ${monthsPerSecond.toFixed(1)} month/sec`;
   } else {
       const yearsPerSecond = daysPerSecond / 365.25;
@@ -238,13 +269,7 @@ speedSlider.addEventListener("input", (event) => {
   }
 
   speedDisplay.textContent = speedText;
-});
-
-// Ensure the minimal value of speedSlider corresponds to one day per second
-if (speedSlider.min) {
-  speedSlider.min = Math.log10(1 / initialSpeed);
 }
-
 
 const yearSlider = document.getElementById("year-slider");
 yearSlider.addEventListener("input", (event) => {
@@ -300,6 +325,7 @@ const startIcon = document.getElementById('start-icon');
 const pauseIcon = document.getElementById('pause-icon');
 
 startStopButton.onclick = function () {
+    autoAdjustSpeed = true;  
     isPaused ? viz.start() : viz.stop();
     startIcon.style.display = isPaused ? "inline-block" : "none";
     pauseIcon.style.display = isPaused ? "none" : "inline-block";
