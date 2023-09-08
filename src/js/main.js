@@ -66,6 +66,17 @@ const start = [0, 0, 0];
 const end = [0, 0, LY_TO_AU*1000];
 drawLine(viz, start, end);
 
+// RAYCASTING
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+document.addEventListener('click', function(event) {
+  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+  raycaster.setFromCamera(mouse, viz.getViewer().get3jsCamera());
+  const intersects = raycaster.intersectObjects(viz.getScene().children, true);
+  console.log(intersects.length > 0 ? 'Intersection found!' : 'No intersections.');
+});//WORKING !!!! (but caution, it selects the skybox hance some work to be usefull..)
+
 
 // SIM LOOP
 viz.onTick = function () {
