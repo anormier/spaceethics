@@ -108,25 +108,34 @@ if (autoAdjustSpeed) {
   const distVisFrom = 1;  // Lower limit in AU
   const distVisTo = 300;  // Upper limit in AU
 
-  allObjects.forEach((point) => {
-    updateVisibility(point, dateInMilliseconds, distanceToSunInAU, distVisFrom, distVisTo, viz);
-  });
+  
 
   if (!manIcon.classList.contains("active")) {
     // Update visibility of messages based on distance limits
+    allObjects.forEach((point) => {
+      updateVisibility(point, dateInMilliseconds, distanceToSunInAU, distVisFrom, distVisTo, viz);
+    });
     if (distanceToSunInAU < 1*LY_TO_AU) {
-        unloadAllObjects();
+      setPlanetLabelsVisible(true);  
+      unloadAllObjects();
         placeObjectsUnified(allVoyagers, dateInMilliseconds, './assets/symbols/Red_Circle_full.png');
        placeObjectsUnified(updatedMessages, dateInMilliseconds, './assets/symbols/Red_Circle_full.png', false);
     } else if (distanceToSunInAU > 1*LY_TO_AU && distanceToSunInAU < 300*LY_TO_AU) {
-        unloadAllObjects();
+      setPlanetLabelsVisible(false);  
+      unloadAllObjects();
         placeObjectsUnified(allVoyagers, dateInMilliseconds, './assets/symbols/Red_Circle_full.png', false);
       placeObjectsUnified(updatedMessages, dateInMilliseconds, './assets/symbols/Red_Circle_full.png');
     } else {
         unloadAllObjects();
+        setPlanetLabelsVisible(false);  
     }
 } else {
-    unloadAllObjects();
+   
+  allObjects.forEach((point) => {
+    point.visible = false;
+    viz.removeObject(point.newObject);
+    });
+  unloadAllObjects();
 }
 
 
@@ -661,9 +670,12 @@ function unloadAllObjects() {
 }
 
 //LABEL VISIBILITY
-planetObjects.forEach((planetObject) => {
-  planetObject.setLabelVisibility(false);
-}); 
+// argument: true or false
+function setPlanetLabelsVisible(isVisible) {
+  planetObjects.forEach((planetObject) => {
+    planetObject.setLabelVisibility(isVisible);
+  });
+}
 
 
 
