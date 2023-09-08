@@ -495,10 +495,15 @@ const updateStars = () => {
 //  });
 
 
-// FUNCTION: PLACE MOVING STARS (or PARTICULES)
 let starParticleObjects = {};
+let hasLoadedParticles = false;  // This global flag checks if particles have already been loaded on mobile.
 
 function unifiedPlaceStars(stars, date, size, color, particleName) {
+  // If it's mobile and the particles have been loaded already, return early.
+  if (isMobile() && hasLoadedParticles) {
+    return;
+  }
+
   let starPositions = [];
 
   if (starParticleObjects[particleName]) {
@@ -520,10 +525,15 @@ function unifiedPlaceStars(stars, date, size, color, particleName) {
     defaultColor: color,
     size: size,
   });
+
+  // If on mobile, set the flag to true after the first load.
+  if (isMobile()) {
+    hasLoadedParticles = true;
+  }
 };
 
 
-// FUNCTION: PLACE OBJECTS WITH LABELS - (NOT WORKING PROPERLY)
+// FUNCTION: PLACE OBJECTS WITH LABELS VISIBILITY OPTIONNAL
 // A list to keep track of previously added objects.
 let previouslyAddedObjects = [];
 
@@ -548,8 +558,7 @@ function placeObjects(objects, date, textureUrl) {
         return; // skip this iteration
       }
     }
-  
-   
+
 
     // Calculate time difference
     const timeDifference = date - new Date(obj.epoch).getTime();
@@ -583,8 +592,6 @@ function placeObjects(objects, date, textureUrl) {
   
 }
 
-
-// FUNCTION: PLACE OBJECTS WITH LABELS - (NOT WORKING PROPERLY)
 // Global storage for object groups
 let objectGroups = {};
 
