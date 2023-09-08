@@ -148,9 +148,9 @@ viz.createAmbientLight();
 viz.createLight([0, 0, 0]);
 
 if (isMobile()) {
-  unifiedPlaceStars(stars100LY3K45K, new Date("2024-01-01").getDate(), 8, 'white', 'stars1');
-  unifiedPlaceStars(stars100LY45K6K, new Date("2024-01-01").getDate(), 10, 'white', 'stars2');
-  unifiedPlaceStars(stars100LY6Kmore, new Date("2024-01-01").getDate(), 15, 'white','stars3');
+  unifiedPlaceStars(stars100LY3K45K,  Date("2024-01-01").getDate(), 8, 'white', 'stars1');
+  unifiedPlaceStars(stars100LY45K6K,  Date("2024-01-01").getDate(), 10, 'white', 'stars2');
+  unifiedPlaceStars(stars100LY6Kmore,  Date("2024-01-01").getDate(), 15, 'white','stars3');
   }
 
 let planetObjects = [];
