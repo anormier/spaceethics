@@ -114,14 +114,21 @@ if (autoAdjustSpeed) {
 
   if (!manIcon.classList.contains("active")) {
     // Update visibility of messages based on distance limits
-    if (distanceToSunInAU < 500) {
+    if (distanceToSunInAU < 1*LY_TO_AU) {
+        unloadAllObjects();
         placeObjectsUnified(allVoyagers, dateInMilliseconds, './assets/symbols/Red_Circle_full.png');
+       placeObjectsUnified(updatedMessages, dateInMilliseconds, './assets/symbols/Red_Circle_full.png', false);
+    } else if (distanceToSunInAU > 1*LY_TO_AU && distanceToSunInAU < 300*LY_TO_AU) {
+        unloadAllObjects();
+        placeObjectsUnified(allVoyagers, dateInMilliseconds, './assets/symbols/Red_Circle_full.png', false);
+      placeObjectsUnified(updatedMessages, dateInMilliseconds, './assets/symbols/Red_Circle_full.png');
     } else {
-        placeObjectsUnified(updatedMessages, dateInMilliseconds, './assets/symbols/Red_Circle_full.png');
+        unloadAllObjects();
     }
 } else {
     unloadAllObjects();
 }
+
 
 
 
@@ -550,10 +557,7 @@ function placeObjects(objects, date, textureUrl) {
         return; // skip this iteration
       }
 
-    // Debugging: Log position if object ID is 'New Horizon'
-    if (obj.id === "New Horizon") {
-      console.log(adjustedR);
-    }
+ 
   
     // Create and add object to visualization
     const singleObject = viz.createObject(obj.id, {
@@ -582,7 +586,7 @@ function hashObjectArray(objects) {
 }
 
 // Main function to place objects
-function placeObjectsUnified(objects, date, textureUrl) {
+function placeObjectsUnified(objects, date, textureUrl, labelVisible = true) {
   const groupName = hashObjectArray(objects);  // Generate unique groupName
 
   // Remove previously added objects for this group
@@ -625,19 +629,18 @@ function placeObjectsUnified(objects, date, textureUrl) {
       return; // skip this iteration
     }
 
-    // Debugging: Log position if object ID is 'New Horizon'
-    if (obj.id === "New Horizon") {
-      console.log(adjustedR);
-    }
-
+  
     // Create and add object to visualization
     const singleObject = viz.createObject(obj.id, {
       position: position,
       scale: [1, 1, 1],
       particleSize: 5,
-      labelText: obj.id,
+      labelText: obj.id,  // set labelText based on labelVisible
       textureUrl: textureUrl
     });
+
+    // Set label visibility according to the parameter
+    singleObject.setLabelVisibility(labelVisible);
 
     // Add to array of previously added objects for this group
     objectGroups[groupName].push(singleObject);
@@ -662,9 +665,6 @@ planetObjects.forEach((planetObject) => {
   planetObject.setLabelVisibility(false);
 }); 
 
-objectGroups[group].forEach(obj => {
-  obj.setLabelVisibility(false);
-});
 
 
 
