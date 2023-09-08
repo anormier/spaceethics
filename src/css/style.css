@@ -232,7 +232,10 @@ font-size: 16px;
 
 #man-icon {
   color: red;
+  transform: scale(1.7);
+
 }
 #man-icon.active {
   color: white; /* or any other color to indicate active state */
 }
+
