@@ -112,7 +112,6 @@ if (autoAdjustSpeed) {
     updateVisibility(point, dateInMilliseconds, distanceToSunInAU, distVisFrom, distVisTo, viz);
   });
 
-
   if (!manIcon.classList.contains("active")) {
     // Update visibility of messages based on distance limits
     if (distanceToSunInAU < 500) {
@@ -123,6 +122,7 @@ if (autoAdjustSpeed) {
 } else {
     unloadAllObjects();
 }
+
 
 
 };
@@ -151,7 +151,8 @@ const planetData = [
   { name: "saturn", label: "Saturn" },
   { name: "neptune", label: "Neptune" },
   { name: "jupiter", label: "Jupiter" },
-  { name: "pluto", label: "Pluto" }
+  { name: "pluto", label: "Pluto" },
+  
 
 ];
 
@@ -160,9 +161,9 @@ planetData.forEach((planet) => {
   planetObjects.push(object);
 }); 
 
-const moon = createSpaceObject("moon", "moon");
+const moon = createSpaceObject("moon");
 const earth = createSpaceObject("earth", "Earth");
-
+// earth.setLabelVisibility(false);
 
 moon.orbitAround(earth);
 
@@ -184,7 +185,7 @@ function createCelestialSphere(id, options) {
       enable: true,
       speed: options.rotationSpeed,
     },
-    occludeLabels: true
+    occludeLabels: true,
   });
 }
 
@@ -193,7 +194,7 @@ const earthV = createCelestialSphere("earthV", {
   radius: 6371,
   ephem: "EARTH",
   rotationSpeed: 0.3,
-  atmosphere:'true'
+  atmosphere:'true',
 });
 
 const earthLightsV = createCelestialSphere("earthLightsV", {
@@ -338,26 +339,51 @@ raSlider.addEventListener("input", (event) => {
 
 
 
+// function setupButton(id, obj1, params1, zoom1, obj2, params2, zoom2) {
+//     document.getElementById(id).onclick = function () {
+//         const viewer = viz.getViewer();
+//         viewer.followObject(obj1, params1);
+//         viz.zoomToFit(obj1, zoom1);
+//         unloadAllObjects();
+//         if (obj2 && params2 && zoom2) {
+//             setTimeout(() => {
+//                 viewer.followObject(obj2, params2);
+//                 viz.zoomToFit(obj2, zoom2);
+//                 unloadAllObjects();
+//             }, 20);
+//         }
+//     };
+// }
+
+// // Assign actions to buttons
+// setupButton("btn-Messages", sun, [-0.75, -0.75, 0.5], 300000000,sun, [1, 2, 1], 3000000);
+// setupButton("btn-far", sun, [-0.75, -0.75, 0.5], 300000000,sun, [2, 2, 2], 150);
+// setupButton("btn-system",sun, [-0.75, -0.75, 0.5], 300000000, sun, [2, 2, 2], 2);
+// setupButton("btn-earth", sun, [-0.75, -0.75, 0.5], 300000000, earthV, [2, 0, 0], 0.00003);
+// setupButton("btn-mars", sun, [-0.75, -0.75, 0.5], 300000000, marsV, [2, 0, 0], 0.00001);
+// setupButton("btn-moon", sun, [-0.75, -0.75, 0.5], 300000000, moonV, [2, 0, 0], 0.003);
+
 function setupButton(id, obj1, params1, zoom1, obj2, params2, zoom2) {
-    document.getElementById(id).onclick = function () {
-        const viewer = viz.getViewer();
-        viewer.followObject(obj1, params1);
-        viz.zoomToFit(obj1, zoom1);
-        unloadAllObjects();
-        if (obj2 && params2 && zoom2) {
-            setTimeout(() => {
-                viewer.followObject(obj2, params2);
-                viz.zoomToFit(obj2, zoom2);
-                unloadAllObjects();
-            }, 100);
-        }
-    };
+  document.getElementById(id).onclick = function () {
+      const viewer = viz.getViewer();
+      viewer.followObject(obj1, params1);
+      viz.zoomToFit(obj1, zoom1);
+      unloadAllObjects();
+      if (obj2 && params2 && zoom2) {
+          setTimeout(() => {
+              viewer.followObject(obj2, params2);
+              viz.zoomToFit(obj2, zoom2);
+              unloadAllObjects();
+          }, 20);
+      }
+  };
 }
 
+
 // Assign actions to buttons
-setupButton("btn-Messages", sun, [-0.75, -0.75, 0.5], 300000000,sun, [1, 2, 1], 3000000);
-setupButton("btn-far", sun, [-0.75, -0.75, 0.5], 300000000,sun, [2, 2, 2], 150);
-setupButton("btn-system",sun, [-0.75, -0.75, 0.5], 300000000, sun, [2, 2, 2], 2);
+setupButton("btn-Messages", sun, [1, 2, 1], 3000000);
+setupButton("btn-far", sun, [2, 2, 2], 150);
+setupButton("btn-system",sun, [2, 2, 2], 2);
 setupButton("btn-earth", sun, [-0.75, -0.75, 0.5], 300000000, earthV, [2, 0, 0], 0.00003);
 setupButton("btn-mars", sun, [-0.75, -0.75, 0.5], 300000000, marsV, [2, 0, 0], 0.00001);
 setupButton("btn-moon", sun, [-0.75, -0.75, 0.5], 300000000, moonV, [2, 0, 0], 0.003);
@@ -631,4 +657,17 @@ function unloadAllObjects() {
   }
 }
 
+//LABEL VISIBILITY
+planetObjects.forEach((planetObject) => {
+  planetObject.setLabelVisibility(false);
+}); 
+
+objectGroups[group].forEach(obj => {
+  obj.setLabelVisibility(false);
 });
+
+
+
+
+});
+
