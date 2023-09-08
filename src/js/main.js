@@ -47,6 +47,26 @@ camera.addEventListener('change', function() {
     autoAdjustSpeed = true;
 });
 
+// const geometry = new THREE.BoxGeometry(0.1, 0.1, 0.1); // Cube of 0.1 AU side length
+// const material = new THREE.MeshBasicMaterial({color: 0x00ff00}); // Green color
+// const cube = new THREE.Mesh(geometry, material);
+// viz.getScene().add(cube); 
+
+// FUNCTION: Draw a line
+function drawLine(viz, start, end, color = 0xff0000) {
+  const geometry = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(...start), new THREE.Vector3(...end)]);
+  const material = new THREE.LineBasicMaterial({ color });
+  const line = new THREE.Line(geometry, material);
+  viz.getScene().add(line);
+  return line;
+}
+
+// USAGE EXAMPLE
+const start = [0, 0, 0];
+const end = [0, 0, 10];
+drawLine(viz, start, end);
+
+
 // SIM LOOP
 viz.onTick = function () {
   // Get current date and update UI
@@ -59,7 +79,6 @@ viz.onTick = function () {
                           + (currentDate.getDate() / 365.25);
   yearSlider.value = fractionalYear;
 
-  
 
   // Convert current date to time for other calculations
   const dateInMilliseconds = currentDate.getTime();
