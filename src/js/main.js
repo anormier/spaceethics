@@ -63,7 +63,7 @@ function drawLine(viz, start, end, color = 0xff0000) {
 
 // USAGE EXAMPLE
 const start = [0, 0, 0];
-const end = [0, 0, 10];
+const end = [0, 0, LY_TO_AU*1000];
 drawLine(viz, start, end);
 
 
