@@ -694,3 +694,27 @@ function setPlanetLabelsVisible(isVisible) {
 
 });
 
+// stby function:
+// window.THREE = Spacekit.THREE;
+
+// viz.createObject("'Oumuamua", {
+//   ephem: new Spacekit.Ephem(
+//     {
+//       epoch: 2458080.5,
+//       a: -1.27234500742808,
+//       e: 1.201133796102373,
+//       q: 0.2559115812959116,
+//       n: 0.6867469493413392,
+//       i: 122.7417062847286,
+//       om: 24.59690955523242,
+//       w: 241.8105360304898,
+//       ma: 51.1576197938249,
+//       tp: 2458006.01,
+//     },
+//     'deg',
+//   ),
+//   theme: {
+//     orbitColor: 0xff00ff,
+//   },
+//   labelText: "'Oumuamua",
+// });
