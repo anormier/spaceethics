@@ -98,17 +98,16 @@ if (autoAdjustSpeed) {
 
  // DATASET UPDATES ONTICK
   // Update stars if on a desktop
-  if (isDesktop()) { 
+  if (!isMobile()) { 
     unifiedPlaceStars(stars100LY3K45K, dateInMilliseconds, 8, 'white', 'stars1');
     unifiedPlaceStars(stars100LY45K6K, dateInMilliseconds, 10, 'white', 'stars2');
+    unifiedPlaceStars(stars100LY6Kmore, dateInMilliseconds, 15, 'white', 'stars3');
   }
-  unifiedPlaceStars(stars100LY6Kmore, dateInMilliseconds, 15, 'white', 'stars3');
-
   // Update visibility of spatial objects based on distance limits
   const distVisFrom = 1;  // Lower limit in AU
   const distVisTo = 300;  // Upper limit in AU
 
-  
+
 
   if (!manIcon.classList.contains("active")) {
     // Update visibility of messages based on distance limits
@@ -148,6 +147,11 @@ const sun = viz.createObject("sun", Spacekit.SpaceObjectPresets.SUN);
 viz.createAmbientLight();
 viz.createLight([0, 0, 0]);
 
+if (isMobile()) {
+  unifiedPlaceStars(stars100LY3K45K, dateInMilliseconds, 8, 'white', 'stars1');
+  unifiedPlaceStars(stars100LY45K6K, dateInMilliseconds, 10, 'white', 'stars2');
+  unifiedPlaceStars(stars100LY6Kmore, dateInMilliseconds, 15, 'white', 'stars3');
+}
 
 let planetObjects = [];
 
@@ -499,7 +503,7 @@ let starParticleObjects = {};
 let hasLoadedParticles = false;  // This global flag checks if particles have already been loaded on mobile.
 
 function unifiedPlaceStars(stars, date, size, color, particleName) {
-  // If it's mobile and the particles have been loaded already, return early.
+  // If it's mobile and the particles have been loaded already, return early. (in order not to overload)
   if (isMobile() && hasLoadedParticles) {
     return;
   }
