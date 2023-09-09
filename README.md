@@ -1,5 +1,6 @@
 Here is the project structure: 
-
+IT is BUILT ON SPACEKIT.JS (THANKS AND BRAVO)
+SPACEKIT IS BUILT ON THREE. below some info how it is connected
 
 main.js: Will contain the main logic and initialization of the application.
 init.js: Will handle the initial setup of the simulation and sliders.
@@ -48,3 +49,41 @@ spaceethics-main/              (Project Root)
 │   │   └── components/        (Reusable JS components)
 ├── index.html                 (Main HTML file)
 └── README.md                  (Project documentation)
+
+From the code you provided at the end of simulation.ts, the Simulation class has several methods that are publicly exposed. These methods provide access to various internal properties of the Simulation class, specifically to objects related to the THREE.js library and other properties of the Simulation.
+
+Here's a breakdown:
+
+getSimulationElement():
+
+Return Type: HTMLCanvasElement
+Description: Returns the HTML canvas element that contains the simulation.
+getViewer():
+
+Return Type: Camera
+Description: Provides access to the Camera wrapper object, which is likely a higher-level representation of the camera in the simulation, possibly including controls or other properties related to viewing the simulation.
+getScene():
+
+Return Type: THREE.Scene
+Description: Provides direct access to the THREE.js scene object. This is very useful if you want to directly manipulate or query the scene, such as adding or removing objects.
+getRenderer():
+
+Return Type: THREE.WebGL1Renderer
+Description: Gives access to the THREE.js WebGL renderer. This could be useful for custom rendering or post-processing tasks.
+setCameraDrift(driftOn: boolean):
+
+.get3jsObjects()
+returns and array of THREE.js objects, and the first item is a valid THREE.js object!
+
+
+Parameters: A boolean (driftOn) that specifies whether the camera should drift or float around.
+Description: Enables or disables the camera drift feature. This probably allows the camera to have a slight movement, giving a more dynamic feel to the simulation when enabled.
+Finally, the last line export default Simulation; indicates that the Simulation class itself is the default export from the simulation.ts module. This means that when you import from this module without specifying a named export, you will be importing the Simulation class.
+
+If you're aiming to access or manipulate THREE.js objects within the context of Spacekit, these methods are your gateways. They allow you to tap into the underlying THREE.js implementations that Spacekit uses internally, giving you a lot of power and flexibility.
+
+
+----
+Adrien Normier
++33 (0) 7 67 27 63 15
+anormier@gmail.com
