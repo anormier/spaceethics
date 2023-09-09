@@ -148,7 +148,7 @@ if (autoAdjustSpeed) {
       setPlanetLabelsVisible(true);  
       unloadAllObjects();
         placeObjectsUnified(allVoyagers, dateInMilliseconds, './assets/symbols/Red_Circle_full.png');
-       placeObjectsUnified(updatedMessages, dateInMilliseconds, './assets/symbols/Red_Circle_full.png', false);
+     placeObjectsUnified(updatedMessages, dateInMilliseconds, './assets/symbols/Red_Circle_full.png', false);
     } else if (distanceToSunInAU > 1*LY_TO_AU && distanceToSunInAU < 300*LY_TO_AU) {
       setPlanetLabelsVisible(false);  
       unloadAllObjects();
@@ -567,65 +567,7 @@ function unifiedPlaceStars(stars, date, size, color, particleName) {
 };
 
 
-// FUNCTION: PLACE OBJECTS WITH LABELS VISIBILITY OPTIONNAL
-// A list to keep track of previously added objects.
-let previouslyAddedObjects = [];
-
-function placeObjects(objects, date, textureUrl) {
-  // Remove previously added objects and clear the list.
-  previouslyAddedObjects.forEach(obj => {
-    viz.removeObject(obj)
-  });
-  previouslyAddedObjects = [];
-  
-  objects.forEach(obj => {
-    // Check if the 'dateSent' parameter exists
-    if ('dateSent' in obj) {
-      if (date < new Date(obj.dateSent).getTime()) {
-        return; // skip this iteration
-      }
-    }
-  
-    // Check if the 'endDate' parameter exists
-    if ('endDate' in obj) {
-      if (date > new Date(obj.endDate).getTime()) {
-        return; // skip this iteration
-      }
-    }
-
-
-    // Calculate time difference
-    const timeDifference = date - new Date(obj.epoch).getTime();
-  
-    // Calculate adjusted RA, Dec, and R
-    const adjustedRA = obj.ra + obj.vra * timeDifference * 8.78e-15;
-    const adjustedDec = obj.dec + obj.vdec * timeDifference * 8.78e-15;
-    const adjustedR = obj.r + (6.68459e-9 * obj.vr) * timeDifference / 1000;
-  
-    // Convert RA and Dec to XYZ coordinates
-    const position = radecToXYZ(adjustedRA, adjustedDec, adjustedR);
-  
-      if (adjustedR < 0) {
-        return; // skip this iteration
-      }
-
- 
-  
-    // Create and add object to visualization
-    const singleObject = viz.createObject(obj.id, {
-      position: position,
-      scale: [1, 1, 1],
-      particleSize: 5,
-      labelText: obj.id,
-      textureUrl: textureUrl
-    });
-  
-    // Add to array of previously added objects
-    previouslyAddedObjects.push(singleObject);
-  });
-  
-}
-
+// FUNCTION: PLACE OBJECTS
 // Global storage for object groups
 let objectGroups = {};
 

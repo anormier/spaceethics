@@ -1,3 +1,5 @@
+// This is thre file messages.js
+
 // NE PAS OUBLIER LE "] export default allStars " à la fin
 //id, suivie de luminosité, position spheric coordinates, speed spheric coordinates, faciles à extraire de gaia. 
 // Scales SPACEKIT: UA 
@@ -6,29 +8,40 @@
 // https://docs.google.com/document/d/1yTf3pZyt0oHXOcD2GHqih9vMRM2k535-KLniOF_a_PA/edit INFOS GAIA
 
 //extract: https://docs.google.com/spreadsheets/d/1JZJq8M9Yg2gfahe1NwU_fI7p-xS1J8Eub3L0Z_LCZgg/edit#gid=2136432496
-
 function addDefaultParams(messages) {
-    return messages.map(message => {
-      // If dateSent in the message is just a year, converting it to a full date string
+  const idTracker = {};
+
+  return messages.map(message => {
+      const originalId = message.id;
+
+      // If the ID already exists, append "-X" to it
+      if (idTracker[originalId]) {
+          idTracker[originalId]++;
+          message.id = `${originalId}-${idTracker[originalId]}`;
+      } else {
+          idTracker[originalId] = 1; // Initialize counter for the ID
+      }
+
+      // If dateSent in the message is just a year, convert it to a full date string
       const dateSent = new Date(`${message.dateSent}-01-01`);
       const epoch = dateSent;
-  
+
       return {
-        r: 1,
-        ra: 258,
-        dec: 12,
-        vra: 0,
-        vdec: 0,
-        dateSent: new Date("1977-09-05"), // Default value
-        vr: 300000,
-        epoch: "2024-01-01",
-        ...message, // Spread the existing message properties
-        dateSent, // Override the default value with the new Date object
-        epoch // Override the default epoch value
+          r: 1,
+          ra: 258,
+          dec: 12,
+          vra: 0,
+          vdec: 0,
+          dateSent: new Date("1977-09-05"), // Default value
+          vr: 300000,
+          epoch: "2024-01-01",
+          ...message, // Spread the existing message properties
+          dateSent, // Override the default value with the new Date object
+          epoch // Override the default epoch value
       };
-    });
-  }
-  
+  });
+}
+
 
 export const allMessages = [
 
