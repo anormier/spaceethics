@@ -1,5 +1,5 @@
 //BELOW: The file main.js
-//need to split the file in 4 parts:  1) init sim, 2) sim loop, 3) UI elements 4) functions
+// need to fix the issue with zoom out
 
 // IMPORTS
 import { updateVisibility, checkIfVisible, radecToXYZ, isDesktop, toggleFullscreen, updateInfoBox,isMobile } from "./service/utils.js";
@@ -15,6 +15,7 @@ import {navInfo} from './textContents.js';
 
 // Get the Spacekit version of THREE.js.
 const THREE = Spacekit.THREE;
+
 
 // CONSTANTS
 const LY_TO_AU = 63241.16; 
@@ -38,14 +39,29 @@ const viz = new Spacekit.Simulation(document.getElementById("main-container"), {
   },
 });
 
+// Initialization of simulation components
 const skybox = viz.createSkybox(Spacekit.SkyboxPresets.ESO_GIGAGALAXY);
-viz.setJdPerSecond(30);
-viz.renderOnlyInViewport();
 const camera = viz.getViewer().get3jsCamera();
 const scene = viz.getScene();
+const renderer = viz.getRenderer();
+//const viewer = viz.getViewer();
+
+
+// if (viewer && viewer.CameraControls) {
+//   viewer.CameraControls.maxDistance = 1e-23;
+// }
+
+// Simulation settings
+viz.setJdPerSecond(30);
+viz.renderOnlyInViewport();
+
+// Camera settings
 camera.addEventListener('change', function() {
     autoAdjustSpeed = true;
 });
+
+
+
 
 // const geometry = new THREE.BoxGeometry(0.1, 0.1, 0.1); // Cube of 0.1 AU side length
 // const material = new THREE.MeshBasicMaterial({color: 0x00ff00}); // Green color
@@ -585,90 +601,6 @@ closeBtn.addEventListener('click', closeInfoBox);
 // Fullscreen mode
 document.getElementById('fullscreen-btn').addEventListener('click', toggleFullscreen);
 
-
-
-// MOVING DATASETS: THREE FUNCTIONS: messages, stars, labeled obj (not working ok)
-
-// const updateStars = () => {
-//   placeStars(stars100LY3K45K);
-// };
-
-// // FUNCTION: PLACE MESSAGES
-// const mxDotPositions = [];
-// // Function to calculate and push positions using radecToXYZ
-// function calculatePositions(mx, multiplier) {
-//   let count;
-//   if (isDesktop()) {
-//       count = 1000;
-//   } else {
-//       count = 10;
-//   }
-//   for (let i = 1; i < count; i++) {
-//     const r = i * (LY_TO_AU * mx.dist) / (count * multiplier);
-//     const position = radecToXYZ(mx.ra + ra, mx.dec + dec, r);
-//     mxDotPositions.push(position);
-//   }
-// }
-// allMessages.forEach(mx => {
-//   calculatePositions(mx, 1);
-// // calculatePositions(mx, 100);
-// // calculatePositions(mx, 1000);
-// });
-// viz.createStaticParticles('mx', mxDotPositions, {
-//    defaultColor: 'red',
-//    size: 5,
-// });
-
-// //messages destinations
-
-//  const mxPositions = [];
-
-// allMessages.forEach((mx) => {  
-//   mxPositions.push(radecToXYZ(mx.ra + ra,mx.dec + dec,63241.16 * mx.dist))
-// });
-
-// viz.createStaticParticles('mx', mxPositions, {
-//    defaultColor: 'red',
-//    size: 20,
-//  });
-
-
-let starParticleObjects = {};
-let hasLoadedParticles = false;  // This global flag checks if particles have already been loaded on mobile.
-
-function unifiedPlaceStars(stars, date, size, color, particleName) {
-  // If it's mobile and the particles have been loaded already, return early. (in order not to overload)
-  if (isMobile() && hasLoadedParticles) {
-    return;
-  }
-
-  let starPositions = [];
-
-  if (starParticleObjects[particleName]) {
-    viz.removeObject(starParticleObjects[particleName]);
-  }
-
-  const placeStar = (star) => {
-    const timeDifference = date - new Date(star.eopch).getTime();
-    const adjustedRA = star.ra + ra + star.vra * timeDifference * 8.78e-15;
-    const adjustedDec = star.dec + dec + star.vdec * timeDifference * 8.78e-15;
-    const adjustedRmed = 206265*star.rmed + (6.68459e-9* star.vrmed) * timeDifference/1000;
-
-    starPositions.push(radecToXYZ(adjustedRA, adjustedDec, adjustedRmed));
-  };
-
-  stars.forEach(star => placeStar(star));
-
-  starParticleObjects[particleName] = viz.createStaticParticles(particleName, starPositions, {
-    defaultColor: color,
-    size: size,
-  });
-
-  // If on mobile, set the flag to true after the first load.
-  if (isMobile()) {
-    hasLoadedParticles = true;
-  }
-};
 
 
 // FUNCTION: PLACE OBJECTS
