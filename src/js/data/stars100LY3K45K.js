@@ -44,7 +44,12 @@ function modifyArrayWithMapping(arr) {
         let modifiedEntry = { ...entry };
         for (let oldKey in keyMapping) {
             if (oldKey in modifiedEntry) {
-                modifiedEntry[keyMapping[oldKey]] = modifiedEntry[oldKey];
+                // If the key is 'rmed', multiply its value by 206,265
+                if (oldKey === 'rmed') {
+                    modifiedEntry[keyMapping[oldKey]] = 206265 * modifiedEntry[oldKey];
+                } else {
+                    modifiedEntry[keyMapping[oldKey]] = modifiedEntry[oldKey];
+                }
                 delete modifiedEntry[oldKey];
             }
         }

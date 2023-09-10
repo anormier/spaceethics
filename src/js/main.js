@@ -158,7 +158,7 @@ camera.near = 0.1; // Example value
 camera.far = 100000000000000000000000000; // Example value
 camera.updateProjectionMatrix();
 
-initObjectForDataset(modifiedStars100LY3K45K, scene, 'point', {color: 'yellow', size: 5});
+initObjectForDataset(modifiedStars100LY3K45K, scene, 'point', {color: 'white', size: 2});
 initObjectForDataset(stars100LY45K6K, scene, 'point', {color: 'red', size: 6});
 initObjectForDataset(stars100LY6Kmore, scene, 'point', {color: 'blue', size: 7});
 initObjectForDataset(allVoyagers, scene, 'point', {color: 'red', size: 3});
@@ -264,7 +264,7 @@ function updateSpheresForDataset(dataset, dateInMilliseconds) {
   if (!manIcon.classList.contains("active")) {
     // Update visibility of messages based on distance limits
 
-// updateSpheresForDataset(modifiedStars100LY3K45K, dateInMilliseconds);
+updateSpheresForDataset(modifiedStars100LY3K45K, dateInMilliseconds);
 updateSpheresForDataset(stars100LY45K6K, dateInMilliseconds);
 updateSpheresForDataset(stars100LY6Kmore, dateInMilliseconds);
 updateSpheresForDataset(allVoyagers, dateInMilliseconds);
