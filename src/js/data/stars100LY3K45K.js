@@ -30,6 +30,30 @@
 //     AND distance_gspphot < 61
 
 // EPOCH AS BEEN FORCED TO '2016-01-01' epoch for gaia DR3
+
+
+
+function modifyArrayWithMapping(arr) {
+    const keyMapping = {
+        rmed: 'r',
+        vrmed: 'vr',
+        eopch: 'epoch'
+    };
+
+    return arr.map(entry => {
+        let modifiedEntry = { ...entry };
+        for (let oldKey in keyMapping) {
+            if (oldKey in modifiedEntry) {
+                modifiedEntry[keyMapping[oldKey]] = modifiedEntry[oldKey];
+                delete modifiedEntry[oldKey];
+            }
+        }
+        return modifiedEntry;
+    });
+}
+
+
+
 const stars100LY3K45K = [
  
     //// source_id | parallax_over_error | teff_gspphot (K) | distance_gspphot (pc) | ra (deg) | radial_velocity (km.s**-1) | dec (deg) | pmra (mas.yr**-1) | pmdec (mas.yr**-1)
@@ -2687,6 +2711,7 @@ const stars100LY3K45K = [
     { id:6232511606838403968, lum:4503.0303, rmed:5.887, ra:224.37159427348143, dec:-21.423140396261676, vrmed:26.751173, vra:1031.4718694823848 , vdec:-1723.6189029383202,eopch: '2016-01-01' },
     { id:819750862709551360, lum:4503.621, rmed:17.9812, ra:145.85713451058854, dec:42.68788925776642, vrmed:-12.420588, vra:35.78728413456852 , vdec:-826.0524965850624,eopch: '2016-01-01' },
     
-]
+];
 
-export default stars100LY3K45K;
+const modifiedStars100LY3K45K = modifyArrayWithMapping(stars100LY3K45K);
+export default modifiedStars100LY3K45K;

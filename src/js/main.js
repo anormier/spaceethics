@@ -6,7 +6,7 @@ import { updateVisibility, checkIfVisible, radecToXYZ, isDesktop, toggleFullscre
 import { distToCam } from './service/simCalc.js'; 
 
 import allObjects from "./data/spatial-objects.js";
-import stars100LY3K45K from "./data/stars100LY3K45K.js";
+import modifiedStars100LY3K45K from "./data/stars100LY3K45K.js";
 import stars100LY45K6K from "./data/stars100LY45K6K.js";
 import stars100LY6Kmore from "./data/stars100LY6Kmore.js";
 import {updatedMessages, allMessages} from "./data/messages.js";
@@ -73,64 +73,97 @@ const start = [0, 0, 0];
 const end = [0, 0, LY_TO_AU*1000];
 drawLine(viz, start, end);
 
-// RAYCASTING
-// GOAL: FETCH o NAME ON CLICK // maybe use get .get3jsObjects()
-// (returns and array of THREE.js objects, and the first item is a valid THREE.js object!)
-const raycaster = new THREE.Raycaster();
-const selectedObjects = []; // Array to store selected objects
+// // RAYCASTING
+// // GOAL: FETCH o NAME ON CLICK // maybe use get .get3jsObjects()
+// // (returns and array of THREE.js objects, and the first item is a valid THREE.js object!)
+// const raycaster = new THREE.Raycaster();
+// const selectedObjects = []; // Array to store selected objects
 
-const mouse = new THREE.Vector2();
-const objectNameDiv = document.getElementById('objectNameDiv'); // Get the div element
-// ... (previous code)
+// const mouse = new THREE.Vector2();
+// const objectNameDiv = document.getElementById('objectNameDiv'); // Get the div element
+// // ... (previous code)
 
-// Click event listener
-document.addEventListener('click', function(event) {
-  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-  mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
-  raycaster.setFromCamera(mouse, viz.getViewer().get3jsCamera());
-  const intersects = raycaster.intersectObjects(viz.getScene().children, true);
+// // Click event listener
+// document.addEventListener('click', function(event) {
+//   mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+//   mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+//   raycaster.setFromCamera(mouse, viz.getViewer().get3jsCamera());
+//   const intersects = raycaster.intersectObjects(viz.getScene().children, true);
 
-  // Get the first intersected object
-  const firstIntersectedObject = intersects[0];
+//   // Get the first intersected object
+//   const firstIntersectedObject = intersects[0];
 
-  if (firstIntersectedObject) {
-    const objectName = firstIntersectedObject.object.name;
-    objectNameDiv.textContent = `Clicked on object: ${objectName}`; // Update the div content
-    changeObjectColor(firstIntersectedObject.object);
-  } else {
-    objectNameDiv.textContent = 'Click on an object to see its name here.'; // Reset the div content if no object is clicked
-  }
-});
+//   if (firstIntersectedObject) {
+//     const objectName = firstIntersectedObject.object.name;
+//     objectNameDiv.textContent = `Clicked on object: ${objectName}`; // Update the div content
+//     changeObjectColor(firstIntersectedObject.object);
+//   } else {
+//     objectNameDiv.textContent = 'Click on an object to see its name here.'; // Reset the div content if no object is clicked
+//   }
+// });
 
 
-// Function to change the color of an object
-function changeObjectColor(object) {
-  // Example: Change the object's color to blue
-  const originalColor = object.material.color.clone(); // Store the original color
-  object.material.color.set('blue'); // Set the new color (red in this example)
+// // Function to change the color of an object
+// function changeObjectColor(object) {
+//   // Example: Change the object's color to blue
+//   const originalColor = object.material.color.clone(); // Store the original color
+//   object.material.color.set('blue'); // Set the new color (red in this example)
 
-  // Reset color on a timeout (you can adjust the timeout as needed)
-  setTimeout(() => {
-    object.material.color.copy(originalColor); // Reset to original color
-  }, 1000); // 1000 milliseconds (1 second) in this example
-}
+//   // Reset color on a timeout (you can adjust the timeout as needed)
+//   setTimeout(() => {
+//     object.material.color.copy(originalColor); // Reset to original color
+//   }, 1000); // 1000 milliseconds (1 second) in this example
+// }
 
-// Initialization - run this once when your application loads.
+// // Initialization - run this once when your application loads.
 
-function initSpheresForDataset(dataset, scene) {
+function initObjectForDataset(dataset, scene, type, params) {
   dataset.forEach(obj => {
-    const sphere = new THREE.Mesh(
-      new THREE.SphereGeometry(0.1),  // You can further parametrize this if needed.
-      new THREE.MeshBasicMaterial({ color: 'yellow' })
-    );
-    sphere.visible = false;
-    scene.add(sphere);
-    obj.sphereObject = sphere;
+      let object;
+      
+      switch (type) {
+          case 'sphere':
+              const sphereGeometry = new THREE.SphereGeometry(params.radius);
+              const sphereMaterial = new THREE.MeshBasicMaterial({ color: params.color });
+              object = new THREE.Mesh(sphereGeometry, sphereMaterial);
+              break;
+              
+          case 'cube':
+              const cubeGeometry = new THREE.BoxGeometry(params.size, params.size, params.size);
+              const cubeMaterial = new THREE.MeshBasicMaterial({ color: params.color });
+              object = new THREE.Mesh(cubeGeometry, cubeMaterial);
+              break;
+              
+          case 'point': //size unchanged
+          default:
+              object = new THREE.Points(
+                  new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0)]),
+                  new THREE.PointsMaterial({ 
+                      color: params.color, 
+                      size: params.size,
+                      sizeAttenuation: false  // Keeps point size constant in terms of pixels
+                  })
+              );
+              break;
+      }
+      
+      object.visible = false;
+      scene.add(object);
+      obj.graphicalObject = object; // Rename to 'graphicalObject' as it can be any of the three types now
   });
 }
 
-initSpheresForDataset(allVoyagers, scene);
-initSpheresForDataset(allMessages, scene);
+
+camera.near = 0.1; // Example value
+camera.far = 100000000000000000000000000; // Example value
+camera.updateProjectionMatrix();
+
+initObjectForDataset(modifiedStars100LY3K45K, scene, 'point', {color: 'yellow', size: 5});
+initObjectForDataset(stars100LY45K6K, scene, 'point', {color: 'red', size: 6});
+initObjectForDataset(stars100LY6Kmore, scene, 'point', {color: 'blue', size: 7});
+initObjectForDataset(allVoyagers, scene, 'point', {color: 'red', size: 3});
+initObjectForDataset(updatedMessages, scene, 'point', {color: 'red', size: 3});
+
 // ... and so on for other datasets
 
 
@@ -185,7 +218,6 @@ if (autoAdjustSpeed) {
  // DATASET UPDATES ONTICK
   // Update stars if on a desktop
   if (!isMobile()) { 
-    unifiedPlaceStars(stars100LY3K45K, dateInMilliseconds, 8, 'white', 'stars1');
     unifiedPlaceStars(stars100LY45K6K, dateInMilliseconds, 10, 'white', 'stars2');
     unifiedPlaceStars(stars100LY6Kmore, dateInMilliseconds, 15, 'white', 'stars3');
   }
@@ -220,20 +252,24 @@ function updateSpheresForDataset(dataset, dateInMilliseconds) {
   dataset.forEach(obj => {
     const position = calculatePosition(obj, dateInMilliseconds);
     if (position) {
-      obj.sphereObject.position.set(...position);
-      obj.sphereObject.visible = true;
+      obj.graphicalObject.position.set(...position);
+      obj.graphicalObject.visible = true;      
     } else {
-      obj.sphereObject.visible = false;
+      obj.graphicalObject.visible = false;
     }
   });
 }
-updateSpheresForDataset(allVoyagers, dateInMilliseconds);
-updateSpheresForDataset(allMessages, dateInMilliseconds);
-// ... and so on for other datasets
 
 
   if (!manIcon.classList.contains("active")) {
     // Update visibility of messages based on distance limits
+
+// updateSpheresForDataset(modifiedStars100LY3K45K, dateInMilliseconds);
+updateSpheresForDataset(stars100LY45K6K, dateInMilliseconds);
+updateSpheresForDataset(stars100LY6Kmore, dateInMilliseconds);
+updateSpheresForDataset(allVoyagers, dateInMilliseconds);
+updateSpheresForDataset(updatedMessages, dateInMilliseconds);
+
     allObjects.forEach((point) => {
       updateVisibility(point, dateInMilliseconds, distanceToSunInAU, distVisFrom, distVisTo, viz);
     });
@@ -579,9 +615,9 @@ document.getElementById('fullscreen-btn').addEventListener('click', toggleFullsc
 
 // MOVING DATASETS: THREE FUNCTIONS: messages, stars, labeled obj (not working ok)
 
-const updateStars = () => {
-  placeStars(stars100LY3K45K);
-};
+// const updateStars = () => {
+//   placeStars(stars100LY3K45K);
+// };
 
 // // FUNCTION: PLACE MESSAGES
 // const mxDotPositions = [];
