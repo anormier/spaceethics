@@ -236,9 +236,11 @@ function updateSpheresForDataset(dataset, dateInMilliseconds) {
   if (!manIcon.classList.contains("active")) {
     // Update visibility of messages based on distance limits
 
+    if (!isMobile()){
 updateSpheresForDataset(modifiedStars100LY3K45K, dateInMilliseconds);
 updateSpheresForDataset(stars100LY45K6K, dateInMilliseconds);
 updateSpheresForDataset(stars100LY6Kmore, dateInMilliseconds);
+}
 updateSpheresForDataset(allVoyagers, dateInMilliseconds);
 updateSpheresForDataset(updatedMessages, dateInMilliseconds);
 
