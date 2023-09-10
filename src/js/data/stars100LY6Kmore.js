@@ -29,8 +29,34 @@
 //     AND parallax_over_error > 100 
 //     AND distance_gspphot < 61
 
+function modifyArrayWithMapping(arr) {
+    const keyMapping = {
+        rmed: 'r',
+        vrmed: 'vr',
+        eopch: 'epoch'
+    };
+
+    return arr.map(entry => {
+        let modifiedEntry = { ...entry };
+        for (let oldKey in keyMapping) {
+            if (oldKey in modifiedEntry) {
+                // If the key is 'rmed', multiply its value by 206,265
+                if (oldKey === 'rmed') {
+                    modifiedEntry[keyMapping[oldKey]] = 206265 * modifiedEntry[oldKey];
+                } else {
+                    modifiedEntry[keyMapping[oldKey]] = modifiedEntry[oldKey];
+                }
+                delete modifiedEntry[oldKey];
+            }
+        }
+        return modifiedEntry;
+    });
+}
+
+
+
 // EPOCH AS BEEN FORCED TO '2016-01-01' epoch for gaia DR3
-const stars100LY6Kmore = [
+const rawstars100LY6Kmore = [
  
     //// source_id | parallax_over_error | teff_gspphot (K) | distance_gspphot (pc) | ra (deg) | radial_velocity (km.s**-1) | dec (deg) | pmra (mas.yr**-1) | pmdec (mas.yr**-1)
 
@@ -188,5 +214,6 @@ const stars100LY6Kmore = [
     { id:4512265810537057664, lum:8369.756, rmed:27.9523, ra:281.7556053210387, dec:18.182027709302517, vrmed:-44.109154, vra:98.83509154388179 , vdec:115.12046908681071,eopch: '2016-01-01' },
     
 ]
-
+const stars100LY6Kmore = modifyArrayWithMapping(rawstars100LY6Kmore);
 export default stars100LY6Kmore;
+
