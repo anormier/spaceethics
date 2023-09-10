@@ -22,7 +22,6 @@ let autoAdjustSpeed = true;
 let manIcon = document.getElementById("man-icon");
 
 
-
 document.addEventListener("DOMContentLoaded", function() {
 
 //INIT SIM
@@ -154,13 +153,13 @@ function initObjectForDataset(dataset, scene, type, params) {
 }
 
 
-camera.near = 0.1; // Example value
+camera.near = 0.00000000000000001; // Example value
 camera.far = 100000000000000000000000000; // Example value
 camera.updateProjectionMatrix();
 
-initObjectForDataset(modifiedStars100LY3K45K, scene, 'point', {color: 'white', size: 2});
-initObjectForDataset(stars100LY45K6K, scene, 'point', {color: 'red', size: 6});
-initObjectForDataset(stars100LY6Kmore, scene, 'point', {color: 'blue', size: 7});
+initObjectForDataset(modifiedStars100LY3K45K, scene, 'point', {color: 'white', size: 1});
+initObjectForDataset(stars100LY45K6K, scene, 'point', {color: 'white', size: 2});
+initObjectForDataset(stars100LY6Kmore, scene, 'point', {color: 'white', size: 3});
 initObjectForDataset(allVoyagers, scene, 'point', {color: 'red', size: 3});
 initObjectForDataset(updatedMessages, scene, 'point', {color: 'red', size: 3});
 
@@ -216,35 +215,6 @@ if (autoAdjustSpeed) {
 }
 
  // DATASET UPDATES ONTICK
-  // Update stars if on a desktop
-  if (!isMobile()) { 
-    unifiedPlaceStars(stars100LY45K6K, dateInMilliseconds, 10, 'white', 'stars2');
-    unifiedPlaceStars(stars100LY6Kmore, dateInMilliseconds, 15, 'white', 'stars3');
-  }
-  // Update visibility of spatial objects based on distance limits
-  const distVisFrom = 1;  // Lower limit in AU
-  const distVisTo = 300;  // Upper limit in AU
-
-  // allVoyagers.forEach(obj => {
-  //   const position = calculatePosition(obj, dateInMilliseconds);
-  //   if (position) {
-  //     const sphere = new THREE.Mesh(
-  //       new THREE.SphereGeometry(10),
-  //       new THREE.MeshBasicMaterial({ color: 'yellow' })
-  //     );
-  //     sphere.position.set(...position);
-  //     scene.add(sphere);
-  //     // You might also want to associate the sphere object with your data so you can remove/update it later.
-  //     obj.sphereObject = sphere;
-  //   } else {
-  //     if (obj.sphereObject) {
-  //       obj.sphereObject.geometry.dispose();
-  //       obj.sphereObject.material.dispose();
-  //       scene.remove(obj.sphereObject);
-  //       obj.sphereObject = null;
-  //     }
-  //   }
-  // });
 
 
 // Tick Update - run this during each simulation tick.
@@ -259,7 +229,9 @@ function updateSpheresForDataset(dataset, dateInMilliseconds) {
     }
   });
 }
-
+  // Update visibility of spatial objects based on distance limits
+  const distVisFrom = 1;  // Lower limit in AU
+  const distVisTo = 300;  // Upper limit in AU
 
   if (!manIcon.classList.contains("active")) {
     // Update visibility of messages based on distance limits
