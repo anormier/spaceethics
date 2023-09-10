@@ -53,11 +53,11 @@ camera.addEventListener('change', function() {
 // const cube = new THREE.Mesh(geometry, material);
 // viz.getScene().add(cube); 
 
-// const sphere = new THREE.Mesh(
-//   new THREE.SphereGeometry(0.5), 
-//   new THREE.MeshBasicMaterial({ color: 'yellow' })
-// );
-// scene.add(sphere);
+const sphere = new THREE.Mesh(
+  new THREE.SphereGeometry(0.5), 
+  new THREE.MeshBasicMaterial({ color: 'yellow' })
+);
+scene.add(sphere);
 
 // FUNCTION: Draw a line
 function drawLine(viz, start, end, color = 0xff0000) {
@@ -166,6 +166,23 @@ if (autoAdjustSpeed) {
   updateSpeedDisplay(desiredSpeed); // New function to handle updating the speed display text
 }
 
+// Initialization - run this once when your application loads.
+allVoyagers.forEach(obj => {
+  const sphere = new THREE.Mesh(
+    new THREE.SphereGeometry(10),
+    new THREE.MeshBasicMaterial({ color: 'yellow' })
+  );
+  
+  // Initially, set the sphere to not be visible.
+  sphere.visible = false;
+  
+  // Add the sphere to the scene.
+  scene.add(sphere);
+  
+  // Save a reference to the sphere in the object.
+  obj.sphereObject = sphere;
+});
+
  // DATASET UPDATES ONTICK
   // Update stars if on a desktop
   if (!isMobile()) { 
@@ -177,7 +194,42 @@ if (autoAdjustSpeed) {
   const distVisFrom = 1;  // Lower limit in AU
   const distVisTo = 300;  // Upper limit in AU
 
+  allVoyagers.forEach(obj => {
+  //   const position = calculatePosition(obj, dateInMilliseconds);
+  //   if (position) {
+  //     const sphere = new THREE.Mesh(
+  //       new THREE.SphereGeometry(10),
+  //       new THREE.MeshBasicMaterial({ color: 'yellow' })
+  //     );
+  //     sphere.position.set(...position);
+  //     scene.add(sphere);
+  //     // You might also want to associate the sphere object with your data so you can remove/update it later.
+  //     obj.sphereObject = sphere;
+  //   } else {
+  //     if (obj.sphereObject) {
+  //       obj.sphereObject.geometry.dispose();
+  //       obj.sphereObject.material.dispose();
+  //       scene.remove(obj.sphereObject);
+  //       obj.sphereObject = null;
+  //     }
+  //   }
+  // });
 
+  // Tick Update - run this during each simulation tick.
+allVoyagers.forEach(obj => {
+  const position = calculatePosition(obj, dateInMilliseconds);
+  
+  if (position) {
+    // Update the position of the sphere.
+    obj.sphereObject.position.set(...position);
+    
+    // Make sure the sphere is visible.
+    obj.sphereObject.visible = true;
+  } else {
+    // Hide the sphere if it shouldn't be visible.
+    obj.sphereObject.visible = false;
+  }
+});
 
   if (!manIcon.classList.contains("active")) {
     // Update visibility of messages based on distance limits
@@ -672,23 +724,17 @@ function placeObjectsUnified(objects, date, textureUrl, labelVisible = true) {
 }
 
 function unloadAllObjects() {
-  // Loop through all object groups
   const scene = viz.getScene();
 
   for (let group in objectGroups) {
-      // Remove each object (and associated spheres) from the visualization
-      objectGroups[group].forEach(item => {
-          if (item instanceof THREE.Object3D) { // If it's a THREE object like our sphere
-              scene.remove(item);
-          } else if (typeof item === "object" && item.object) { // If it has an associated object (like the ones with positions)
-              viz.removeObject(item.object);
-          } else {  // It's just a single object like before
-              viz.removeObject(item);
-          }
-      });
+    objectGroups[group].forEach(objData => {
+      viz.removeObject(objData.object);
+      if (objData.attachedSphere) {
+        scene.remove(objData.attachedSphere);
+      }
+    });
 
-      // Clear the array for this group
-      objectGroups[group] = [];
+    objectGroups[group] = [];
   }
 }
 
@@ -707,35 +753,59 @@ function setPlanetLabelsVisible(isVisible) {
     planetObject.setLabelVisibility(isVisible);
   });
 }
+function attachSpheres(groupName, size, color) {
+  console.log("Processing groupName:", groupName);
 
-function attachSpheres(objectsGroupName, diameter, color) {
-  if (!objectGroups[objectsGroupName]) return; // Return if group doesn't exist
+  if (!objectGroups[groupName]) {
+      console.error(`Group '${groupName}' not found in objectGroups.`);
+      return;
+  }
 
-  // Define the material and geometry based on provided parameters
-  const material = new THREE.MeshBasicMaterial({ color: color });
-  const geometry = new THREE.SphereGeometry(diameter / 2); // Diameter divided by 2 gives the radius
+  objectGroups[groupName].forEach((objData, index) => {
+      console.log(`objData [${index}] position:`, objData.position);
 
-  // Loop through each object in the group
-  objectGroups[objectsGroupName].forEach(item => {
-      const { object, position } = item;
+      const sphereGeometry = new THREE.SphereGeometry(size / 2);
+      const sphereMaterial = new THREE.MeshBasicMaterial({ color: color });
+      const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
 
-      // Create the THREE mesh for the sphere
-      const sphere = new THREE.Mesh(geometry, material);
-      sphere.position.set(position.x, position.y, position.z);
+      // Check if objData.position is defined before trying to access its properties
+      if (objData.position) {
+          sphere.position.set(objData.position.x, objData.position.y, objData.position.z);
+          console.warn(`onesphere added`);
+      } else {
+          console.warn(`objData [${index}] position is undefined.`);
+      }
 
-      // Add the sphere to the viz scene
-      scene.add(sphere);
+      viz.getScene().add(sphere);
+      objData.attachedSphere = sphere; // Attach the sphere to the object data for easier removal later
 
-      // Store the sphere in the object group for later management (e.g., removal)
-      objectGroups[objectsGroupName].push(sphere);
+
+  
   });
+}
+
+
+function calculatePosition(obj, date) {
+  // Filtering based on 'dateSent' and 'endDate'
+  if ('dateSent' in obj && date < new Date(obj.dateSent).getTime()) return false;
+  if ('endDate' in obj && date > new Date(obj.endDate).getTime()) return false;
+
+  // Calculate time difference
+  const timeDifference = date - new Date(obj.epoch).getTime();
+
+  // Adjusted RA, Dec, and R
+  const adjustedRA = obj.ra + obj.vra * timeDifference * 8.78e-15;
+  const adjustedDec = obj.dec + obj.vdec * timeDifference * 8.78e-15;
+  const adjustedR = obj.r + (6.68459e-9 * obj.vr) * timeDifference / 1000;
+
+  if (adjustedR < 0) return false;
+
+  return radecToXYZ(adjustedRA, adjustedDec, adjustedR);
 }
 
 
 
 
-
-});
 
 // stby function:
 // window.THREE = Spacekit.THREE;
@@ -760,4 +830,4 @@ function attachSpheres(objectsGroupName, diameter, color) {
 //     orbitColor: 0xff00ff,
 //   },
 //   labelText: "'Oumuamua",
-// });
+});
