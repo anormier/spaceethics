@@ -153,7 +153,7 @@ function initObjectForDataset(dataset, scene, type, params) {
 }
 
 
-camera.near = 0.00000000000000001; // Example value
+camera.near = 0.00001; // Example value
 camera.far = 100000000000000000000000000; // Example value
 camera.updateProjectionMatrix();
 
@@ -714,8 +714,8 @@ function placeObjectsUnified(objects, date, textureUrl, labelVisible = true) {
     // Create and add object to visualization
     const singleObject = viz.createObject(obj.id, {
       position: position,
-      scale: [1, 1, 1],
-      particleSize: 5,
+      scale: [0.0001, 0.0001, 0.0001],
+      particleSize: 1,
       labelText: obj.id,
       textureUrl: textureUrl
     });
@@ -744,7 +744,6 @@ function unloadAllObjects() {
     objectGroups[group] = [];
   }
 }
-
 
 
 
