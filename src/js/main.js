@@ -67,15 +67,48 @@ const end = [0, 0, LY_TO_AU*1000];
 drawLine(viz, start, end);
 
 // RAYCASTING
+// GOAL: FETCH o NAME ON CLICK // maybe use get .get3jsObjects()
+// (returns and array of THREE.js objects, and the first item is a valid THREE.js object!)
 const raycaster = new THREE.Raycaster();
+const selectedObjects = []; // Array to store selected objects
+
 const mouse = new THREE.Vector2();
+const objectNameDiv = document.getElementById('objectNameDiv'); // Get the div element
+// ... (previous code)
+
+// Click event listener
 document.addEventListener('click', function(event) {
   mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
   mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
   raycaster.setFromCamera(mouse, viz.getViewer().get3jsCamera());
   const intersects = raycaster.intersectObjects(viz.getScene().children, true);
-  console.log(intersects.length > 0 ? 'Intersection found!' : 'No intersections.');
-});//WORKING !!!! (but caution, it selects the skybox hance some work to be usefull..)
+
+  // Get the first intersected object
+  const firstIntersectedObject = intersects[0];
+
+  if (firstIntersectedObject) {
+    const objectName = firstIntersectedObject.object.name;
+    objectNameDiv.textContent = `Clicked on object: ${objectName}`; // Update the div content
+    changeObjectColor(firstIntersectedObject.object);
+  } else {
+    objectNameDiv.textContent = 'Click on an object to see its name here.'; // Reset the div content if no object is clicked
+  }
+});
+
+
+// Function to change the color of an object
+function changeObjectColor(object) {
+  // Example: Change the object's color to blue
+  const originalColor = object.material.color.clone(); // Store the original color
+  object.material.color.set('blue'); // Set the new color (red in this example)
+
+  // Reset color on a timeout (you can adjust the timeout as needed)
+  setTimeout(() => {
+    object.material.color.copy(originalColor); // Reset to original color
+  }, 1000); // 1000 milliseconds (1 second) in this example
+}
+
+
 
 
 // SIM LOOP
