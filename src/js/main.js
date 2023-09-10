@@ -53,11 +53,11 @@ camera.addEventListener('change', function() {
 // const cube = new THREE.Mesh(geometry, material);
 // viz.getScene().add(cube); 
 
-const sphere = new THREE.Mesh(
-  new THREE.SphereGeometry(0.5), 
-  new THREE.MeshBasicMaterial({ color: 'yellow' })
-);
-scene.add(sphere);
+// const sphere = new THREE.Mesh(
+//   new THREE.SphereGeometry(0.5), 
+//   new THREE.MeshBasicMaterial({ color: 'yellow' })
+// );
+// scene.add(sphere);
 
 // FUNCTION: Draw a line
 function drawLine(viz, start, end, color = 0xff0000) {
@@ -115,7 +115,23 @@ function changeObjectColor(object) {
   }, 1000); // 1000 milliseconds (1 second) in this example
 }
 
+// Initialization - run this once when your application loads.
 
+function initSpheresForDataset(dataset, scene) {
+  dataset.forEach(obj => {
+    const sphere = new THREE.Mesh(
+      new THREE.SphereGeometry(0.1),  // You can further parametrize this if needed.
+      new THREE.MeshBasicMaterial({ color: 'yellow' })
+    );
+    sphere.visible = false;
+    scene.add(sphere);
+    obj.sphereObject = sphere;
+  });
+}
+
+initSpheresForDataset(allVoyagers, scene);
+initSpheresForDataset(allMessages, scene);
+// ... and so on for other datasets
 
 
 // SIM LOOP
@@ -166,23 +182,6 @@ if (autoAdjustSpeed) {
   updateSpeedDisplay(desiredSpeed); // New function to handle updating the speed display text
 }
 
-// Initialization - run this once when your application loads.
-allVoyagers.forEach(obj => {
-  const sphere = new THREE.Mesh(
-    new THREE.SphereGeometry(10),
-    new THREE.MeshBasicMaterial({ color: 'yellow' })
-  );
-  
-  // Initially, set the sphere to not be visible.
-  sphere.visible = false;
-  
-  // Add the sphere to the scene.
-  scene.add(sphere);
-  
-  // Save a reference to the sphere in the object.
-  obj.sphereObject = sphere;
-});
-
  // DATASET UPDATES ONTICK
   // Update stars if on a desktop
   if (!isMobile()) { 
@@ -194,7 +193,7 @@ allVoyagers.forEach(obj => {
   const distVisFrom = 1;  // Lower limit in AU
   const distVisTo = 300;  // Upper limit in AU
 
-  allVoyagers.forEach(obj => {
+  // allVoyagers.forEach(obj => {
   //   const position = calculatePosition(obj, dateInMilliseconds);
   //   if (position) {
   //     const sphere = new THREE.Mesh(
@@ -215,21 +214,23 @@ allVoyagers.forEach(obj => {
   //   }
   // });
 
-  // Tick Update - run this during each simulation tick.
-allVoyagers.forEach(obj => {
-  const position = calculatePosition(obj, dateInMilliseconds);
-  
-  if (position) {
-    // Update the position of the sphere.
-    obj.sphereObject.position.set(...position);
-    
-    // Make sure the sphere is visible.
-    obj.sphereObject.visible = true;
-  } else {
-    // Hide the sphere if it shouldn't be visible.
-    obj.sphereObject.visible = false;
-  }
-});
+
+// Tick Update - run this during each simulation tick.
+function updateSpheresForDataset(dataset, dateInMilliseconds) {
+  dataset.forEach(obj => {
+    const position = calculatePosition(obj, dateInMilliseconds);
+    if (position) {
+      obj.sphereObject.position.set(...position);
+      obj.sphereObject.visible = true;
+    } else {
+      obj.sphereObject.visible = false;
+    }
+  });
+}
+updateSpheresForDataset(allVoyagers, dateInMilliseconds);
+updateSpheresForDataset(allMessages, dateInMilliseconds);
+// ... and so on for other datasets
+
 
   if (!manIcon.classList.contains("active")) {
     // Update visibility of messages based on distance limits
@@ -241,16 +242,12 @@ allVoyagers.forEach(obj => {
       unloadAllObjects();
         placeObjectsUnified(allVoyagers, dateInMilliseconds, './assets/symbols/Red_Circle_full.png');
      placeObjectsUnified(updatedMessages, dateInMilliseconds, './assets/symbols/Red_Circle_full.png', false);
-     attachSpheres(hashObjectArray(allVoyagers), 1, 'yellow');  // Red 1AU sphere for Voyagers
-     attachSpheres(hashObjectArray(updatedMessages), 10*LY_TO_AU, 'yellow');  // Yellow 1LY sphere for Messages
 
     } else if (distanceToSunInAU > 1*LY_TO_AU && distanceToSunInAU < 300*LY_TO_AU) {
       setPlanetLabelsVisible(false);  
       unloadAllObjects();
         placeObjectsUnified(allVoyagers, dateInMilliseconds, './assets/symbols/Red_Circle_full.png', false);
       placeObjectsUnified(updatedMessages, dateInMilliseconds, './assets/symbols/Red_Circle_full.png');
-      attachSpheres(hashObjectArray(allVoyagers), 1, 'red');  // Red 1AU sphere for Voyagers
-      attachSpheres(hashObjectArray(updatedMessages), 1*LY_TO_AU, 'yellow');  // Yellow 1LY sphere for Messages 
     } else {
         unloadAllObjects();
         setPlanetLabelsVisible(false);  
@@ -741,11 +738,6 @@ function unloadAllObjects() {
 
 
 
-
-
-
-
-
 //LABEL VISIBILITY
 // argument: true or false
 function setPlanetLabelsVisible(isVisible) {
@@ -753,37 +745,6 @@ function setPlanetLabelsVisible(isVisible) {
     planetObject.setLabelVisibility(isVisible);
   });
 }
-function attachSpheres(groupName, size, color) {
-  console.log("Processing groupName:", groupName);
-
-  if (!objectGroups[groupName]) {
-      console.error(`Group '${groupName}' not found in objectGroups.`);
-      return;
-  }
-
-  objectGroups[groupName].forEach((objData, index) => {
-      console.log(`objData [${index}] position:`, objData.position);
-
-      const sphereGeometry = new THREE.SphereGeometry(size / 2);
-      const sphereMaterial = new THREE.MeshBasicMaterial({ color: color });
-      const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-
-      // Check if objData.position is defined before trying to access its properties
-      if (objData.position) {
-          sphere.position.set(objData.position.x, objData.position.y, objData.position.z);
-          console.warn(`onesphere added`);
-      } else {
-          console.warn(`objData [${index}] position is undefined.`);
-      }
-
-      viz.getScene().add(sphere);
-      objData.attachedSphere = sphere; // Attach the sphere to the object data for easier removal later
-
-
-  
-  });
-}
-
 
 function calculatePosition(obj, date) {
   // Filtering based on 'dateSent' and 'endDate'
