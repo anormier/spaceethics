@@ -43,6 +43,7 @@ const skybox = viz.createSkybox(Spacekit.SkyboxPresets.ESO_GIGAGALAXY);
 viz.setJdPerSecond(30);
 viz.renderOnlyInViewport();
 const camera = viz.getViewer().get3jsCamera();
+const scene = viz.getScene();
 camera.addEventListener('change', function() {
     autoAdjustSpeed = true;
 });
@@ -51,6 +52,12 @@ camera.addEventListener('change', function() {
 // const material = new THREE.MeshBasicMaterial({color: 0x00ff00}); // Green color
 // const cube = new THREE.Mesh(geometry, material);
 // viz.getScene().add(cube); 
+
+// const sphere = new THREE.Mesh(
+//   new THREE.SphereGeometry(0.5), 
+//   new THREE.MeshBasicMaterial({ color: 'yellow' })
+// );
+// scene.add(sphere);
 
 // FUNCTION: Draw a line
 function drawLine(viz, start, end, color = 0xff0000) {
@@ -182,11 +189,16 @@ if (autoAdjustSpeed) {
       unloadAllObjects();
         placeObjectsUnified(allVoyagers, dateInMilliseconds, './assets/symbols/Red_Circle_full.png');
      placeObjectsUnified(updatedMessages, dateInMilliseconds, './assets/symbols/Red_Circle_full.png', false);
+     attachSpheres(hashObjectArray(allVoyagers), 1, 'yellow');  // Red 1AU sphere for Voyagers
+     attachSpheres(hashObjectArray(updatedMessages), 10*LY_TO_AU, 'yellow');  // Yellow 1LY sphere for Messages
+
     } else if (distanceToSunInAU > 1*LY_TO_AU && distanceToSunInAU < 300*LY_TO_AU) {
       setPlanetLabelsVisible(false);  
       unloadAllObjects();
         placeObjectsUnified(allVoyagers, dateInMilliseconds, './assets/symbols/Red_Circle_full.png', false);
       placeObjectsUnified(updatedMessages, dateInMilliseconds, './assets/symbols/Red_Circle_full.png');
+      attachSpheres(hashObjectArray(allVoyagers), 1, 'red');  // Red 1AU sphere for Voyagers
+      attachSpheres(hashObjectArray(updatedMessages), 1*LY_TO_AU, 'yellow');  // Yellow 1LY sphere for Messages 
     } else {
         unloadAllObjects();
         setPlanetLabelsVisible(false);  
@@ -660,19 +672,62 @@ function placeObjectsUnified(objects, date, textureUrl, labelVisible = true) {
 }
 
 function unloadAllObjects() {
+  // Loop through all object groups
+  const scene = viz.getScene();
+
   for (let group in objectGroups) {
-    objectGroups[group].forEach(objData => {
-      viz.removeObject(objData.object);
-    });
-    objectGroups[group] = [];
+      // Remove each object (and associated spheres) from the visualization
+      objectGroups[group].forEach(item => {
+          if (item instanceof THREE.Object3D) { // If it's a THREE object like our sphere
+              scene.remove(item);
+          } else if (typeof item === "object" && item.object) { // If it has an associated object (like the ones with positions)
+              viz.removeObject(item.object);
+          } else {  // It's just a single object like before
+              viz.removeObject(item);
+          }
+      });
+
+      // Clear the array for this group
+      objectGroups[group] = [];
   }
 }
+
+
+
+
+
+
+
+
 
 //LABEL VISIBILITY
 // argument: true or false
 function setPlanetLabelsVisible(isVisible) {
   planetObjects.forEach((planetObject) => {
     planetObject.setLabelVisibility(isVisible);
+  });
+}
+
+function attachSpheres(objectsGroupName, diameter, color) {
+  if (!objectGroups[objectsGroupName]) return; // Return if group doesn't exist
+
+  // Define the material and geometry based on provided parameters
+  const material = new THREE.MeshBasicMaterial({ color: color });
+  const geometry = new THREE.SphereGeometry(diameter / 2); // Diameter divided by 2 gives the radius
+
+  // Loop through each object in the group
+  objectGroups[objectsGroupName].forEach(item => {
+      const { object, position } = item;
+
+      // Create the THREE mesh for the sphere
+      const sphere = new THREE.Mesh(geometry, material);
+      sphere.position.set(position.x, position.y, position.z);
+
+      // Add the sphere to the viz scene
+      scene.add(sphere);
+
+      // Store the sphere in the object group for later management (e.g., removal)
+      objectGroups[objectsGroupName].push(sphere);
   });
 }
 
