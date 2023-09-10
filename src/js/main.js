@@ -606,18 +606,17 @@ let objectGroups = {};
 
 // Function to generate a hash based on object IDs
 function hashObjectArray(objects) {
-  let ids = objects.map(obj => obj.id).sort().join(',');
-  return ids;
+  return objects.map(obj => obj.id).sort().join(',');
 }
 
 // Main function to place objects
 function placeObjectsUnified(objects, date, textureUrl, labelVisible = true) {
-  const groupName = hashObjectArray(objects);  // Generate unique groupName
+  const groupName = hashObjectArray(objects);  // Generate a unique groupName
 
   // Remove previously added objects for this group
   if (objectGroups[groupName]) {
-    objectGroups[groupName].forEach(obj => {
-      viz.removeObject(obj);
+    objectGroups[groupName].forEach(objData => {
+      viz.removeObject(objData.object);
     });
   }
 
@@ -625,62 +624,46 @@ function placeObjectsUnified(objects, date, textureUrl, labelVisible = true) {
   objectGroups[groupName] = [];
 
   objects.forEach(obj => {
-    // Check if the 'dateSent' parameter exists
-    if ('dateSent' in obj) {
-      if (date < new Date(obj.dateSent).getTime()) {
-        return; // skip this iteration
-      }
-    }
-
-    // Check if the 'endDate' parameter exists
-    if ('endDate' in obj) {
-      if (date > new Date(obj.endDate).getTime()) {
-        return; // skip this iteration
-      }
-    }
+    // Filtering based on 'dateSent' and 'endDate'
+    if ('dateSent' in obj && date < new Date(obj.dateSent).getTime()) return;
+    if ('endDate' in obj && date > new Date(obj.endDate).getTime()) return;
 
     // Calculate time difference
     const timeDifference = date - new Date(obj.epoch).getTime();
 
-    // Calculate adjusted RA, Dec, and R
+    // Adjusted RA, Dec, and R
     const adjustedRA = obj.ra + obj.vra * timeDifference * 8.78e-15;
     const adjustedDec = obj.dec + obj.vdec * timeDifference * 8.78e-15;
     const adjustedR = obj.r + (6.68459e-9 * obj.vr) * timeDifference / 1000;
 
-    // Convert RA and Dec to XYZ coordinates
     const position = radecToXYZ(adjustedRA, adjustedDec, adjustedR);
 
-    if (adjustedR < 0) {
-      return; // skip this iteration
-    }
+    if (adjustedR < 0) return;
 
-  
     // Create and add object to visualization
     const singleObject = viz.createObject(obj.id, {
       position: position,
       scale: [1, 1, 1],
       particleSize: 5,
-      labelText: obj.id,  // set labelText based on labelVisible
+      labelText: obj.id,
       textureUrl: textureUrl
     });
 
-    // Set label visibility according to the parameter
     singleObject.setLabelVisibility(labelVisible);
 
-    // Add to array of previously added objects for this group
-    objectGroups[groupName].push(singleObject);
+    // Store in the global object group with both object and its position
+    objectGroups[groupName].push({
+      object: singleObject,
+      position: position
+    });
   });
 }
 
 function unloadAllObjects() {
-  // Loop through all object groups
   for (let group in objectGroups) {
-    // Remove each object from the visualization
-    objectGroups[group].forEach(obj => {
-      viz.removeObject(obj);
+    objectGroups[group].forEach(objData => {
+      viz.removeObject(objData.object);
     });
-
-    // Clear the array for this group
     objectGroups[group] = [];
   }
 }
