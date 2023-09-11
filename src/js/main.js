@@ -168,6 +168,8 @@ function initObjectForDataset(dataset, scene, type, params, isStatic = false, da
 
       if (isStatic && date) {
           const position = calculatePosition(obj, date.getTime());
+          console.log("Position for object:", obj, "is:", position); // Debugging line
+
           if (position) {
               obj.graphicalObject.position.set(...position);
               obj.graphicalObject.visible = true;
@@ -184,18 +186,21 @@ camera.near = 0.00001; //  good setting: 0.00001
 camera.far = 10000000; // Example value
 camera.updateProjectionMatrix();
 
+const staticDate = new Date("2024-01-01")
+;
+
 if (isMobile()) {
-// Initialisations pour low performance devices
+// Initialisations pour low performance devices (STATIC) - no need to update ontick.
   initObjectForDataset(modifiedStars100LY3K45K, scene, 'point', {color: 'white', size: 1}, true, staticDate);
   initObjectForDataset(stars100LY45K6K, scene, 'point', {color: 'white', size: 2}, true, staticDate);
   initObjectForDataset(stars100LY6Kmore, scene, 'point', {color: 'white', size: 3}, true, staticDate);
 } else {
-  // Initialisations for high performance devices
+  // Initialisations for high performance devices (Dynamic) - update ontick.(ADD LINE ONTICK)
 initObjectForDataset(modifiedStars100LY3K45K, scene, 'point', {color: 'white', size: 1});
 initObjectForDataset(stars100LY45K6K, scene, 'point', {color: 'white', size: 2});
 initObjectForDataset(stars100LY6Kmore, scene, 'point', {color: 'white', size: 3});
 }
-// Initialisations pour tous supports
+// Initialisations pour tous supports (ADD LINE ONTICK if moving)
 initObjectForDataset(allVoyagers, scene, 'point', {color: 'red', size: 3});
 initObjectForDataset(updatedMessages, scene, 'point', {color: 'red', size: 3});
 
@@ -325,11 +330,6 @@ const sun = viz.createObject("sun", Spacekit.SpaceObjectPresets.SUN);
 viz.createAmbientLight();
 viz.createLight([0, 0, 0]);
 
-// if (isMobile()) {
-//   unifiedPlaceStars(stars100LY3K45K,  Date("2024-01-01").getDate(), 8, 'white', 'stars1');
-//   unifiedPlaceStars(stars100LY45K6K,  Date("2024-01-01").getDate(), 10, 'white', 'stars2');
-//   unifiedPlaceStars(stars100LY6Kmore,  Date("2024-01-01").getDate(), 15, 'white','stars3');
-//   }
 
 let planetObjects = [];
 
