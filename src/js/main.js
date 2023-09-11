@@ -178,8 +178,10 @@ function initObjectForDataset(dataset, scene, type, params, isStatic = false, da
   });
 }
 
-camera.near = 0.00001; // Example value
-camera.far = 100000000000000000000000000; // Example value
+// THIS SETS THE MAX ZOOMIN and prevents render of planets render when too low.
+camera.near = 0.00001; //  good setting: 0.00001
+// THIS SETS THE MAX ZOOMOUT
+camera.far = 10000000; // Example value
 camera.updateProjectionMatrix();
 
 initObjectForDataset(modifiedStars100LY3K45K, scene, 'point', {color: 'white', size: 1});
