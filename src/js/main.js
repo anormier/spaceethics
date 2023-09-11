@@ -132,23 +132,23 @@ drawLine(viz, start, end);
 
 // // Initialization - run this once when your application loads.
 
-function initObjectForDataset(dataset, scene, type, params) {
+function initObjectForDataset(dataset, scene, type, params, isStatic = false, date = null) {
   dataset.forEach(obj => {
       let object;
-      
+
       switch (type) {
           case 'sphere':
               const sphereGeometry = new THREE.SphereGeometry(params.radius);
               const sphereMaterial = new THREE.MeshBasicMaterial({ color: params.color });
               object = new THREE.Mesh(sphereGeometry, sphereMaterial);
               break;
-              
+
           case 'cube':
               const cubeGeometry = new THREE.BoxGeometry(params.size, params.size, params.size);
               const cubeMaterial = new THREE.MeshBasicMaterial({ color: params.color });
               object = new THREE.Mesh(cubeGeometry, cubeMaterial);
               break;
-              
+
           case 'point': //size unchanged
           default:
               object = new THREE.Points(
@@ -161,12 +161,23 @@ function initObjectForDataset(dataset, scene, type, params) {
               );
               break;
       }
-      
+
       object.visible = false;
       scene.add(object);
-      obj.graphicalObject = object; // Rename to 'graphicalObject' as it can be any of the three types now
+      obj.graphicalObject = object;
+
+      if (isStatic && date) {
+          const position = calculatePosition(obj, date.getTime());
+          if (position) {
+              obj.graphicalObject.position.set(...position);
+              obj.graphicalObject.visible = true;
+          } else {
+              obj.graphicalObject.visible = false;
+          }
+      }
   });
 }
+
 
 
 camera.near = 0.00001; // Example value
