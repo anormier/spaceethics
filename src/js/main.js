@@ -178,8 +178,6 @@ function initObjectForDataset(dataset, scene, type, params, isStatic = false, da
   });
 }
 
-
-
 camera.near = 0.00001; // Example value
 camera.far = 100000000000000000000000000; // Example value
 camera.updateProjectionMatrix();
@@ -260,16 +258,23 @@ function updateSpheresForDataset(dataset, dateInMilliseconds) {
   const distVisFrom = 1;  // Lower limit in AU
   const distVisTo = 300;  // Upper limit in AU
 
+//UPDATE STAR POSITIONS
+  if (!isMobile()){
+    updateSpheresForDataset(modifiedStars100LY3K45K, dateInMilliseconds);
+    updateSpheresForDataset(stars100LY45K6K, dateInMilliseconds);
+    updateSpheresForDataset(stars100LY6Kmore, dateInMilliseconds);
+  }
+
+//UPDATE HUMAN IMPACT
+
   if (!manIcon.classList.contains("active")) {
     // Update visibility of messages based on distance limits
 
+    updateSpheresForDataset(allVoyagers, dateInMilliseconds);
+    updateSpheresForDataset(updatedMessages, dateInMilliseconds);
+
+    // Do not update this on mobile (heavy computations)
     if (!isMobile()){
-updateSpheresForDataset(modifiedStars100LY3K45K, dateInMilliseconds);
-updateSpheresForDataset(stars100LY45K6K, dateInMilliseconds);
-updateSpheresForDataset(stars100LY6Kmore, dateInMilliseconds);
-}
-updateSpheresForDataset(allVoyagers, dateInMilliseconds);
-updateSpheresForDataset(updatedMessages, dateInMilliseconds);
 
     allObjects.forEach((point) => {
       updateVisibility(point, dateInMilliseconds, distanceToSunInAU, distVisFrom, distVisTo, viz);
@@ -289,14 +294,16 @@ updateSpheresForDataset(updatedMessages, dateInMilliseconds);
         unloadAllObjects();
         setPlanetLabelsVisible(false);  
     }
-} else {
-   
-  allObjects.forEach((point) => {
-    point.visible = false;
-    viz.removeObject(point.newObject);
-    });
-  unloadAllObjects();
-}
+  }
+
+  } else {
+    
+    allObjects.forEach((point) => {
+      point.visible = false;
+      viz.removeObject(point.newObject);
+      });
+    unloadAllObjects();
+  }
 
 
 
