@@ -291,14 +291,17 @@ function updateSpheresForDataset(dataset, dateInMilliseconds) {
     // Do not update this on mobile (heavy computations)
     if (!isMobile()){
 
-    allObjects.forEach((point) => {
-      updateVisibility(point, dateInMilliseconds, distanceToSunInAU, distVisFrom, distVisTo, viz);
-    });
+   
+
     if (distanceToSunInAU < 1*LY_TO_AU) {
       setPlanetLabelsVisible(true);  
       unloadAllObjects();
         placeObjectsUnified(allVoyagers, dateInMilliseconds, './assets/symbols/Red_Circle_full.png');
      placeObjectsUnified(updatedMessages, dateInMilliseconds, './assets/symbols/Red_Circle_full.png', false);
+
+     allObjects.forEach((point) => {
+      updateVisibility(point, dateInMilliseconds, distanceToSunInAU, distVisFrom, distVisTo, viz);
+    });
 
     } else if (distanceToSunInAU > 1*LY_TO_AU && distanceToSunInAU < 300*LY_TO_AU) {
       setPlanetLabelsVisible(false);  
