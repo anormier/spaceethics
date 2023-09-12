@@ -74,6 +74,62 @@ camera.addEventListener('change', function() {
 // );
 // scene.add(sphere);
 
+// const geometry = new THREE.ConeGeometry(0.5, 1, 32); 
+// // Parameters: radius, height, radialSegments
+
+// const material = new THREE.MeshBasicMaterial({color: 0x00ff00}); // Green color
+// const cone = new THREE.Mesh(geometry, material);
+// viz.getScene().add(cone); 
+/**
+ * @param {number} angle - Angle is half the angular resolution, specified in arcminutes.
+ * @param {Object} origin - Coordinates {x, y, z} of the tip of the cone.
+ * @param {Object} end - Coordinates {x, y, z} of the center of the base of the cone.
+ * @param {number} transparency - Transparency percentage: 0 (opaque) to 100 (fully transparent).
+ * @param {number} color - Color of the cone.
+ */
+function createCone(angle, origin, end, transparency, color) {
+  // Convert angle from arcminutes to radians
+  const angleInRadians = (angle / 60) * (Math.PI / 180);
+  
+  // Calculate the height (length) of the cone based on origin and end positions
+  const direction = new THREE.Vector3(
+      end.x - origin.x,
+      end.y - origin.y,
+      end.z - origin.z
+  );
+  const length = direction.length();
+
+  // Calculate the radius of the base using the angle and length
+  const radius = length * Math.tan(angleInRadians / 2);
+  
+  const geometry = new THREE.ConeGeometry(radius, length, 32);
+  const material = new THREE.MeshBasicMaterial({
+      color: color,
+      transparent: true,
+      opacity: 1 - transparency / 100  // Convert percentage to a value between 0 and 1
+  });
+  
+  const cone = new THREE.Mesh(geometry, material);
+  
+  // Set position of the cone
+  cone.position.set(
+      (origin.x + end.x) / 2,
+      (origin.y + end.y) / 2,
+      (origin.z + end.z) / 2
+  );
+
+  // Rotate cone to correct orientation with its tip at the origin and base at the end
+  const up = new THREE.Vector3(0, -1, 0);
+  cone.quaternion.setFromUnitVectors(up, direction.normalize());
+  
+  return cone;
+}
+
+// Example Usage:
+const cone = createCone(300, {x: 0, y: 0, z: 0}, {x: 0, y: 0, z: 10}, 50, 0xff0000); // Color set to red
+scene.add(cone);
+
+
 // FUNCTION: Draw a line
 function drawLine(viz, start, end, color = 0xff0000) {
   const geometry = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(...start), new THREE.Vector3(...end)]);
@@ -735,7 +791,6 @@ function calculatePosition(obj, date) {
 
   return radecToXYZ(adjustedRA, adjustedDec, adjustedR);
 }
-
 
 
 
