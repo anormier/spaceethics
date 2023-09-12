@@ -106,8 +106,8 @@ function createCone(angle, origin, end, transparency, color) {
 }
 
 // Example Usage:
-const cone = createCone(300, {x: 0, y: 0, z: 0}, {x: 0, y: 0, z: 10}, 50, 0xff0000); // Color set to red
-scene.add(cone);
+// const cone = createCone(300, {x: 0, y: 0, z: 0}, {x: 0, y: 0, z: 10}, 50, 0xff0000); // Color set to red
+// scene.add(cone);
 
 
 // FUNCTION: Draw a line
@@ -122,7 +122,7 @@ function drawLine(viz, start, end, color = 0xff0000) {
 // USAGE EXAMPLE
 const start = [0, 0, 0];
 const end = [0, 0, LY_TO_AU*1000];
-drawLine(viz, start, end);
+// drawLine(viz, start, end);
 
 
 // // Initialization - run this once when your application loads.
