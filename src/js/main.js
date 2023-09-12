@@ -39,47 +39,27 @@ const viz = new Spacekit.Simulation(document.getElementById("main-container"), {
   },
 });
 
-// Initialization of simulation components
+// Initialization of simulation controls and refernces
 const skybox = viz.createSkybox(Spacekit.SkyboxPresets.ESO_GIGAGALAXY);
 const camera = viz.getViewer().get3jsCamera();
 const scene = viz.getScene();
 const renderer = viz.getRenderer();
 //const viewer = viz.getViewer();
 
-
-// if (viewer && viewer.CameraControls) {
-//   viewer.CameraControls.maxDistance = 1e-23;
-// }
-
 // Simulation settings
 viz.setJdPerSecond(30);
 viz.renderOnlyInViewport();
+// THIS SETS THE MAX ZOOMIN and prevents render of planets render when too low.
+camera.near = 0.00001; //  good setting: 0.00001
+// THIS SETS THE MAX ZOOMOUT
+camera.far = 10000000; // Example value
+camera.updateProjectionMatrix(); //needed after update of camera near:far
 
 // Camera settings
 camera.addEventListener('change', function() {
     autoAdjustSpeed = true;
 });
 
-
-
-
-// const geometry = new THREE.BoxGeometry(0.1, 0.1, 0.1); // Cube of 0.1 AU side length
-// const material = new THREE.MeshBasicMaterial({color: 0x00ff00}); // Green color
-// const cube = new THREE.Mesh(geometry, material);
-// viz.getScene().add(cube); 
-
-// const sphere = new THREE.Mesh(
-//   new THREE.SphereGeometry(0.5), 
-//   new THREE.MeshBasicMaterial({ color: 'yellow' })
-// );
-// scene.add(sphere);
-
-// const geometry = new THREE.ConeGeometry(0.5, 1, 32); 
-// // Parameters: radius, height, radialSegments
-
-// const material = new THREE.MeshBasicMaterial({color: 0x00ff00}); // Green color
-// const cone = new THREE.Mesh(geometry, material);
-// viz.getScene().add(cone); 
 /**
  * @param {number} angle - Angle is half the angular resolution, specified in arcminutes.
  * @param {Object} origin - Coordinates {x, y, z} of the tip of the cone.
@@ -144,47 +124,6 @@ const start = [0, 0, 0];
 const end = [0, 0, LY_TO_AU*1000];
 drawLine(viz, start, end);
 
-// // RAYCASTING
-// // GOAL: FETCH o NAME ON CLICK // maybe use get .get3jsObjects()
-// // (returns and array of THREE.js objects, and the first item is a valid THREE.js object!)
-// const raycaster = new THREE.Raycaster();
-// const selectedObjects = []; // Array to store selected objects
-
-// const mouse = new THREE.Vector2();
-// const objectNameDiv = document.getElementById('objectNameDiv'); // Get the div element
-// // ... (previous code)
-
-// // Click event listener
-// document.addEventListener('click', function(event) {
-//   mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-//   mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
-//   raycaster.setFromCamera(mouse, viz.getViewer().get3jsCamera());
-//   const intersects = raycaster.intersectObjects(viz.getScene().children, true);
-
-//   // Get the first intersected object
-//   const firstIntersectedObject = intersects[0];
-
-//   if (firstIntersectedObject) {
-//     const objectName = firstIntersectedObject.object.name;
-//     objectNameDiv.textContent = `Clicked on object: ${objectName}`; // Update the div content
-//     changeObjectColor(firstIntersectedObject.object);
-//   } else {
-//     objectNameDiv.textContent = 'Click on an object to see its name here.'; // Reset the div content if no object is clicked
-//   }
-// });
-
-
-// // Function to change the color of an object
-// function changeObjectColor(object) {
-//   // Example: Change the object's color to blue
-//   const originalColor = object.material.color.clone(); // Store the original color
-//   object.material.color.set('blue'); // Set the new color (red in this example)
-
-//   // Reset color on a timeout (you can adjust the timeout as needed)
-//   setTimeout(() => {
-//     object.material.color.copy(originalColor); // Reset to original color
-//   }, 1000); // 1000 milliseconds (1 second) in this example
-// }
 
 // // Initialization - run this once when your application loads.
 
@@ -236,11 +175,7 @@ function initObjectForDataset(dataset, scene, type, params, isStatic = false, da
   });
 }
 
-// THIS SETS THE MAX ZOOMIN and prevents render of planets render when too low.
-camera.near = 0.00001; //  good setting: 0.00001
-// THIS SETS THE MAX ZOOMOUT
-camera.far = 10000000; // Example value
-camera.updateProjectionMatrix();
+
 
 const staticDate = new Date("2024-01-01")
 ;
@@ -350,6 +285,7 @@ function updateSpheresForDataset(dataset, dateInMilliseconds) {
       unloadAllObjects(); // unload all objects
      placeObjectsUnified(allVoyagers, dateInMilliseconds, './assets/symbols/Red_Circle_full.png');
      placeObjectsUnified(updatedMessages, dateInMilliseconds, './assets/symbols/Red_Circle_full.png', false);
+     updateSpheresForDataset(allVoyagers, dateInMilliseconds);//Update Voyagers POINTS
 
      allObjects.forEach((point) => {
       updateVisibility(point, dateInMilliseconds, distanceToSunInAU, distVisFrom, distVisTo, viz);
@@ -487,6 +423,9 @@ const jupiter3 = createCelestialSphere("jupiter3", {
   atmosphere:'true'
 });
 
+
+
+
 // UI HTML
 function toggleManColor() {
   var manIcon = document.getElementById("man-icon");
@@ -497,7 +436,6 @@ function toggleManColor() {
   }
 }
 document.getElementById("human-icon-btn").addEventListener("click", toggleManColor);
-
 
 // UI ELEMENTS
 document.getElementById('parameters-btn').addEventListener('click', function() {
@@ -594,32 +532,6 @@ raSlider.addEventListener("input", (event) => {
 // UI ELEMENTS II
 // Setup navigation buttons
 
-
-
-// function setupButton(id, obj1, params1, zoom1, obj2, params2, zoom2) {
-//     document.getElementById(id).onclick = function () {
-//         const viewer = viz.getViewer();
-//         viewer.followObject(obj1, params1);
-//         viz.zoomToFit(obj1, zoom1);
-//         unloadAllObjects();
-//         if (obj2 && params2 && zoom2) {
-//             setTimeout(() => {
-//                 viewer.followObject(obj2, params2);
-//                 viz.zoomToFit(obj2, zoom2);
-//                 unloadAllObjects();
-//             }, 20);
-//         }
-//     };
-// }
-
-// // Assign actions to buttons
-// setupButton("btn-Messages", sun, [-0.75, -0.75, 0.5], 300000000,sun, [1, 2, 1], 3000000);
-// setupButton("btn-far", sun, [-0.75, -0.75, 0.5], 300000000,sun, [2, 2, 2], 150);
-// setupButton("btn-system",sun, [-0.75, -0.75, 0.5], 300000000, sun, [2, 2, 2], 2);
-// setupButton("btn-earth", sun, [-0.75, -0.75, 0.5], 300000000, earthV, [2, 0, 0], 0.00003);
-// setupButton("btn-mars", sun, [-0.75, -0.75, 0.5], 300000000, marsV, [2, 0, 0], 0.00001);
-// setupButton("btn-moon", sun, [-0.75, -0.75, 0.5], 300000000, moonV, [2, 0, 0], 0.003);
-
 function setupButton(id, obj1, params1, zoom1, obj2, params2, zoom2) {
   document.getElementById(id).onclick = function () {
       const viewer = viz.getViewer();
@@ -635,7 +547,6 @@ function setupButton(id, obj1, params1, zoom1, obj2, params2, zoom2) {
       }
   };
 }
-
 
 // Assign actions to buttons
 setupButton("btn-Messages", sun, [1, 2, 1], 3000000);
@@ -658,7 +569,7 @@ startStopButton.onclick = function () {
     isPaused = !isPaused;
 };
 
-// UI ELEMENTS III
+// UI ELEMENTS III info Box, nav buttons
 const infoBox = document.getElementById('info-box');
 const closeBtn = document.getElementById('close-btn');
 
@@ -765,7 +676,6 @@ function unloadAllObjects() {
 }
 
 
-
 //LABEL VISIBILITY
 // argument: true or false
 function setPlanetLabelsVisible(isVisible) {
@@ -773,6 +683,7 @@ function setPlanetLabelsVisible(isVisible) {
     planetObject.setLabelVisibility(isVisible);
   });
 }
+
 
 function calculatePosition(obj, date) {
   // Filtering based on 'dateSent' and 'endDate'
@@ -793,29 +704,4 @@ function calculatePosition(obj, date) {
 }
 
 
-
-
-// stby function:
-// window.THREE = Spacekit.THREE;
-
-// viz.createObject("'Oumuamua", {
-//   ephem: new Spacekit.Ephem(
-//     {
-//       epoch: 2458080.5,
-//       a: -1.27234500742808,
-//       e: 1.201133796102373,
-//       q: 0.2559115812959116,
-//       n: 0.6867469493413392,
-//       i: 122.7417062847286,
-//       om: 24.59690955523242,
-//       w: 241.8105360304898,
-//       ma: 51.1576197938249,
-//       tp: 2458006.01,
-//     },
-//     'deg',
-//   ),
-//   theme: {
-//     orbitColor: 0xff00ff,
-//   },
-//   labelText: "'Oumuamua",
 });
