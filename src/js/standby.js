@@ -85,3 +85,46 @@ viz.createObject("'Oumuamua", {
     orbitColor: 0xff00ff,
   },
   labelText: "'Oumuamua",
+
+
+  // RAYCASTER RETURNING INFO ON CUBE OBJECTS ONLY
+
+// Cube creation and setup
+const geometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
+const material = new THREE.MeshBasicMaterial({
+    color: 0x00ff00,
+    transparent: true,
+    opacity: 0.2  // Make it very transparent to start
+});
+const cube = new THREE.Mesh(geometry, material);
+
+cube.name = "MyCube";  // Assign a unique name
+cube.userData.textInfo = "This is some information about the cube.";  // Store text information
+
+viz.getScene().add(cube);
+
+// Raycaster setup
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+
+document.addEventListener('click', function(event) {
+    // Calculate normalized device coordinates (-1 to +1) for both components
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+
+    raycaster.setFromCamera(mouse, viz.getViewer().get3jsCamera());
+
+    // Find intersected objects
+    const intersects = raycaster.intersectObjects(viz.getScene().children);
+
+    for (let intersect of intersects) {
+        // Check if geometry is of type BoxGeometry (cube)
+        if (intersect.object.geometry instanceof THREE.BoxGeometry) {
+            console.log("Object Name: " + intersect.object.name);
+            console.log("Stored Text: " + intersect.object.userData.textInfo);
+            
+            // Make the cube less transparent upon click
+            intersect.object.material.opacity = 0.8; 
+        }
+    }
+});
