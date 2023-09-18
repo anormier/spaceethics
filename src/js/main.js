@@ -126,7 +126,6 @@ const end = [0, 0, LY_TO_AU*1000];
 
 
 // // Initialization - run this once when your application loads.
-
 function initObjectForDataset(dataset, scene, type, params, isStatic = false, date = null) {
   dataset.forEach(obj => {
       let object;
@@ -144,18 +143,23 @@ function initObjectForDataset(dataset, scene, type, params, isStatic = false, da
               object = new THREE.Mesh(cubeGeometry, cubeMaterial);
               break;
 
-          case 'point': //size unchanged
-          default:
+          case 'point': 
               object = new THREE.Points(
                   new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0)]),
                   new THREE.PointsMaterial({ 
                       color: params.color, 
                       size: params.size,
-                      sizeAttenuation: false  // Keeps point size constant in terms of pixels
+                      sizeAttenuation: false  
                   })
               );
               break;
+          default:
+              break;
       }
+
+      // Storing the nameSet and textSet values in the userData of the object
+      object.userData.nameSet = obj.nameSet;
+      object.userData.textSet = obj.textSet;
 
       object.visible = false;
       scene.add(object);
@@ -163,7 +167,7 @@ function initObjectForDataset(dataset, scene, type, params, isStatic = false, da
 
       if (isStatic && date) {
           const position = calculatePosition(obj, date.getTime());
-          console.log("Position for object:", obj, "is:", position); // Debugging line
+          console.log("Position for object:", obj, "is:", position); 
 
           if (position) {
               obj.graphicalObject.position.set(...position);
@@ -174,6 +178,7 @@ function initObjectForDataset(dataset, scene, type, params, isStatic = false, da
       }
   });
 }
+
 
 
 
