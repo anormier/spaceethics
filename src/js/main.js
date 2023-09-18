@@ -13,6 +13,23 @@ import {updatedMessages, allMessages} from "./data/messages.js";
 import allVoyagers from "./data/voyagers.js";
 import {navInfo} from './textContents.js';
 
+(function(){
+  var oldLog = console.log;
+  console.log = function (message) {
+      // Continue using the old console.log function
+      oldLog.apply(console, arguments);
+
+      // Append to the HTML element
+      var output = document.getElementById('console-output');
+      var newMessage = document.createElement('div');
+      newMessage.textContent = message;
+      output.appendChild(newMessage);
+
+      // Optional: Scroll to the bottom to always see the latest message
+      output.scrollTop = output.scrollHeight;
+  };
+})();
+
 // Get the Spacekit version of THREE.js.
 const THREE = Spacekit.THREE;
 
@@ -208,6 +225,55 @@ uiElements.forEach(el => {
 });
 
 
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+
+let pixelToSize = (pixelWidth, distanceToCamera) => {
+  const vFOV = viz.getViewer().get3jsCamera().fov * (Math.PI / 180);
+  const height = 2 * Math.tan(vFOV / 2) * distanceToCamera;
+  const heightPerPixel = height / window.innerHeight;
+  return pixelWidth * heightPerPixel;
+}
+document.addEventListener('click', function(event) {
+  if (!raycastingActive) 
+  return; // Skip raycasting if it's not active
+
+  // Convert mouse position to NDC (Normalized Device Coordinates)
+  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+
+  // Set raycaster threshold based on scene's scale
+  const averageDistance = 6000000;
+  raycaster.params.Points.threshold = pixelToSize(15, averageDistance);
+  raycaster.setFromCamera(mouse, viz.getViewer().get3jsCamera());
+
+  // Get the list of objects that have a nameSet or textSet in their userData
+  const objectsToCheck = viz.getScene().children.filter(obj => obj.userData && (obj.userData.nameSet || obj.userData.textSet));
+  const intersects = raycaster.intersectObjects(objectsToCheck);
+  console.log(`raycaster used`);
+
+  // Go through all intersected objects
+  for (let intersect of intersects) {
+      const userData = intersect.object.userData;
+
+      // Get name, text, and refURL from userData, using fallback values if not available
+      const name = userData.nameSet !== "DefaultName" ? userData.nameSet : "Placeholder Name";
+      const text = userData.textSet !== "DefaultText" ? userData.textSet : "Placeholder Text";
+      const refURL = userData.refURL && userData.refURL !== "DefaultText" ? userData.refURL : "#";
+
+      // Update the infobox with obtained values
+      document.getElementById('nameSet').textContent = name;
+      document.getElementById('textSet').textContent = text;
+      document.getElementById('refURL').href = refURL;
+      document.getElementById('refURL').textContent = refURL !== "#" ? "more on this object" : "Placeholder URL";
+
+      // Log the values being set
+      console.log(`Setting infobox with - Name: ${name}, Text: ${text}, Ref URL: ${refURL}`);
+
+      // Show the infobox
+      document.getElementById('info-box').style.display = 'block';
+  }
+});
 
 
 
@@ -477,97 +543,7 @@ function toggleManColor() {
 }
 document.getElementById("human-icon-btn").addEventListener("click", toggleManColor);
 
-
-//UI RAYCASTER
-const raycaster = new THREE.Raycaster();
-const mouse = new THREE.Vector2();
-
-let pixelToSize = (pixelWidth, distanceToCamera) => {
-  const vFOV = viz.getViewer().get3jsCamera().fov * (Math.PI / 180);
-  const height = 2 * Math.tan(vFOV / 2) * distanceToCamera;
-  const heightPerPixel = height / window.innerHeight;
-  return pixelWidth * heightPerPixel;
-}
-let selectedSprite = null;
-
-document.addEventListener('mouseover', function(event) {
-  if (!raycastingActive) return; // Skip raycasting if it's not active
-
-  // Convert mouse position to NDC (Normalized Device Coordinates)
-  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-  mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
-
-  // Set raycaster threshold based on scene's scale
-  const averageDistance = 6000000;
-  raycaster.params.Points.threshold = pixelToSize(15, averageDistance);
-  raycaster.setFromCamera(mouse, viz.getViewer().get3jsCamera());
-
-  // Get the list of objects that have a nameSet or textSet in their userData
-  const objectsToCheck = viz.getScene().children.filter(obj => obj.userData && (obj.userData.nameSet || obj.userData.textSet));
-  const intersects = raycaster.intersectObjects(objectsToCheck);
-  console.log(`raycaster used`);
-
-  // If a sprite is already selected, remove it first
-  if (selectedSprite) {
-    viz.getScene().remove(selectedSprite);
-  }
-
-  // Go through all intersected objects
-  for (let intersect of intersects) {
-      const userData = intersect.object.userData;
-
-      // Get name, text, and refURL from userData, using fallback values if not available
-      const name = userData.nameSet !== "DefaultName" ? userData.nameSet : "Placeholder Name";
-      const text = userData.textSet !== "DefaultText" ? userData.textSet : "Placeholder Text";
-      const refURL = userData.refURL && userData.refURL !== "DefaultText" ? userData.refURL : "#";
-
-      // Create a transparent red frame sprite and add it to the scene
-      const spriteMaterial = new THREE.SpriteMaterial({
-        color: 0xff0000,
-        transparent: true,
-        opacity: 0.5
-    });
-    selectedSprite = new THREE.Sprite(spriteMaterial);
-    
-    // This function updates the sprite's scale so that it always appears as 40x40 pixels on screen.
-    function updateSpriteScale() {
-        // Calculate the size a sprite needs to be to appear 40 pixels wide on screen
-        const distanceToCamera = selectedSprite.position.distanceTo(viz.getViewer().get3jsCamera().position);
-        const spriteWidthInWorld = 10 * (distanceToCamera / window.innerHeight) * 2; // Assuming camera's FOV is the default 50 degrees, adjust otherwise.
-        selectedSprite.scale.set(spriteWidthInWorld, spriteWidthInWorld, 1);
-    }
-    
-    // Update the sprite scale initially
-    updateSpriteScale();
-    
-    // Call the update function whenever the camera moves.
-    viz.getViewer().get3jsCamera().addEventListener('change', updateSpriteScale);
-    
-    selectedSprite.position.copy(intersect.object.position);
-    viz.getScene().add(selectedSprite);
-    
-
-      // Set a timer to remove the sprite after 30 seconds
-      setTimeout(() => {
-        viz.getScene().remove(selectedSprite);
-      }, 1000);
-
-      // Update the infobox with obtained values
-      document.getElementById('nameSet').textContent = name;
-      document.getElementById('textSet').textContent = text;
-      document.getElementById('refURL').href = refURL;
-      document.getElementById('refURL').textContent = refURL !== "#" ? "more on this object" : "Placeholder URL";
-
-      // Log the values being set
-      console.log(`Setting infobox with - Name: ${name}, Text: ${text}, Ref URL: ${refURL}`);
-
-      // Show the infobox
-      document.getElementById('info-box').style.display = 'block';
-  }
-});
-
-
-// UI ELEMENTS I
+// UI ELEMENTS
 document.getElementById('parameters-btn').addEventListener('click', function() {
   const menu = document.getElementById('parameters-menu');
   menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
