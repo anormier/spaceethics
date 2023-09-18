@@ -126,10 +126,9 @@ const end = [0, 0, LY_TO_AU*1000];
 
 
 const raycaster = new THREE.Raycaster();
-raycaster.params.Points.threshold = 0.05; // 5px threshold for Points
 const mouse = new THREE.Vector2();
 
-const pixelToSize = (pixelWidth, distanceToCamera) => {
+let pixelToSize = (pixelWidth, distanceToCamera) => {
   const vFOV = viz.getViewer().get3jsCamera().fov * (Math.PI / 180);
   const height = 2 * Math.tan(vFOV / 2) * distanceToCamera;
   const heightPerPixel = height / window.innerHeight;
@@ -154,11 +153,11 @@ document.addEventListener('click', function(event) {
       let displayText = "";
       
       if (intersect.object.userData.nameSet && intersect.object.userData.nameSet !== "DefaultName") {
-          displayText += "Name Set: " + intersect.object.userData.nameSet + "\n";
+          displayText +=  intersect.object.userData.nameSet + "\n";
       }
 
       if (intersect.object.userData.textSet && intersect.object.userData.textSet !== "DefaultText") {
-          displayText += "Text Set: " + intersect.object.userData.textSet;
+          displayText += intersect.object.userData.textSet;
       }
 
       if (displayText) {
@@ -278,6 +277,9 @@ viz.onTick = function () {
   // Calculate distance to sun in AU
   const distanceToSunInAU = distToCam(cameraPosition, sunPosition);
   
+  const desiredPixelThreshold = 15;  // Adjust as needed.
+raycaster.params.Points.threshold = pixelToSize(desiredPixelThreshold, distanceToSunInAU);
+
 
   const { boundaryDate, resetDate } = getDateBoundariesBasedOnDistance(distanceToSunInAU);
   // Check for date boundary and reset if needed
