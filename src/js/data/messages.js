@@ -9,39 +9,41 @@
 
 //extract: https://docs.google.com/spreadsheets/d/1JZJq8M9Yg2gfahe1NwU_fI7p-xS1J8Eub3L0Z_LCZgg/edit#gid=2136432496
 function addDefaultParams(messages) {
-  const idTracker = {};
-
-  return messages.map(message => {
-      const originalId = message.id;
-
-      // If the ID already exists, append "-X" to it
-      if (idTracker[originalId]) {
-          idTracker[originalId]++;
-          message.id = `${originalId}-${idTracker[originalId]}`;
-      } else {
-          idTracker[originalId] = 1; // Initialize counter for the ID
-      }
-
-      // If dateSent in the message is just a year, convert it to a full date string
-      const dateSent = new Date(`${message.dateSent}-01-01`);
-      const epoch = dateSent;
-
-      return {
-          r: 1,
-          ra: 258,
-          dec: 12,
-          vra: 0,
-          vdec: 0,
-          dateSent: new Date("1977-09-05"), // Default value
-          vr: 300000,
-          epoch: "2024-01-01",
-          ...message, // Spread the existing message properties
-          dateSent, // Override the default value with the new Date object
-          epoch // Override the default epoch value
-      };
-  });
-}
-
+    const idTracker = {};
+  
+    return messages.map(message => {
+        const originalId = message.id;
+  
+        // If the ID already exists, append "-X" to it
+        if (idTracker[originalId]) {
+            idTracker[originalId]++;
+            message.id = `${originalId}-${idTracker[originalId]}`;
+        } else {
+            idTracker[originalId] = 1; // Initialize counter for the ID
+        }
+  
+        // If dateSent in the message is just a year, convert it to a full date string
+        const dateSent = new Date(`${message.dateSent}-01-01`);
+        const epoch = dateSent;
+  
+        return {
+            r: 1,
+            ra: 258,
+            dec: 12,
+            vra: 0,
+            vdec: 0,
+            dateSent: new Date("1977-09-05"), // Default value
+            vr: 300000,
+            epoch: "2024-01-01",
+            nameSet: message.nameSet || "DefaultName", // Default value if not provided
+            textSet: message.textSet || "DefaultText", // Default value if not provided
+            ...message, // Spread the existing message properties
+            dateSent, // Override the default value with the new Date object
+            epoch // Override the default epoch value
+        };
+    });
+  }
+  
 
 export const allMessages = [
 
