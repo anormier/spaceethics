@@ -48,7 +48,7 @@ function addDefaultParams(messages) {
 export const allMessages = [
 
     { id: 'RuBisCo Stars', dist: 16.8, ra: 3.745, dec: -9.773, dateSent: 2009 },
-    { id: 'Sonar Caling 2', dist: 12.36, ra: 12.36, dec: 111.852, dateSent: 2018 },
+    { nameSet:'Sonar Calling',textSet:'Sent by a technofestival !', id: 'Sonar Caling 2', dist: 12.36, ra: 12.36, dec: 111.852, dateSent: 2018 },
     { id: 'Cosmic Call2', dist: 20, ra: 15.6919, dec: 0.7155, dateSent: 2003 },
     { id: 'Across the Universe', dist: 20, ra: 37.9523, dec: 89.2641, dateSent: 2008 },
     { id: 'A Simple Response to an Elemental Message', dist: 20, ra: 37.9523, dec: 89.2641, dateSent: 2016 },

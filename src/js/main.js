@@ -124,6 +124,43 @@ const start = [0, 0, 0];
 const end = [0, 0, LY_TO_AU*1000];
 // drawLine(viz, start, end);
 
+const raycaster = new THREE.Raycaster();
+raycaster.params.Points.threshold = 0.05; // 5px threshold for Points
+const mouse = new THREE.Vector2();
+
+const pixelToSize = (pixelWidth, distanceToCamera) => {
+  const vFOV = viz.getViewer().get3jsCamera().fov * (Math.PI / 180);
+  const height = 2 * Math.tan(vFOV / 2) * distanceToCamera;
+  const heightPerPixel = height / window.innerHeight;
+  return pixelWidth * heightPerPixel;
+}
+
+document.addEventListener('click', function(event) {
+  console.log("raycaster used");
+  
+  // Convert mouse position to NDC
+  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+
+  const averageDistance = 6000000; // Adjust based on your scene's scale
+  raycaster.params.Points.threshold = pixelToSize(15, averageDistance);
+  raycaster.setFromCamera(mouse, viz.getViewer().get3jsCamera());
+
+  const objectsToCheck = viz.getScene().children.filter(obj => obj.userData && (obj.userData.nameSet || obj.userData.textSet));
+  const intersects = raycaster.intersectObjects(objectsToCheck);
+  console.log("intersect defined");
+
+  for (let intersect of intersects) {
+      if (intersect.object.userData.nameSet) {
+          console.log("Name Set: " + intersect.object.userData.nameSet);
+      }
+      if (intersect.object.userData.textSet) {
+          console.log("Text Set: " + intersect.object.userData.textSet);
+      }
+  }
+});
+
+
 
 // // Initialization - run this once when your application loads.
 function initObjectForDataset(dataset, scene, type, params, isStatic = false, date = null) {
@@ -161,13 +198,20 @@ function initObjectForDataset(dataset, scene, type, params, isStatic = false, da
       object.userData.nameSet = obj.nameSet;
       object.userData.textSet = obj.textSet;
 
+      
       object.visible = false;
       scene.add(object);
       obj.graphicalObject = object;
 
+      // Log to ensure the graphical object contains the nameSet and textSet properties
+      console.log(`Object for ID: ${obj.id}`);
+      console.log("nameSet:", obj.graphicalObject.userData.nameSet);
+      console.log("textSet:", obj.graphicalObject.userData.textSet);
+
       if (isStatic && date) {
           const position = calculatePosition(obj, date.getTime());
-          console.log("Position for object:", obj, "is:", position); 
+
+          console.log("Position for object:", obj, "is:", position); // Debugging line
 
           if (position) {
               obj.graphicalObject.position.set(...position);
@@ -178,7 +222,6 @@ function initObjectForDataset(dataset, scene, type, params, isStatic = false, da
       }
   });
 }
-
 
 
 
