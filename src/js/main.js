@@ -217,6 +217,8 @@ let pixelToSize = (pixelWidth, distanceToCamera) => {
   const heightPerPixel = height / window.innerHeight;
   return pixelWidth * heightPerPixel;
 }
+let selectedSprite = null;
+
 document.addEventListener('click', function(event) {
   if (!raycastingActive) return; // Skip raycasting if it's not active
 
@@ -234,6 +236,11 @@ document.addEventListener('click', function(event) {
   const intersects = raycaster.intersectObjects(objectsToCheck);
   console.log(`raycaster used`);
 
+  // If a sprite is already selected, remove it first
+  if (selectedSprite) {
+    viz.getScene().remove(selectedSprite);
+  }
+
   // Go through all intersected objects
   for (let intersect of intersects) {
       const userData = intersect.object.userData;
@@ -242,6 +249,37 @@ document.addEventListener('click', function(event) {
       const name = userData.nameSet !== "DefaultName" ? userData.nameSet : "Placeholder Name";
       const text = userData.textSet !== "DefaultText" ? userData.textSet : "Placeholder Text";
       const refURL = userData.refURL && userData.refURL !== "DefaultText" ? userData.refURL : "#";
+
+      // Create a transparent red frame sprite and add it to the scene
+      const spriteMaterial = new THREE.SpriteMaterial({
+        color: 0xff0000,
+        transparent: true,
+        opacity: 0.5
+    });
+    selectedSprite = new THREE.Sprite(spriteMaterial);
+    
+    // This function updates the sprite's scale so that it always appears as 40x40 pixels on screen.
+    function updateSpriteScale() {
+        // Calculate the size a sprite needs to be to appear 40 pixels wide on screen
+        const distanceToCamera = selectedSprite.position.distanceTo(viz.getViewer().get3jsCamera().position);
+        const spriteWidthInWorld = 10 * (distanceToCamera / window.innerHeight) * 2; // Assuming camera's FOV is the default 50 degrees, adjust otherwise.
+        selectedSprite.scale.set(spriteWidthInWorld, spriteWidthInWorld, 1);
+    }
+    
+    // Update the sprite scale initially
+    updateSpriteScale();
+    
+    // Call the update function whenever the camera moves.
+    viz.getViewer().get3jsCamera().addEventListener('change', updateSpriteScale);
+    
+    selectedSprite.position.copy(intersect.object.position);
+    // viz.getScene().add(selectedSprite);
+    
+
+    //   // Set a timer to remove the sprite after 30 seconds
+    //   setTimeout(() => {
+    //     viz.getScene().remove(selectedSprite);
+    //   }, 1000);
 
       // Update the infobox with obtained values
       document.getElementById('nameSet').textContent = name;
@@ -256,6 +294,7 @@ document.addEventListener('click', function(event) {
       document.getElementById('info-box').style.display = 'block';
   }
 });
+
 
 
 
