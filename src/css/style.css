@@ -183,10 +183,29 @@ button {
   margin: 5px;       /* Space around each button */
   display: none; 
   z-index: 1000;
+
 font-size: 16px;
-  width: 200px; /* Set a fixed width for the box */
-  max-height: calc(100% - 100px); /* Assuming the space you want to leave at the top is 100px. Adjust as needed. */
+  width: 300px; /* Set a fixed width for the box */
+  max-height: calc(100% - 300px); /* Assuming the space you want to leave at the top is 100px. Adjust as needed. */
   overflow-y: auto; /* Make it scrollable when content overflows */
+}
+
+
+/* For Webkit browsers (Chrome, Safari etc.) */
+.info-box::-webkit-scrollbar {
+  width: 10px;
+}
+
+.info-box::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.info-box::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+.info-box::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
 
 

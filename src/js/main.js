@@ -125,52 +125,6 @@ const end = [0, 0, LY_TO_AU*1000];
 // drawLine(viz, start, end);
 
 
-const raycaster = new THREE.Raycaster();
-const mouse = new THREE.Vector2();
-
-let pixelToSize = (pixelWidth, distanceToCamera) => {
-  const vFOV = viz.getViewer().get3jsCamera().fov * (Math.PI / 180);
-  const height = 2 * Math.tan(vFOV / 2) * distanceToCamera;
-  const heightPerPixel = height / window.innerHeight;
-  return pixelWidth * heightPerPixel;
-}
-
-document.addEventListener('click', function(event) {
-  console.log("raycaster used");
-  
-  // Convert mouse position to NDC
-  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-  mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
-
-  const averageDistance = 6000000; // Adjust based on your scene's scale
-  raycaster.params.Points.threshold = pixelToSize(15, averageDistance);
-  raycaster.setFromCamera(mouse, viz.getViewer().get3jsCamera());
-
-  const objectsToCheck = viz.getScene().children.filter(obj => obj.userData && (obj.userData.nameSet || obj.userData.textSet));
-  const intersects = raycaster.intersectObjects(viz.getScene().children);
-
-  for (let intersect of intersects) {
-      let displayText = "";
-      
-      if (intersect.object.userData.nameSet && intersect.object.userData.nameSet !== "DefaultName") {
-          displayText +=  intersect.object.userData.nameSet + "\n";
-      }
-
-      if (intersect.object.userData.textSet && intersect.object.userData.textSet !== "DefaultText") {
-          displayText += intersect.object.userData.textSet;
-      }
-
-      if (displayText) {
-          infoBox.textContent = displayText;
-          infoBox.appendChild(closeBtn);
-          infoBox.style.display = 'block';
-      }
-  }
-});
-
-
-
-
 // // Initialization - run this once when your application loads.
 function initObjectForDataset(dataset, scene, type, params, isStatic = false, date = null) {
   dataset.forEach(obj => {
@@ -206,6 +160,8 @@ function initObjectForDataset(dataset, scene, type, params, isStatic = false, da
       // Storing the nameSet and textSet values in the userData of the object
       object.userData.nameSet = obj.nameSet;
       object.userData.textSet = obj.textSet;
+      object.userData.refURL = obj.refURL;
+
 
       
       object.visible = false;
@@ -231,6 +187,77 @@ function initObjectForDataset(dataset, scene, type, params, isStatic = false, da
       }
   });
 }
+
+//
+let raycastingActive = true; // A variable to keep track of whether raycasting is active
+// Getting all UI elements
+const uiElements = document.querySelectorAll('.ui-element');
+
+uiElements.forEach(el => {
+  el.addEventListener('mouseover', function() {
+    raycastingActive = false; // Deactivate raycasting
+    console.log(`raycaster deactivated`);
+
+  });
+
+  el.addEventListener('mouseout', function() {
+    raycastingActive = true; // Activate raycasting
+    console.log(`raycaster activated`);
+
+  });
+});
+
+
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+
+let pixelToSize = (pixelWidth, distanceToCamera) => {
+  const vFOV = viz.getViewer().get3jsCamera().fov * (Math.PI / 180);
+  const height = 2 * Math.tan(vFOV / 2) * distanceToCamera;
+  const heightPerPixel = height / window.innerHeight;
+  return pixelWidth * heightPerPixel;
+}
+document.addEventListener('click', function(event) {
+  if (!raycastingActive) return; // Skip raycasting if it's not active
+
+  // Convert mouse position to NDC (Normalized Device Coordinates)
+  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+
+  // Set raycaster threshold based on scene's scale
+  const averageDistance = 6000000;
+  raycaster.params.Points.threshold = pixelToSize(15, averageDistance);
+  raycaster.setFromCamera(mouse, viz.getViewer().get3jsCamera());
+
+  // Get the list of objects that have a nameSet or textSet in their userData
+  const objectsToCheck = viz.getScene().children.filter(obj => obj.userData && (obj.userData.nameSet || obj.userData.textSet));
+  const intersects = raycaster.intersectObjects(objectsToCheck);
+  console.log(`raycaster used`);
+
+  // Go through all intersected objects
+  for (let intersect of intersects) {
+      const userData = intersect.object.userData;
+
+      // Get name, text, and refURL from userData, using fallback values if not available
+      const name = userData.nameSet !== "DefaultName" ? userData.nameSet : "Placeholder Name";
+      const text = userData.textSet !== "DefaultText" ? userData.textSet : "Placeholder Text";
+      const refURL = userData.refURL && userData.refURL !== "DefaultText" ? userData.refURL : "#";
+
+      // Update the infobox with obtained values
+      document.getElementById('nameSet').textContent = name;
+      document.getElementById('textSet').textContent = text;
+      document.getElementById('refURL').href = refURL;
+      document.getElementById('refURL').textContent = refURL !== "#" ? "more on this object" : "Placeholder URL";
+
+      // Log the values being set
+      console.log(`Setting infobox with - Name: ${name}, Text: ${text}, Ref URL: ${refURL}`);
+
+      // Show the infobox
+      document.getElementById('info-box').style.display = 'block';
+  }
+});
+
+
 
 
 
@@ -635,12 +662,14 @@ const infoBox = document.getElementById('info-box');
 const closeBtn = document.getElementById('close-btn');
 
 const showInfoOnClick = (event) => {
-    if (navInfo[event.target.id]) {
-        infoBox.textContent = navInfo[event.target.id] + " ";
-        infoBox.appendChild(closeBtn);
-        infoBox.style.display = 'block';
-    }
+  if (navInfo[event.target.id]) {
+      const navInfoContent = document.getElementById('navInfoContent');
+      navInfoContent.textContent = navInfo[event.target.id];
+      infoBox.appendChild(closeBtn);
+      infoBox.style.display = 'block';
+  }
 };
+
 
 const closeInfoBox = () => {
     infoBox.style.display = 'none';
