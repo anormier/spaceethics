@@ -124,6 +124,7 @@ const start = [0, 0, 0];
 const end = [0, 0, LY_TO_AU*1000];
 // drawLine(viz, start, end);
 
+
 const raycaster = new THREE.Raycaster();
 raycaster.params.Points.threshold = 0.05; // 5px threshold for Points
 const mouse = new THREE.Vector2();
@@ -276,6 +277,7 @@ viz.onTick = function () {
 
   // Calculate distance to sun in AU
   const distanceToSunInAU = distToCam(cameraPosition, sunPosition);
+  
 
   const { boundaryDate, resetDate } = getDateBoundariesBasedOnDistance(distanceToSunInAU);
   // Check for date boundary and reset if needed
