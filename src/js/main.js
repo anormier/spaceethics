@@ -147,18 +147,27 @@ document.addEventListener('click', function(event) {
   raycaster.setFromCamera(mouse, viz.getViewer().get3jsCamera());
 
   const objectsToCheck = viz.getScene().children.filter(obj => obj.userData && (obj.userData.nameSet || obj.userData.textSet));
-  const intersects = raycaster.intersectObjects(objectsToCheck);
-  console.log("intersect defined");
+  const intersects = raycaster.intersectObjects(viz.getScene().children);
 
   for (let intersect of intersects) {
-      if (intersect.object.userData.nameSet) {
-          console.log("Name Set: " + intersect.object.userData.nameSet);
+      let displayText = "";
+      
+      if (intersect.object.userData.nameSet && intersect.object.userData.nameSet !== "DefaultName") {
+          displayText += "Name Set: " + intersect.object.userData.nameSet + "\n";
       }
-      if (intersect.object.userData.textSet) {
-          console.log("Text Set: " + intersect.object.userData.textSet);
+
+      if (intersect.object.userData.textSet && intersect.object.userData.textSet !== "DefaultText") {
+          displayText += "Text Set: " + intersect.object.userData.textSet;
+      }
+
+      if (displayText) {
+          infoBox.textContent = displayText;
+          infoBox.appendChild(closeBtn);
+          infoBox.style.display = 'block';
       }
   }
 });
+
 
 
 
