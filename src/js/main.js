@@ -12,6 +12,8 @@ import stars100LY6Kmore from "./data/stars100LY6Kmore.js";
 import {updatedMessages, allMessages} from "./data/messages.js";
 import allVoyagers from "./data/voyagers.js";
 import {navInfo} from './textContents.js';
+import { fetchSignalsFromDSN } from './service/scrapDSN.js';
+
 
 (function(){
   var oldLog = console.log;
@@ -40,7 +42,10 @@ let autoAdjustSpeed = true;
 let manIcon = document.getElementById("man-icon");
 
 
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", async function(){
+
+  const dsnData = await fetchSignalsFromDSN();
+  console.log('Fetched DSN data:', dsnData);
 
 //INIT SIM
 const viz = new Spacekit.Simulation(document.getElementById("main-container"), {
@@ -186,9 +191,9 @@ function initObjectForDataset(dataset, scene, type, params, isStatic = false, da
       obj.graphicalObject = object;
 
       // Log to ensure the graphical object contains the nameSet and textSet properties
-      console.log(`Object for ID: ${obj.id}`);
-      console.log("nameSet:", obj.graphicalObject.userData.nameSet);
-      console.log("textSet:", obj.graphicalObject.userData.textSet);
+      // console.log(`Object for ID: ${obj.id}`);
+      // console.log("nameSet:", obj.graphicalObject.userData.nameSet);
+      // console.log("textSet:", obj.graphicalObject.userData.textSet);
 
       if (isStatic && date) {
           const position = calculatePosition(obj, date.getTime());
@@ -268,7 +273,7 @@ document.addEventListener('click', function(event) {
       document.getElementById('refURL').textContent = refURL !== "#" ? "more on this object" : "Placeholder URL";
 
       // Log the values being set
-      console.log(`Setting infobox with - Name: ${name}, Text: ${text}, Ref URL: ${refURL}`);
+      //console.log(`Setting infobox with - Name: ${name}, Text: ${text}, Ref URL: ${refURL}`);
 
       // Show the infobox
       document.getElementById('info-box').style.display = 'block';
