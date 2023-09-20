@@ -12,7 +12,7 @@ import stars100LY6Kmore from "./data/stars100LY6Kmore.js";
 import {updatedMessages, allMessages} from "./data/messages.js";
 import allVoyagers from "./data/voyagers.js";
 import {navInfo} from './textContents.js';
-import { fetchSignalsFromDSN } from './service/scrapDSN.js';
+import { fetchDetailedSignalsFromDSN } from './service/scrapDSN.js';
 
 
 (function(){
@@ -44,8 +44,12 @@ let manIcon = document.getElementById("man-icon");
 
 document.addEventListener("DOMContentLoaded", async function(){
 
-  const dsnData = await fetchSignalsFromDSN();
-  console.log('Fetched DSN data:', dsnData);
+  try {
+    const detailedDSNData = await fetchDetailedSignalsFromDSN();
+    console.log('Fetched detailed DSN signal data:', detailedDSNData);
+} catch (error) {
+    console.error('Error fetching detailed DSN signal data:', error);
+}
 
 //INIT SIM
 const viz = new Spacekit.Simulation(document.getElementById("main-container"), {

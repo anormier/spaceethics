@@ -1,9 +1,10 @@
 // scrapDSN.js
 
+
 /**
- * Fetch DSN (Deep Space Network) data.
+ * Fetch DSN (Deep Space Network) signal data.
  */
-export async function fetchSignalsFromDSN() {
+export async function fetchDetailedSignalsFromDSN() {
     try {
         const response = await axios.get('https://eyes.nasa.gov/dsn/data/dsn.xml');
         const parser = new DOMParser();
@@ -19,19 +20,29 @@ export async function fetchSignalsFromDSN() {
                 let upSignals = Array.from(dish.getElementsByTagName('upSignal'));
 
                 const downSignalData = downSignals.map(signal => ({
-                    signalType: 'downward',
-                    power: signal.getAttribute('power'),
+                    signalType: 'downSignal',
+                    dishName: dish.getAttribute("name"),
+                    active: signal.getAttribute("active") === "true",
+                    type: signal.getAttribute("signalType"),
+                    dataRate: signal.getAttribute("dataRate"),
+                    frequency: signal.getAttribute("frequency"),
                     band: signal.getAttribute('band'),
+                    power: signal.getAttribute('power'),
                     spacecraft: signal.getAttribute('spacecraft'),
-                    uplegRange: signal.getAttribute('uplegRange')
+                    spacecraftID: signal.getAttribute("spacecraftID")
                 }));
 
                 const upSignalData = upSignals.map(signal => ({
-                    signalType: 'upward',
-                    power: signal.getAttribute('power'),
+                    signalType: 'upSignal',
+                    dishName: dish.getAttribute("name"),
+                    active: signal.getAttribute("active") === "true",
+                    type: signal.getAttribute("signalType"),
+                    dataRate: signal.getAttribute("dataRate"),
+                    frequency: signal.getAttribute("frequency"),
                     band: signal.getAttribute('band'),
+                    power: signal.getAttribute('power'),
                     spacecraft: signal.getAttribute('spacecraft'),
-                    uplegRange: signal.getAttribute('uplegRange')
+                    spacecraftID: signal.getAttribute("spacecraftID")
                 }));
 
                 return {
@@ -57,8 +68,7 @@ export async function fetchSignalsFromDSN() {
         return result;
 
     } catch (error) {
-        console.error('Error fetching DSN data:', error);
+        console.error('Error fetching detailed DSN signal data:', error);
         throw error;
     }
 }
-
