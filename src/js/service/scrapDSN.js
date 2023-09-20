@@ -1,3 +1,4 @@
+
 export async function fetchDetailedSignalsFromDSN() {
     try {
         const response = await axios.get('https://eyes.nasa.gov/dsn/data/dsn.xml');
@@ -11,47 +12,59 @@ export async function fetchDetailedSignalsFromDSN() {
             throw new Error("Invalid XML data received.");
         }
 
-        const dishes = Array.from(xmlDoc.getElementsByTagName("dish"));
-
-        if (!dishes.length) {
-            throw new Error("No dishes found in XML data.");
-        }
-
         const signals = [];
 
-        dishes.forEach((dish) => {
+        Array.from(xmlDoc.getElementsByTagName("dish")).forEach((dish) => {
             const dishName = dish.getAttribute("name");
-            const upSignals = Array.from(dish.getElementsByTagName("upSignal"));
-            const downSignals = Array.from(dish.getElementsByTagName("downSignal"));
+            const azimuthAngle = dish.getAttribute("azimuthAngle");
+            const elevationAngle = dish.getAttribute("elevationAngle");
 
-            upSignals.forEach((upSignal) => {
-                signals.push({
-                    signalType: "upSignal",
-                    dishName: dishName,
-                    active: upSignal.getAttribute("active") === "true",
-                    type: upSignal.getAttribute("signalType"),
-                    dataRate: upSignal.getAttribute("dataRate"),
-                    frequency: upSignal.getAttribute("frequency"),
-                    band: upSignal.getAttribute("band"),
-                    power: upSignal.getAttribute("power"),
-                    spacecraft: upSignal.getAttribute("spacecraft"),
-                    spacecraftID: upSignal.getAttribute("spacecraftID"),
-                });
-            });
+            const stationNode = dish.parentNode;
+            const stationName = stationNode.getAttribute("name");
+            const stationFriendlyName = stationNode.getAttribute("friendlyName");
+            const stationTime = stationNode.getAttribute("timeUTC");
 
-            downSignals.forEach((downSignal) => {
-                signals.push({
-                    signalType: "downSignal",
-                    dishName: dishName,
-                    active: downSignal.getAttribute("active") === "true",
-                    type: downSignal.getAttribute("signalType"),
-                    dataRate: downSignal.getAttribute("dataRate"),
-                    frequency: downSignal.getAttribute("frequency"),
-                    band: downSignal.getAttribute("band"),
-                    power: downSignal.getAttribute("power"),
-                    spacecraft: downSignal.getAttribute("spacecraft"),
-                    spacecraftID: downSignal.getAttribute("spacecraftID"),
-                });
+            Array.from(dish.getElementsByTagName("downSignal")).forEach((downSignal) => {
+                const signalType = downSignal.getAttribute("signalType");
+                const active = downSignal.getAttribute("active") === "true";
+                const dataRate = downSignal.getAttribute("dataRate");
+                const frequency = downSignal.getAttribute("frequency");
+                const band = downSignal.getAttribute("band");
+                const power = downSignal.getAttribute("power");
+                const spacecraft = downSignal.getAttribute("spacecraft");
+                const spacecraftID = downSignal.getAttribute("spacecraftID");
+
+                const targetNodes = Array.from(dish.getElementsByTagName("target"));
+
+                // Filter out spacecraft with the name "TEST"
+                if (spacecraft !== "TEST") {
+                    // Filter out messages with no target
+                    const messagesWithTarget = targetNodes.filter((targetNode) => {
+                        return targetNode.getAttribute("name") === spacecraft;
+                    });
+
+                    messagesWithTarget.forEach((targetNode) => {
+                        const uplegRange = targetNode.getAttribute("uplegRange");
+
+                        signals.push({
+                            signalType: signalType,
+                            dishName: dishName,
+                            azimuthAngle: azimuthAngle,
+                            elevationAngle: elevationAngle,
+                            stationName: stationName,
+                            stationFriendlyName: stationFriendlyName,
+                            stationTime: stationTime,
+                            active: active,
+                            dataRate: dataRate,
+                            frequency: frequency,
+                            band: band,
+                            power: power,
+                            spacecraft: spacecraft,
+                            spacecraftID: spacecraftID,
+                            uplegRange: uplegRange,
+                        });
+                    });
+                }
             });
         });
 
