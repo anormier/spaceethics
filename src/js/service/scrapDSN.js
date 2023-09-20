@@ -1,72 +1,61 @@
-// scrapDSN.js
-
-
-/**
- * Fetch DSN (Deep Space Network) signal data.
- */
 export async function fetchDetailedSignalsFromDSN() {
     try {
         const response = await axios.get('https://eyes.nasa.gov/dsn/data/dsn.xml');
         const parser = new DOMParser();
         const xmlDoc = parser.parseFromString(response.data, "text/xml");
 
-        let stations = Array.from(xmlDoc.getElementsByTagName("station"));
+        // Debugging output
+        console.log('XML Data:', xmlDoc);
 
-        const result = stations.map(station => {
-            let dishes = Array.from(station.getElementsByTagName("dish"));
+        if (!xmlDoc || !xmlDoc.documentElement || xmlDoc.getElementsByTagName('parsererror').length) {
+            throw new Error("Invalid XML data received.");
+        }
 
-            const dishData = dishes.map(dish => {
-                let downSignals = Array.from(dish.getElementsByTagName('downSignal'));
-                let upSignals = Array.from(dish.getElementsByTagName('upSignal'));
+        const dishes = Array.from(xmlDoc.getElementsByTagName("dish"));
 
-                const downSignalData = downSignals.map(signal => ({
-                    signalType: 'downSignal',
-                    dishName: dish.getAttribute("name"),
-                    active: signal.getAttribute("active") === "true",
-                    type: signal.getAttribute("signalType"),
-                    dataRate: signal.getAttribute("dataRate"),
-                    frequency: signal.getAttribute("frequency"),
-                    band: signal.getAttribute('band'),
-                    power: signal.getAttribute('power'),
-                    spacecraft: signal.getAttribute('spacecraft'),
-                    spacecraftID: signal.getAttribute("spacecraftID")
-                }));
+        if (!dishes.length) {
+            throw new Error("No dishes found in XML data.");
+        }
 
-                const upSignalData = upSignals.map(signal => ({
-                    signalType: 'upSignal',
-                    dishName: dish.getAttribute("name"),
-                    active: signal.getAttribute("active") === "true",
-                    type: signal.getAttribute("signalType"),
-                    dataRate: signal.getAttribute("dataRate"),
-                    frequency: signal.getAttribute("frequency"),
-                    band: signal.getAttribute('band'),
-                    power: signal.getAttribute('power'),
-                    spacecraft: signal.getAttribute('spacecraft'),
-                    spacecraftID: signal.getAttribute("spacecraftID")
-                }));
+        const signals = [];
 
-                return {
-                    name: dish.getAttribute('name'),
-                    azimuthAngle: dish.getAttribute('azimuthAngle'),
-                    elevationAngle: dish.getAttribute('elevationAngle'),
-                    signals: [...downSignalData, ...upSignalData]
-                };
+        dishes.forEach((dish) => {
+            const dishName = dish.getAttribute("name");
+            const upSignals = Array.from(dish.getElementsByTagName("upSignal"));
+            const downSignals = Array.from(dish.getElementsByTagName("downSignal"));
+
+            upSignals.forEach((upSignal) => {
+                signals.push({
+                    signalType: "upSignal",
+                    dishName: dishName,
+                    active: upSignal.getAttribute("active") === "true",
+                    type: upSignal.getAttribute("signalType"),
+                    dataRate: upSignal.getAttribute("dataRate"),
+                    frequency: upSignal.getAttribute("frequency"),
+                    band: upSignal.getAttribute("band"),
+                    power: upSignal.getAttribute("power"),
+                    spacecraft: upSignal.getAttribute("spacecraft"),
+                    spacecraftID: upSignal.getAttribute("spacecraftID"),
+                });
             });
 
-            // Convert the timeUTC to JavaScript Date format.
-            const timeUTC = new Date(station.getAttribute('timeUTC'));
-
-            return {
-                name: station.getAttribute('name'),
-                friendlyName: station.getAttribute('friendlyName'),
-                timeUTC: timeUTC,
-                timeZoneOffset: station.getAttribute('timeZoneOffset'),
-                dishes: dishData
-            };
+            downSignals.forEach((downSignal) => {
+                signals.push({
+                    signalType: "downSignal",
+                    dishName: dishName,
+                    active: downSignal.getAttribute("active") === "true",
+                    type: downSignal.getAttribute("signalType"),
+                    dataRate: downSignal.getAttribute("dataRate"),
+                    frequency: downSignal.getAttribute("frequency"),
+                    band: downSignal.getAttribute("band"),
+                    power: downSignal.getAttribute("power"),
+                    spacecraft: downSignal.getAttribute("spacecraft"),
+                    spacecraftID: downSignal.getAttribute("spacecraftID"),
+                });
+            });
         });
 
-        return result;
-
+        return signals;
     } catch (error) {
         console.error('Error fetching detailed DSN signal data:', error);
         throw error;
