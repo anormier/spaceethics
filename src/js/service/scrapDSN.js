@@ -51,3 +51,87 @@ export async function fetchDetailedSignalsFromDSN() {
         return null;
     }
 }
+
+// Function to convert from horizontal to equatorial coordinates
+function horizontalToEquatorial(azimuth, elevation, observerLat, observerLon, date) {
+    const LST = calculateLST(date, observerLon);
+    
+    const azimuthRad = azimuth * Math.PI / 180;
+    const elevationRad = elevation * Math.PI / 180;
+    const observerLatRad = observerLat * Math.PI / 180;
+    
+    const dec = Math.asin(Math.sin(observerLatRad) * Math.sin(elevationRad) + Math.cos(observerLatRad) * Math.cos(elevationRad) * Math.cos(azimuthRad));
+    const HA = Math.acos((Math.sin(elevationRad) - Math.sin(dec) * Math.sin(observerLatRad)) / (Math.cos(dec) * Math.cos(observerLatRad)));
+    const RA = LST - HA * 180 / Math.PI;
+    
+    const decDeg = dec * 180 / Math.PI;
+    
+    return {
+      ra: RA,
+      dec: decDeg
+    };
+  }
+  
+  // Function to convert km to astronomical units (AU)
+  function kmToAU(km) {
+    return km / 1.496e+8;
+  }
+  
+  // Function to calculate Local Sidereal Time (LST)
+  function calculateLST(date, longitude) {
+    const JD = (date - new Date(Date.UTC(2000, 0, 1, 12, 0, 0))) / (1000 * 60 * 60 * 24) + 2451545.0;
+    const T = (JD - 2451545.0) / 36525.0;
+    
+    let GST = 280.46061837 + 360.98564736629 * (JD - 2451545) + T * T * (0.000387933 - T / 38710000);
+    GST = GST % 360;
+    
+    if (GST < 0) {
+      GST += 360;
+    }
+    
+    const LST = (GST + longitude) % 360;
+    
+    return LST;
+  }
+  
+  export async function augmentAndExportSignals() {
+    try {
+      const fetchedSignals = await fetchDetailedSignalsFromDSN();
+      
+      if (!fetchedSignals) {
+        console.error("Failed to fetch signals");
+        return null;
+      }
+      
+      const augmentedSignals = fetchedSignals.map(signal => {
+        const { azimuthAngle, elevationAngle, timeUTC, lat, lon, uplegRange, spacecraft } = signal;
+        
+        const date = new Date(timeUTC);
+        const { ra, dec } = horizontalToEquatorial(parseFloat(azimuthAngle), parseFloat(elevationAngle), parseFloat(lat), parseFloat(lon), date);
+        
+        return {
+          ...signal,
+          r: kmToAU(parseFloat(uplegRange)),
+          ra,
+          dec,
+          vra: 0,
+          vdec: 0,
+          dateSent: new Date().toUTCString(),
+          vr: 300000,
+          epoch: new Date().toUTCString(),
+          nameSet: `Upload to/Download from ${spacecraft}`,
+          textSet: `Information about ${spacecraft}, Transmission Power: XX dBm`
+        };
+      });
+      
+      // Now augmentedSignals contains the augmented data
+      // You can export it as needed, e.g., to a file, database, etc.
+      console.log(augmentedSignals); // For demonstration, logging it to the console
+      return augmentedSignals;
+  
+    } catch (error) {
+      console.error('Error in augmenting DSN signal data:', error);
+      return null;
+    }
+  }
+  

@@ -12,7 +12,7 @@ import stars100LY6Kmore from "./data/stars100LY6Kmore.js";
 import {updatedMessages, allMessages} from "./data/messages.js";
 import allVoyagers from "./data/voyagers.js";
 import {navInfo} from './textContents.js';
-import { fetchDetailedSignalsFromDSN } from './service/scrapDSN.js';
+import { fetchDetailedSignalsFromDSN,augmentAndExportSignals } from './service/scrapDSN.js';
 
 
 (function(){
@@ -49,6 +49,13 @@ document.addEventListener("DOMContentLoaded", async function(){
     console.log('Fetched detailed DSN signal data:', detailedDSNData);
 } catch (error) {
     console.error('Error fetching detailed DSN signal data:', error);
+}
+
+try {
+  const augmentAndExportSignalsData = await augmentAndExportSignals();
+  console.log('Fetched Augmented DSN signal data:', augmentAndExportSignalsData);
+} catch (error) {
+  console.error('Error fetching detailed DSN signal data:', error);
 }
 
 //INIT SIM
