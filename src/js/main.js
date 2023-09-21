@@ -469,7 +469,7 @@ function updateObjectsForDataset(dataset, dateInMilliseconds) {
     const position = calculatePosition(obj, dateInMilliseconds);
     if (position) {
       if (obj.graphicalObject instanceof THREE.Mesh && obj.graphicalObject.geometry instanceof THREE.ConeGeometry) {
-        console.log("Updating a Cone:", obj);
+       // console.log("Updating a Cone:", obj);
 
         const origin = { x: 0, y: 0, z: 0 };
         const end = { x: position[0], y: position[1], z: position[2] };
@@ -480,7 +480,7 @@ function updateObjectsForDataset(dataset, dateInMilliseconds) {
         obj.graphicalObject.position.copy(cone.position);
         obj.graphicalObject.quaternion.copy(cone.quaternion);
 
-        console.log("Cone after update:", obj.graphicalObject);
+     //   console.log("Cone after update:", obj.graphicalObject);
       } else {
         obj.graphicalObject.position.set(...position);
       }
