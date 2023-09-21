@@ -86,55 +86,6 @@ camera.addEventListener('change', function() {
     autoAdjustSpeed = true;
 });
 
-/**
- * @param {number} angle - Angle is half the angular resolution, specified in arcminutes.
- * @param {Object} origin - Coordinates {x, y, z} of the tip of the cone.
- * @param {Object} end - Coordinates {x, y, z} of the center of the base of the cone.
- * @param {number} transparency - Transparency percentage: 0 (opaque) to 100 (fully transparent).
- * @param {number} color - Color of the cone.
- */
-function createCone(angle, origin, end, transparency, color) {
-  // Convert angle from arcminutes to radians
-  const angleInRadians = (angle / 60) * (Math.PI / 180);
-  
-  // Calculate the height (length) of the cone based on origin and end positions
-  const direction = new THREE.Vector3(
-      end.x - origin.x,
-      end.y - origin.y,
-      end.z - origin.z
-  );
-  const length = direction.length();
-
-  // Calculate the radius of the base using the angle and length
-  const radius = length * Math.tan(angleInRadians / 2);
-  
-  const geometry = new THREE.ConeGeometry(radius, length, 32);
-  const material = new THREE.MeshBasicMaterial({
-      color: color,
-      transparent: true,
-      opacity: 1 - transparency / 100  // Convert percentage to a value between 0 and 1
-  });
-  
-  const cone = new THREE.Mesh(geometry, material);
-  
-  // Set position of the cone
-  cone.position.set(
-      (origin.x + end.x) / 2,
-      (origin.y + end.y) / 2,
-      (origin.z + end.z) / 2
-  );
-
-  // Rotate cone to correct orientation with its tip at the origin and base at the end
-  const up = new THREE.Vector3(0, -1, 0);
-  cone.quaternion.setFromUnitVectors(up, direction.normalize());
-  
-  return cone;
-}
-
-// Example Usage:
-// const cone = createCone(300, {x: 0, y: 0, z: 0}, {x: 0, y: 0, z: 10}, 50, 0xff0000); // Color set to red
-// scene.add(cone);
-
 
 // FUNCTION: Draw a line
 function drawLine(viz, start, end, color = 0xff0000) {
@@ -168,6 +119,14 @@ function initObjectForDataset(dataset, scene, type, params, isStatic = false, da
               const cubeMaterial = new THREE.MeshBasicMaterial({ color: params.color });
               object = new THREE.Mesh(cubeGeometry, cubeMaterial);
               break;
+
+          case 'cone':
+            const origin = { x: 0, y: 0, z: 0 };
+            const end = calculatePosition(obj, date ? date.getTime() : Date.now());
+            
+            // Use arbitrary values for angle, transparency, and color for now. Adjust as necessary.
+            object = createCone(500, origin, end, 60, params.color);
+            break;
 
           case 'line': 
           const geometry = new THREE.BufferGeometry().setFromPoints([
@@ -311,12 +270,13 @@ if (isMobile()) {
 initObjectForDataset(modifiedStars100LY3K45K, scene, 'point', {color: 'white', size: 1});
 initObjectForDataset(stars100LY45K6K, scene, 'point', {color: 'white', size: 2});
 initObjectForDataset(stars100LY6Kmore, scene, 'point', {color: 'white', size: 3});
-initObjectForDataset(updatedMessages, scene, 'line', {origin: [0, 0, 0], color: 0xff0000});
+//initObjectForDataset(updatedMessages, scene, 'line', {origin: [0, 0, 0], color: 0xff0000});
 
 }
 // Initialisations pour tous supports (ADD LINE ONTICK if moving)
 initObjectForDataset(allVoyagers, scene, 'point', {color: 'red', size: 3});
 //initObjectForDataset(updatedMessages, scene, 'point', {color: 'red', size: 3});
+initObjectForDataset(updatedMessages, scene, 'cone', {color: 'red'});
 
 console.log(updatedMessages.map(obj => obj.graphicalObject.type).join(', '));
 
@@ -413,11 +373,11 @@ if (autoAdjustSpeed) {
       unloadAllObjects();
       //Lalbels
       placeObjectsUnified(allVoyagers, dateInMilliseconds, './assets/symbols/Red_Circle_full.png', false);
-      placeObjectsUnified(updatedMessages, dateInMilliseconds, './assets/symbols/Red_Circle_full.png');
+      //placeObjectsUnified(updatedMessages, dateInMilliseconds, './assets/symbols/Red_Circle_full.png');
       //points
       updateObjectsForDataset(allVoyagers, dateInMilliseconds);//Update Voyagers POINTS
       updateObjectsForDataset(updatedMessages, dateInMilliseconds); //Update MessagerPOINTS
-      updateLinesForDataset(updatedMessages, dateInMilliseconds); //Update MessagerPOINTS
+     // updateLinesForDataset(updatedMessages, dateInMilliseconds); //Update MessagerPOINTS
 
     } else {
 
@@ -440,12 +400,77 @@ if (autoAdjustSpeed) {
 };
 
 
+/**
+ * @param {number} angle - Angle is half the angular resolution, specified in arcminutes.
+ * @param {Object} origin - Coordinates {x, y, z} of the tip of the cone.
+ * @param {Object} end - Coordinates {x, y, z} of the center of the base of the cone.
+ * @param {number} transparency - Transparency percentage: 0 (opaque) to 100 (fully transparent).
+ * @param {number} color - Color of the cone.
+ */
+function createCone(angle, origin, end, transparency, color) {
+  // Convert angle from degrees to radians
+  const angleInRadians = (angle / 60) * (Math.PI / 180);
+  
+  // Calculate the height (length) of the cone based on origin and end positions
+  const direction = new THREE.Vector3(
+      end.x - origin.x,
+      end.y - origin.y,
+      end.z - origin.z
+  );
+  const length = direction.length();
+
+  // Calculate the radius of the base using the angle and length
+  const radius = length * Math.tan(angleInRadians / 2);
+  
+  const geometry = new THREE.ConeGeometry(radius, length, 32);
+  const material = new THREE.MeshBasicMaterial({
+      color: color,
+      transparent: true,
+      opacity: 1 - transparency / 100  // Convert percentage to a value between 0 and 1
+  });
+  
+  const cone = new THREE.Mesh(geometry, material);
+  
+  // Set position of the cone
+  cone.position.set(
+      (origin.x + end.x) / 2,
+      (origin.y + end.y) / 2,
+      (origin.z + end.z) / 2
+  );
+
+  // Rotate cone to correct orientation with its tip at the origin and base at the end
+  const up = new THREE.Vector3(0, -1, 0);
+  cone.quaternion.setFromUnitVectors(up, direction.normalize());
+  
+  return cone;
+}
+
+// Example Usage:
+// const cone = createCone(300, {x: 0, y: 0, z: 0}, {x: 0, y: 0, z: 10}, 50, 0xff0000); // Color set to red
+// scene.add(cone);
+
+
 //update functions
 function updateObjectsForDataset(dataset, dateInMilliseconds) {
   dataset.forEach(obj => {
     const position = calculatePosition(obj, dateInMilliseconds);
     if (position) {
-      obj.graphicalObject.position.set(...position);
+      if (obj.graphicalObject instanceof THREE.Mesh && obj.graphicalObject.geometry instanceof THREE.ConeGeometry) {
+        console.log("Updating a Cone:", obj);
+
+        const origin = { x: 0, y: 0, z: 0 };
+        const end = { x: position[0], y: position[1], z: position[2] };
+
+        const cone = createCone(300, origin, end, 60, obj.graphicalObject.material.color);
+
+        obj.graphicalObject.geometry = cone.geometry;
+        obj.graphicalObject.position.copy(cone.position);
+        obj.graphicalObject.quaternion.copy(cone.quaternion);
+
+        console.log("Cone after update:", obj.graphicalObject);
+      } else {
+        obj.graphicalObject.position.set(...position);
+      }
       obj.graphicalObject.visible = true;      
     } else {
       obj.graphicalObject.visible = false;
@@ -486,6 +511,7 @@ function updateLinesForDataset(dataset, dateInMilliseconds) {
     }
   });
 }
+
 
 // NATURAL OBJECTS
 const sun = viz.createObject("sun", Spacekit.SpaceObjectPresets.SUN);
