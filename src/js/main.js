@@ -169,6 +169,15 @@ function initObjectForDataset(dataset, scene, type, params, isStatic = false, da
               object = new THREE.Mesh(cubeGeometry, cubeMaterial);
               break;
 
+          case 'line': 
+          const geometry = new THREE.BufferGeometry().setFromPoints([
+              new THREE.Vector3(...params.origin), 
+              new THREE.Vector3(0, 0, 0)  // Placeholder, will be updated
+          ]);
+          const material = new THREE.LineBasicMaterial({ color: params.color });
+          object = new THREE.Line(geometry, material);
+          break;
+
           case 'point': 
               object = new THREE.Points(
                   new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0)]),
@@ -301,6 +310,8 @@ if (isMobile()) {
 initObjectForDataset(modifiedStars100LY3K45K, scene, 'point', {color: 'white', size: 1});
 initObjectForDataset(stars100LY45K6K, scene, 'point', {color: 'white', size: 2});
 initObjectForDataset(stars100LY6Kmore, scene, 'point', {color: 'white', size: 3});
+initObjectForDataset(updatedMessages, scene, 'line', {origin: [0, 0, 0], color: 0xff0000});
+
 }
 // Initialisations pour tous supports (ADD LINE ONTICK if moving)
 initObjectForDataset(allVoyagers, scene, 'point', {color: 'red', size: 3});
@@ -363,8 +374,8 @@ if (autoAdjustSpeed) {
  // DATASET UPDATES ONTICK
 
 
-// Tick Update - run this during each simulation tick.
-function updateSpheresForDataset(dataset, dateInMilliseconds) {
+// Tick Update - run this UPDATE FOR ALL CASE BUT LINES during each simulation tick.
+function updateObjectsForDataset(dataset, dateInMilliseconds) {
   dataset.forEach(obj => {
     const position = calculatePosition(obj, dateInMilliseconds);
     if (position) {
@@ -375,15 +386,29 @@ function updateSpheresForDataset(dataset, dateInMilliseconds) {
     }
   });
 }
+// New function to update lines
+function updateLinesForDataset(dataset, dateInMilliseconds) {
+  dataset.forEach(obj => {
+      const position = calculatePosition(obj, dateInMilliseconds);
+      if (position) {
+          // Assuming obj.graphicalObject.geometry.vertices[1] is the end point
+          obj.graphicalObject.geometry.vertices[1].set(...position);
+          obj.graphicalObject.geometry.verticesNeedUpdate = true;
+          obj.graphicalObject.visible = true;
+      } else {
+          obj.graphicalObject.visible = false;
+      }
+  });
+}
   // Update visibility of spatial objects based on distance limits
   const distVisFrom = 1;  // Lower limit in AU
   const distVisTo = 300;  // Upper limit in AU
 
 //UPDATE STAR POSITIONS
   if (!isMobile()){
-    updateSpheresForDataset(modifiedStars100LY3K45K, dateInMilliseconds);
-    updateSpheresForDataset(stars100LY45K6K, dateInMilliseconds);
-    updateSpheresForDataset(stars100LY6Kmore, dateInMilliseconds);
+    updateObjectsForDataset(modifiedStars100LY3K45K, dateInMilliseconds);
+    updateObjectsForDataset(stars100LY45K6K, dateInMilliseconds);
+    updateObjectsForDataset(stars100LY6Kmore, dateInMilliseconds);
   }
 
 //UPDATE HUMAN IMPACT
@@ -400,7 +425,7 @@ function updateSpheresForDataset(dataset, dateInMilliseconds) {
       unloadAllObjects(); // unload all objects
      placeObjectsUnified(allVoyagers, dateInMilliseconds, './assets/symbols/Red_Circle_full.png');
      placeObjectsUnified(updatedMessages, dateInMilliseconds, './assets/symbols/Red_Circle_full.png', false);
-     updateSpheresForDataset(allVoyagers, dateInMilliseconds);//Update Voyagers POINTS
+     updateObjectsForDataset(allVoyagers, dateInMilliseconds);//Update Voyagers POINTS
 
      allObjects.forEach((point) => {
       updateVisibility(point, dateInMilliseconds, distanceToSunInAU, distVisFrom, distVisTo, viz);
@@ -413,8 +438,10 @@ function updateSpheresForDataset(dataset, dateInMilliseconds) {
       placeObjectsUnified(allVoyagers, dateInMilliseconds, './assets/symbols/Red_Circle_full.png', false);
       placeObjectsUnified(updatedMessages, dateInMilliseconds, './assets/symbols/Red_Circle_full.png');
       //points
-      updateSpheresForDataset(allVoyagers, dateInMilliseconds);//Update Voyagers POINTS
-      updateSpheresForDataset(updatedMessages, dateInMilliseconds); //Update MessagerPOINTS
+      updateObjectsForDataset(allVoyagers, dateInMilliseconds);//Update Voyagers POINTS
+      updateObjectsForDataset(updatedMessages, dateInMilliseconds); //Update MessagerPOINTS
+      updateLinesForDataset(updatedMessages, dateInMilliseconds); //Update MessagerPOINTS
+
     } else {
 
         unloadAllObjects();
