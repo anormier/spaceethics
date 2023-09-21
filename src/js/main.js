@@ -125,7 +125,7 @@ function initObjectForDataset(dataset, scene, type, params, isStatic = false, da
             const end = calculatePosition(obj, date ? date.getTime() : Date.now());
             
             // Use arbitrary values for angle, transparency, and color for now. Adjust as necessary.
-            object = createCone(500, origin, end, 60, params.color);
+            object = createCone(500, origin, end, 70, params.color,100);
             break;
 
           case 'line': 
@@ -356,12 +356,13 @@ if (autoAdjustSpeed) {
     // Do not update this on mobile (heavy computations)
     if (!isMobile()){  }
 
+    updateObjectsForDataset(updatedMessages, dateInMilliseconds); //Update MessagerCones
 
     if (distanceToSunInAU < 1*LY_TO_AU) {
       setPlanetLabelsVisible(true);  //solar system planets labels
       unloadAllObjects(); // unload all objects
      placeObjectsUnified(allVoyagers, dateInMilliseconds, './assets/symbols/Red_Circle_full.png');
-     placeObjectsUnified(updatedMessages, dateInMilliseconds, './assets/symbols/Red_Circle_full.png', false);
+    // placeObjectsUnified(updatedMessages, dateInMilliseconds, './assets/symbols/Red_Circle_full.png', false);
      updateObjectsForDataset(allVoyagers, dateInMilliseconds);//Update Voyagers POINTS
 
      allObjects.forEach((point) => {
@@ -376,7 +377,6 @@ if (autoAdjustSpeed) {
       //placeObjectsUnified(updatedMessages, dateInMilliseconds, './assets/symbols/Red_Circle_full.png');
       //points
       updateObjectsForDataset(allVoyagers, dateInMilliseconds);//Update Voyagers POINTS
-      updateObjectsForDataset(updatedMessages, dateInMilliseconds); //Update MessagerPOINTS
      // updateLinesForDataset(updatedMessages, dateInMilliseconds); //Update MessagerPOINTS
 
     } else {
@@ -407,7 +407,7 @@ if (autoAdjustSpeed) {
  * @param {number} transparency - Transparency percentage: 0 (opaque) to 100 (fully transparent).
  * @param {number} color - Color of the cone.
  */
-function createCone(angle, origin, end, transparency, color) {
+function createCone(angle, origin, end, transparency, color, distCut = 0) {
   // Convert angle from degrees to radians
   const angleInRadians = (angle / 60) * (Math.PI / 180);
   
@@ -419,10 +419,20 @@ function createCone(angle, origin, end, transparency, color) {
   );
   const length = direction.length();
 
-  // Calculate the radius of the base using the angle and length
-  const radius = length * Math.tan(angleInRadians / 2);
-  
-  const geometry = new THREE.ConeGeometry(radius, length, 32);
+  // Calculate the remaining length of the cone after cutting
+  const newLength = length - distCut;
+
+  // Check if distCut is within the length of the cone
+  if (newLength <= 0) {
+    console.warn('distCut is greater than or equal to the length of the cone. Cone will not be visible.');
+    return;
+  }
+
+  // Calculate the new radius of the base using the angle and new length
+  const newRadius = newLength * Math.tan(angleInRadians / 2);
+
+  // Create the cone geometry with the new dimensions
+  const geometry = new THREE.ConeGeometry(newRadius, newLength, 32);
   const material = new THREE.MeshBasicMaterial({
       color: color,
       transparent: true,
@@ -431,14 +441,17 @@ function createCone(angle, origin, end, transparency, color) {
   
   const cone = new THREE.Mesh(geometry, material);
   
-  // Set position of the cone
+  // Calculate the position offset due to the cutting
+  const offset = direction.clone().normalize().multiplyScalar(distCut / 2);
+
+  // Set new position of the cone
   cone.position.set(
-      (origin.x + end.x) / 2,
-      (origin.y + end.y) / 2,
-      (origin.z + end.z) / 2
+      (origin.x + end.x) / 2 + offset.x,
+      (origin.y + end.y) / 2 + offset.y,
+      (origin.z + end.z) / 2 + offset.z
   );
 
-  // Rotate cone to correct orientation with its tip at the origin and base at the end
+  // Rotate cone to correct orientation
   const up = new THREE.Vector3(0, -1, 0);
   cone.quaternion.setFromUnitVectors(up, direction.normalize());
   
@@ -461,7 +474,7 @@ function updateObjectsForDataset(dataset, dateInMilliseconds) {
         const origin = { x: 0, y: 0, z: 0 };
         const end = { x: position[0], y: position[1], z: position[2] };
 
-        const cone = createCone(300, origin, end, 60, obj.graphicalObject.material.color);
+        const cone = createCone(300, origin, end, 100, obj.graphicalObject.material.color,100);
 
         obj.graphicalObject.geometry = cone.geometry;
         obj.graphicalObject.position.copy(cone.position);
