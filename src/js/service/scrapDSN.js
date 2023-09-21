@@ -1,57 +1,57 @@
 export async function fetchDetailedSignalsFromDSN() {
     try {
-        const response = await axios.get('https://eyes.nasa.gov/dsn/data/dsn.xml');
-        const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(response.data, "text/xml");
-
-        // Validate the XML data
-        if (!xmlDoc || !xmlDoc.documentElement || xmlDoc.getElementsByTagName('parsererror').length) {
-            throw new Error("Invalid XML data received.");
-        }
-
-        const signals = [];
-
-        // Loop through each dish
-        Array.from(xmlDoc.getElementsByTagName("dish")).forEach((dish) => {
-            const dishAttributes = Array.from(dish.attributes).reduce((acc, attr) => ({ ...acc, [attr.name]: attr.value }), {});
-            const stationNode = dish.parentNode;
-            const stationAttributes = Array.from(stationNode.attributes).reduce((acc, attr) => ({ ...acc, [attr.name]: attr.value }), {});
-
-            // Loop through both downSignal and upSignal
-            ['downSignal', 'upSignal'].forEach(signalType => {
-                Array.from(dish.getElementsByTagName(signalType)).forEach((signalNode) => {
-                    const signalAttributes = Array.from(signalNode.attributes).reduce((acc, attr) => ({ ...acc, [attr.name]: attr.value }), {});
-
-                    const spacecraft = signalNode.getAttribute("spacecraft");
-
-                    // Exclude spacecraft named "TEST"
-                    if (spacecraft !== "TEST") {
-                        // Find targets with matching spacecraft names
-                        const targetNodes = Array.from(dish.getElementsByTagName("target")).filter(targetNode => targetNode.getAttribute("name") === spacecraft);
-                        
-                        targetNodes.forEach(targetNode => {
-                            const targetAttributes = Array.from(targetNode.attributes).reduce((acc, attr) => ({ ...acc, [attr.name]: attr.value }), {});
-
-                            signals.push({
-                                signalType,
-                                ...signalAttributes,
-                                ...targetAttributes,
-                                ...dishAttributes,
-                                ...stationAttributes
-                            });
-                        });
-                    }
+      const response = await axios.get('https://eyes.nasa.gov/dsn/data/dsn.xml');
+      const parser = new DOMParser();
+      const xmlDoc = parser.parseFromString(response.data, "text/xml");
+  
+      // Validate the XML data
+      if (!xmlDoc || !xmlDoc.documentElement || xmlDoc.getElementsByTagName('parsererror').length) {
+        throw new Error("Invalid XML data received.");
+      }
+  
+      const signals = [];
+  
+      // Loop through each dish
+      Array.from(xmlDoc.getElementsByTagName("dish")).forEach((dish) => {
+        const dishAttributes = Array.from(dish.attributes).reduce((acc, attr) => ({ ...acc, [attr.name]: attr.value }), {});
+        const stationNode = dish.parentNode;
+        const stationAttributes = Array.from(stationNode.attributes).reduce((acc, attr) => ({ ...acc, [attr.name]: attr.value }), {});
+  
+        // Loop through both downSignal and upSignal
+        ['downSignal', 'upSignal'].forEach(signalType => {
+          Array.from(dish.getElementsByTagName(signalType)).forEach((signalNode) => {
+            const signalAttributes = Array.from(signalNode.attributes).reduce((acc, attr) => ({ ...acc, [attr.name]: attr.value }), {});
+  
+            const spacecraft = signalNode.getAttribute("spacecraft");
+  
+            // Exclude spacecraft named "TEST"
+            if (spacecraft !== "TEST") {
+              // Find targets with matching spacecraft names
+              const targetNodes = Array.from(dish.getElementsByTagName("target")).filter(targetNode => targetNode.getAttribute("name") === spacecraft);
+              
+              targetNodes.forEach(targetNode => {
+                const targetAttributes = Array.from(targetNode.attributes).reduce((acc, attr) => ({ ...acc, [attr.name]: attr.value }), {});
+  
+                signals.push({
+                  signalType,
+                  ...signalAttributes,
+                  ...targetAttributes,
+                  ...dishAttributes,
+                  ...stationAttributes // includes timeUTC and timeZoneOffset
                 });
-            });
+              });
+            }
+          });
         });
-
-        return signals;
+      });
+  
+      return signals;
     } catch (error) {
-        console.error('Error fetching detailed DSN signal data:', error);
-        return null;
+      console.error('Error fetching detailed DSN signal data:', error);
+      return null;
     }
-}
-
+  }
+  
 // Function to convert from horizontal to equatorial coordinates
 function horizontalToEquatorial(azimuth, elevation, observerLat, observerLon, date) {
     const LST = calculateLST(date, observerLon);
@@ -93,25 +93,55 @@ function horizontalToEquatorial(azimuth, elevation, observerLat, observerLon, da
     
     return LST;
   }
-  
   export async function augmentAndExportSignals() {
     try {
       const fetchedSignals = await fetchDetailedSignalsFromDSN();
-      
+  
       if (!fetchedSignals) {
         console.error("Failed to fetch signals");
         return null;
       }
-      
+  
       const augmentedSignals = fetchedSignals.map(signal => {
-        const { azimuthAngle, elevationAngle, timeUTC, lat, lon, uplegRange, spacecraft } = signal;
-        
-        const date = new Date(timeUTC);
-        const { ra, dec } = horizontalToEquatorial(parseFloat(azimuthAngle), parseFloat(elevationAngle), parseFloat(lat), parseFloat(lon), date);
-        
+        const {
+          azimuthAngle,
+          elevationAngle,
+          timeUTC,
+          lat,
+          lon,
+          uplegRange,
+          spacecraft,
+          timeZoneOffset
+        } = signal;
+  
+        // Initialize ra and dec to null
+        let ra = null;
+        let dec = null;
+  
+        // Only calculate ra and dec if all required attributes are present
+        if (
+          azimuthAngle !== undefined &&
+          elevationAngle !== undefined &&
+          lat !== undefined &&
+          lon !== undefined &&
+          timeUTC !== undefined
+        ) {
+          const date = new Date(parseInt(timeUTC) + parseInt(timeZoneOffset)); // Adjusting for timezone
+          const equatorialCoords = horizontalToEquatorial(
+            parseFloat(azimuthAngle),
+            parseFloat(elevationAngle),
+            parseFloat(lat),
+            parseFloat(lon),
+            date
+          );
+  
+          ra = equatorialCoords.ra;
+          dec = equatorialCoords.dec;
+        }
+  
         return {
           ...signal,
-          r: kmToAU(parseFloat(uplegRange)),
+          r: uplegRange !== undefined ? kmToAU(parseFloat(uplegRange)) : null,
           ra,
           dec,
           vra: 0,
@@ -123,12 +153,11 @@ function horizontalToEquatorial(azimuth, elevation, observerLat, observerLon, da
           textSet: `Information about ${spacecraft}, Transmission Power: XX dBm`
         };
       });
-      
+  
       // Now augmentedSignals contains the augmented data
       // You can export it as needed, e.g., to a file, database, etc.
       console.log(augmentedSignals); // For demonstration, logging it to the console
       return augmentedSignals;
-  
     } catch (error) {
       console.error('Error in augmenting DSN signal data:', error);
       return null;
