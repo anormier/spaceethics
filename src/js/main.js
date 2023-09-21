@@ -220,6 +220,7 @@ function initObjectForDataset(dataset, scene, type, params, isStatic = false, da
               obj.graphicalObject.visible = false;
           }
       }
+      
   });
 }
 
@@ -255,7 +256,7 @@ let pixelToSize = (pixelWidth, distanceToCamera) => {
 document.addEventListener('click', function(event) {
   if (!raycastingActive) 
   return; // Skip raycasting if it's not active
-
+  console.log('Number of objects in scene:', viz.getScene().children.length); 
   // Convert mouse position to NDC (Normalized Device Coordinates)
   mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
   mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
@@ -315,8 +316,9 @@ initObjectForDataset(updatedMessages, scene, 'line', {origin: [0, 0, 0], color: 
 }
 // Initialisations pour tous supports (ADD LINE ONTICK if moving)
 initObjectForDataset(allVoyagers, scene, 'point', {color: 'red', size: 3});
-initObjectForDataset(updatedMessages, scene, 'point', {color: 'red', size: 3});
+//initObjectForDataset(updatedMessages, scene, 'point', {color: 'red', size: 3});
 
+console.log(updatedMessages.map(obj => obj.graphicalObject.type).join(', '));
 
 
 // SIM LOOP
@@ -374,32 +376,7 @@ if (autoAdjustSpeed) {
  // DATASET UPDATES ONTICK
 
 
-// Tick Update - run this UPDATE FOR ALL CASE BUT LINES during each simulation tick.
-function updateObjectsForDataset(dataset, dateInMilliseconds) {
-  dataset.forEach(obj => {
-    const position = calculatePosition(obj, dateInMilliseconds);
-    if (position) {
-      obj.graphicalObject.position.set(...position);
-      obj.graphicalObject.visible = true;      
-    } else {
-      obj.graphicalObject.visible = false;
-    }
-  });
-}
-// New function to update lines
-function updateLinesForDataset(dataset, dateInMilliseconds) {
-  dataset.forEach(obj => {
-      const position = calculatePosition(obj, dateInMilliseconds);
-      if (position) {
-          // Assuming obj.graphicalObject.geometry.vertices[1] is the end point
-          obj.graphicalObject.geometry.vertices[1].set(...position);
-          obj.graphicalObject.geometry.verticesNeedUpdate = true;
-          obj.graphicalObject.visible = true;
-      } else {
-          obj.graphicalObject.visible = false;
-      }
-  });
-}
+
   // Update visibility of spatial objects based on distance limits
   const distVisFrom = 1;  // Lower limit in AU
   const distVisTo = 300;  // Upper limit in AU
@@ -461,6 +438,54 @@ function updateLinesForDataset(dataset, dateInMilliseconds) {
 
 
 };
+
+
+//update functions
+function updateObjectsForDataset(dataset, dateInMilliseconds) {
+  dataset.forEach(obj => {
+    const position = calculatePosition(obj, dateInMilliseconds);
+    if (position) {
+      obj.graphicalObject.position.set(...position);
+      obj.graphicalObject.visible = true;      
+    } else {
+      obj.graphicalObject.visible = false;
+    }
+  });
+}
+// New function to update lines
+function updateLinesForDataset(dataset, dateInMilliseconds) {
+  dataset.forEach((obj, index) => {
+    const position = calculatePosition(obj, dateInMilliseconds);
+    console.log(`Updating line object for index ${index}, name: ${obj.nameSet}`);
+    console.log('New position:', position);
+
+    if (position) {
+      try {
+        // Explicitly check for each property's existence
+        if (!obj || !obj.graphicalObject || !obj.graphicalObject.geometry || !obj.graphicalObject.geometry.getAttribute('position')) {
+          console.error(`Error updating line for index ${index}, name: ${obj.nameSet}`);
+          return; // Skip this iteration
+        }
+
+        const positions = obj.graphicalObject.geometry.getAttribute('position').array;
+        positions[3] = position[0];
+        positions[4] = position[1];
+        positions[5] = position[2];
+        obj.graphicalObject.geometry.getAttribute('position').needsUpdate = true;
+        obj.graphicalObject.visible = true;
+        console.log("Updated object:", obj.graphicalObject);
+
+      } catch (err) {
+        console.error(`Exception thrown while updating line for index ${index}, name: ${obj.nameSet}: ${err}`);
+      }
+
+    } else {
+      if (obj && obj.graphicalObject) {
+        obj.graphicalObject.visible = false;
+      }
+    }
+  });
+}
 
 // NATURAL OBJECTS
 const sun = viz.createObject("sun", Spacekit.SpaceObjectPresets.SUN);
