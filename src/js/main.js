@@ -1,6 +1,4 @@
 //BELOW: this is The file main.js please read, and just acknoledge with -I've read, up to line XXX (being the last line you've read)-, I will then pass you further documents to read, or questions
-
-
 // IMPORTS
 import { updateVisibility, checkIfVisible, radecToXYZ, isDesktop, toggleFullscreen, updateInfoBox,isMobile } from "./service/utils.js";
 import { distToCam } from './service/simCalc.js'; 
@@ -189,78 +187,7 @@ function initObjectForDataset(dataset, scene, type, params, isStatic = false, da
       
   });
 }
-
-//
-let raycastingActive = true; // A variable to keep track of whether raycasting is active
-// Getting all UI elements
-const uiElements = document.querySelectorAll('.ui-element');
-
-uiElements.forEach(el => {
-  el.addEventListener('mouseover', function() {
-    raycastingActive = false; // Deactivate raycasting
-    console.log(`raycaster deactivated`);
-
-  });
-
-  el.addEventListener('mouseout', function() {
-    raycastingActive = true; // Activate raycasting
-    console.log(`raycaster activated`);
-
-  });
-});
-
-
-const raycaster = new THREE.Raycaster();
-const mouse = new THREE.Vector2();
-
-let pixelToSize = (pixelWidth, distanceToCamera) => {
-  const vFOV = viz.getViewer().get3jsCamera().fov * (Math.PI / 180);
-  const height = 2 * Math.tan(vFOV / 2) * distanceToCamera;
-  const heightPerPixel = height / window.innerHeight;
-  return pixelWidth * heightPerPixel;
-}
-document.addEventListener('click', function(event) {
-  if (!raycastingActive) 
-  return; // Skip raycasting if it's not active
-  console.log('Number of objects in scene:', viz.getScene().children.length); 
-  // Convert mouse position to NDC (Normalized Device Coordinates)
-  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-  mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
-
-  // Set raycaster threshold based on scene's scale
-  const averageDistance = 6000000;
-  raycaster.params.Points.threshold = pixelToSize(15, averageDistance);
-  raycaster.setFromCamera(mouse, viz.getViewer().get3jsCamera());
-
-  // Get the list of objects that have a nameSet or textSet in their userData
-  const objectsToCheck = viz.getScene().children.filter(obj => obj.userData && (obj.userData.nameSet || obj.userData.textSet));
-  const intersects = raycaster.intersectObjects(objectsToCheck);
-  console.log(`raycaster used`);
-
-  // Go through all intersected objects
-  for (let intersect of intersects) {
-      const userData = intersect.object.userData;
-
-      // Get name, text, and refURL from userData, using fallback values if not available
-      const name = userData.nameSet !== "DefaultName" ? userData.nameSet : "Placeholder Name";
-      const text = userData.textSet !== "DefaultText" ? userData.textSet : "Placeholder Text";
-      const refURL = userData.refURL && userData.refURL !== "DefaultText" ? userData.refURL : "#";
-
-      // Update the infobox with obtained values
-      document.getElementById('nameSet').textContent = name;
-      document.getElementById('textSet').textContent = text;
-      document.getElementById('refURL').href = refURL;
-      document.getElementById('refURL').textContent = refURL !== "#" ? "more on this object" : "Placeholder URL";
-
-      // Log the values being set
-      //console.log(`Setting infobox with - Name: ${name}, Text: ${text}, Ref URL: ${refURL}`);
-
-      // Show the infobox
-      document.getElementById('info-box').style.display = 'block';
-  }
-});
-
-
+ 
 
 
 
@@ -314,7 +241,7 @@ viz.onTick = function () {
   const desiredPixelThreshold = 15;  // Adjust as needed.
 raycaster.params.Points.threshold = pixelToSize(desiredPixelThreshold, distanceToSunInAU);
 
-
+ 
   const { boundaryDate, resetDate } = getDateBoundariesBasedOnDistance(distanceToSunInAU);
   // Check for date boundary and reset if needed
   if (currentDate >= boundaryDate) {
@@ -405,7 +332,6 @@ if (autoAdjustSpeed) {
 
 
 };
-
 
 /**
  * @param {number} angle - Angle is half the angular resolution, specified in arcminutes.
@@ -533,6 +459,25 @@ function updateLinesForDataset(dataset, dateInMilliseconds) {
 }
 
 
+function calculatePosition(obj, date) {
+  // Filtering based on 'dateSent' and 'endDate'
+  if ('dateSent' in obj && date < new Date(obj.dateSent).getTime()) return false;
+  if ('endDate' in obj && date > new Date(obj.endDate).getTime()) return false;
+
+  // Calculate time difference
+  const timeDifference = date - new Date(obj.epoch).getTime();
+
+  // Adjusted RA, Dec, and R
+  const adjustedRA = obj.ra + obj.vra * timeDifference * 8.78e-15;
+  const adjustedDec = obj.dec + obj.vdec * timeDifference * 8.78e-15;
+  const adjustedR = obj.r + (6.68459e-9 * obj.vr) * timeDifference / 1000;
+
+  if (adjustedR < 0) return false;
+
+  return radecToXYZ(adjustedRA, adjustedDec, adjustedR);
+}
+
+ 
 // NATURAL OBJECTS
 const sun = viz.createObject("sun", Spacekit.SpaceObjectPresets.SUN);
 viz.createAmbientLight();
@@ -636,7 +581,77 @@ const jupiter3 = createCelestialSphere("jupiter3", {
   atmosphere:'true'
 });
 
+ // PARTIE III
 
+// UI: RAYCASTER
+let raycastingActive = true; // A variable to keep track of whether raycasting is active
+// Getting all UI elements
+const uiElements = document.querySelectorAll('.ui-element');
+
+uiElements.forEach(el => {
+  el.addEventListener('mouseover', function() {
+    raycastingActive = false; // Deactivate raycasting
+    console.log(`raycaster deactivated`);
+
+  });
+
+  el.addEventListener('mouseout', function() {
+    raycastingActive = true; // Activate raycasting
+    console.log(`raycaster activated`);
+
+  });
+});
+
+
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+
+let pixelToSize = (pixelWidth, distanceToCamera) => {
+  const vFOV = viz.getViewer().get3jsCamera().fov * (Math.PI / 180);
+  const height = 2 * Math.tan(vFOV / 2) * distanceToCamera;
+  const heightPerPixel = height / window.innerHeight;
+  return pixelWidth * heightPerPixel;
+}
+document.addEventListener('click', function(event) {
+  if (!raycastingActive) 
+  return; // Skip raycasting if it's not active
+  console.log('Number of objects in scene:', viz.getScene().children.length); 
+  // Convert mouse position to NDC (Normalized Device Coordinates)
+  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+
+  // Set raycaster threshold based on scene's scale
+  const averageDistance = 6000000;
+  raycaster.params.Points.threshold = pixelToSize(15, averageDistance);
+  raycaster.setFromCamera(mouse, viz.getViewer().get3jsCamera());
+
+  // Get the list of objects that have a nameSet or textSet in their userData
+  const objectsToCheck = viz.getScene().children.filter(obj => obj.userData && (obj.userData.nameSet || obj.userData.textSet));
+  const intersects = raycaster.intersectObjects(objectsToCheck);
+  console.log(`raycaster used`);
+
+  // Go through all intersected objects
+  for (let intersect of intersects) {
+      const userData = intersect.object.userData;
+
+      // Get name, text, and refURL from userData, using fallback values if not available
+      const name = userData.nameSet !== "DefaultName" ? userData.nameSet : "Placeholder Name";
+      const text = userData.textSet !== "DefaultText" ? userData.textSet : "Placeholder Text";
+      const refURL = userData.refURL && userData.refURL !== "DefaultText" ? userData.refURL : "#";
+
+      // Update the infobox with obtained values
+      document.getElementById('nameSet').textContent = name;
+      document.getElementById('textSet').textContent = text;
+      document.getElementById('refURL').href = refURL;
+      document.getElementById('refURL').textContent = refURL !== "#" ? "more on this object" : "Placeholder URL";
+
+      // Log the values being set
+      //console.log(`Setting infobox with - Name: ${name}, Text: ${text}, Ref URL: ${refURL}`);
+
+      // Show the infobox
+      document.getElementById('info-box').style.display = 'block';
+  }
+});
 
 
 // UI HTML
@@ -689,7 +704,7 @@ function getSpeedBasedOnDistance(distanceToSunInAU) {
   }
   return speed;
 }
-
+ 
 function getDateBoundariesBasedOnDistance(distanceToSunInAU) {
   let boundaryDate, resetDate;
 
@@ -741,7 +756,7 @@ raSlider.addEventListener("input", (event) => {
     ra = parseInt(event.target.value);
     updateStars();
 });
-
+ 
 // UI ELEMENTS II
 // Setup navigation buttons
 
@@ -795,7 +810,7 @@ const showInfoOnClick = (event) => {
   }
 };
 
-
+ 
 const closeInfoBox = () => {
     infoBox.style.display = 'none';
 };
@@ -899,24 +914,6 @@ function setPlanetLabelsVisible(isVisible) {
   });
 }
 
-
-function calculatePosition(obj, date) {
-  // Filtering based on 'dateSent' and 'endDate'
-  if ('dateSent' in obj && date < new Date(obj.dateSent).getTime()) return false;
-  if ('endDate' in obj && date > new Date(obj.endDate).getTime()) return false;
-
-  // Calculate time difference
-  const timeDifference = date - new Date(obj.epoch).getTime();
-
-  // Adjusted RA, Dec, and R
-  const adjustedRA = obj.ra + obj.vra * timeDifference * 8.78e-15;
-  const adjustedDec = obj.dec + obj.vdec * timeDifference * 8.78e-15;
-  const adjustedR = obj.r + (6.68459e-9 * obj.vr) * timeDifference / 1000;
-
-  if (adjustedR < 0) return false;
-
-  return radecToXYZ(adjustedRA, adjustedDec, adjustedR);
-}
 
 
 });
