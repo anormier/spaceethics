@@ -13,23 +13,6 @@ import {navInfo} from './textContents.js';
 import { fetchDetailedSignalsFromDSN,augmentAndExportSignals } from './service/scrapDSN.js';
 
 
-(function(){
-  var oldLog = console.log;
-  console.log = function (message) {
-      // Continue using the old console.log function
-      oldLog.apply(console, arguments);
-
-      // Append to the HTML element
-      var output = document.getElementById('console-output');
-      var newMessage = document.createElement('div');
-      newMessage.textContent = message;
-      output.appendChild(newMessage);
-
-      // Optional: Scroll to the bottom to always see the latest message
-      output.scrollTop = output.scrollHeight;
-  };
-})();
-
 // Get the Spacekit version of THREE.js.
 const THREE = Spacekit.THREE;
 
@@ -333,68 +316,8 @@ if (autoAdjustSpeed) {
 
 };
 
-/**
- * @param {number} angle - Angle is half the angular resolution, specified in arcminutes.
- * @param {Object} origin - Coordinates {x, y, z} of the tip of the cone.
- * @param {Object} end - Coordinates {x, y, z} of the center of the base of the cone.
- * @param {number} transparency - Transparency percentage: 0 (opaque) to 100 (fully transparent).
- * @param {number} color - Color of the cone.
- */
-function createCone(angle, origin, end, transparency, color, distCut = 0) {
-  // Convert angle from degrees to radians
-  const angleInRadians = (angle / 60) * (Math.PI / 180);
-  
-  // Calculate the height (length) of the cone based on origin and end positions
-  const direction = new THREE.Vector3(
-      end.x - origin.x,
-      end.y - origin.y,
-      end.z - origin.z
-  );
-  const length = direction.length();
 
-  // Calculate the remaining length of the cone after cutting
-  const newLength = length - distCut;
-
-  // Check if distCut is within the length of the cone
-  if (newLength <= 0) {
-    console.warn('distCut is greater than or equal to the length of the cone. Cone will not be visible.');
-    return;
-  }
-
-  // Calculate the new radius of the base using the angle and new length
-  const newRadius = newLength * Math.tan(angleInRadians / 2);
-
-  // Create the cone geometry with the new dimensions
-  const geometry = new THREE.ConeGeometry(newRadius, newLength, 32);
-  const material = new THREE.MeshBasicMaterial({
-      color: color,
-      transparent: true,
-      opacity: 1 - transparency / 100  // Convert percentage to a value between 0 and 1
-  });
-  
-  const cone = new THREE.Mesh(geometry, material);
-  
-  // Calculate the position offset due to the cutting
-  const offset = direction.clone().normalize().multiplyScalar(distCut / 2);
-
-  // Set new position of the cone
-  cone.position.set(
-      (origin.x + end.x) / 2 + offset.x,
-      (origin.y + end.y) / 2 + offset.y,
-      (origin.z + end.z) / 2 + offset.z
-  );
-
-  // Rotate cone to correct orientation
-  const up = new THREE.Vector3(0, -1, 0);
-  cone.quaternion.setFromUnitVectors(up, direction.normalize());
-  
-  return cone;
-}
-
-// Example Usage:
-// const cone = createCone(300, {x: 0, y: 0, z: 0}, {x: 0, y: 0, z: 10}, 50, 0xff0000); // Color set to red
-// scene.add(cone);
-
+// POSITIONS AND LOADING FUNCTIONS
 
 //update functions
 function updateObjectsForDataset(dataset, dateInMilliseconds) {
@@ -477,7 +400,135 @@ function calculatePosition(obj, date) {
   return radecToXYZ(adjustedRA, adjustedDec, adjustedR);
 }
 
+
+// Main function to place objects
+function placeObjectsUnified(objects, date, textureUrl, labelVisible = true) {
+  const groupName = hashObjectArray(objects);  // Generate a unique groupName
+
+  // Remove previously added objects for this group
+  if (objectGroups[groupName]) {
+    objectGroups[groupName].forEach(objData => {
+      viz.removeObject(objData.object);
+    });
+  }
+
+  // Initialize or clear the array for this group
+  objectGroups[groupName] = [];
+
+  objects.forEach(obj => {
+    // Filtering based on 'dateSent' and 'endDate'
+    if ('dateSent' in obj && date < new Date(obj.dateSent).getTime()) return;
+    if ('endDate' in obj && date > new Date(obj.endDate).getTime()) return;
+
+    // Calculate time difference
+    const timeDifference = date - new Date(obj.epoch).getTime();
+
+    // Adjusted RA, Dec, and R
+    const adjustedRA = obj.ra + obj.vra * timeDifference * 8.78e-15;
+    const adjustedDec = obj.dec + obj.vdec * timeDifference * 8.78e-15;
+    const adjustedR = obj.r + (6.68459e-9 * obj.vr) * timeDifference / 1000;
+
+    const position = radecToXYZ(adjustedRA, adjustedDec, adjustedR);
+
+    if (adjustedR < 0) return;
+
+    // Create and add object to visualization
+    const singleObject = viz.createObject(obj.id, {
+      position: position,
+      scale: [0.0001, 0.0001, 0.0001],
+      particleSize: 1,
+      labelText: obj.id,
+      textureUrl: textureUrl
+    });
+
+    singleObject.setLabelVisibility(labelVisible);
+
+    // Store in the global object group with both object and its position
+    objectGroups[groupName].push({
+      object: singleObject,
+      position: position
+    });
+  });
+}
+
+function unloadAllObjects() {
+  const scene = viz.getScene();
+
+  for (let group in objectGroups) {
+    objectGroups[group].forEach(objData => {
+      viz.removeObject(objData.object);
+      if (objData.attachedSphere) {
+        scene.remove(objData.attachedSphere);
+      }
+    });
+
+    objectGroups[group] = [];
+  }
+}
  
+
+
+
+//GEOMETRY FUNCTIONS
+/**
+ * @param {number} angle - Angle is half the angular resolution, specified in arcminutes.
+ * @param {Object} origin - Coordinates {x, y, z} of the tip of the cone.
+ * @param {Object} end - Coordinates {x, y, z} of the center of the base of the cone.
+ * @param {number} transparency - Transparency percentage: 0 (opaque) to 100 (fully transparent).
+ * @param {number} color - Color of the cone.
+ */
+function createCone(angle, origin, end, transparency, color, distCut = 0) {
+  // Convert angle from degrees to radians
+  const angleInRadians = (angle / 60) * (Math.PI / 180);
+  
+  // Calculate the height (length) of the cone based on origin and end positions
+  const direction = new THREE.Vector3(
+      end.x - origin.x,
+      end.y - origin.y,
+      end.z - origin.z
+  );
+  const length = direction.length();
+
+  // Calculate the remaining length of the cone after cutting
+  const newLength = length - distCut;
+
+  // Check if distCut is within the length of the cone
+  if (newLength <= 0) {
+    console.warn('distCut is greater than or equal to the length of the cone. Cone will not be visible.');
+    return;
+  }
+
+  // Calculate the new radius of the base using the angle and new length
+  const newRadius = newLength * Math.tan(angleInRadians / 2);
+
+  // Create the cone geometry with the new dimensions
+  const geometry = new THREE.ConeGeometry(newRadius, newLength, 32);
+  const material = new THREE.MeshBasicMaterial({
+      color: color,
+      transparent: true,
+      opacity: 1 - transparency / 100  // Convert percentage to a value between 0 and 1
+  });
+  
+  const cone = new THREE.Mesh(geometry, material);
+  
+  // Calculate the position offset due to the cutting
+  const offset = direction.clone().normalize().multiplyScalar(distCut / 2);
+
+  // Set new position of the cone
+  cone.position.set(
+      (origin.x + end.x) / 2 + offset.x,
+      (origin.y + end.y) / 2 + offset.y,
+      (origin.z + end.z) / 2 + offset.z
+  );
+
+  // Rotate cone to correct orientation
+  const up = new THREE.Vector3(0, -1, 0);
+  cone.quaternion.setFromUnitVectors(up, direction.normalize());
+  
+  return cone;
+}
+
+
 // NATURAL OBJECTS
 const sun = viz.createObject("sun", Spacekit.SpaceObjectPresets.SUN);
 viz.createAmbientLight();
@@ -655,6 +706,24 @@ document.addEventListener('click', function(event) {
 
 
 // UI HTML
+// loops the console (CA SERAIT BIEN POUR LES QUESTION, NON ?)
+(function(){
+  var oldLog = console.log;
+  console.log = function (message) {
+      // Continue using the old console.log function
+      oldLog.apply(console, arguments);
+
+      // Append to the HTML element
+      var output = document.getElementById('console-output');
+      var newMessage = document.createElement('div');
+      newMessage.textContent = message;
+      output.appendChild(newMessage);
+
+      // Optional: Scroll to the bottom to always see the latest message
+      output.scrollTop = output.scrollHeight;
+  };
+})();
+
 function toggleManColor() {
   var manIcon = document.getElementById("man-icon");
   if (manIcon.classList.contains("active")) {
@@ -838,71 +907,6 @@ let objectGroups = {};
 // Function to generate a hash based on object IDs
 function hashObjectArray(objects) {
   return objects.map(obj => obj.id).sort().join(',');
-}
-
-// Main function to place objects
-function placeObjectsUnified(objects, date, textureUrl, labelVisible = true) {
-  const groupName = hashObjectArray(objects);  // Generate a unique groupName
-
-  // Remove previously added objects for this group
-  if (objectGroups[groupName]) {
-    objectGroups[groupName].forEach(objData => {
-      viz.removeObject(objData.object);
-    });
-  }
-
-  // Initialize or clear the array for this group
-  objectGroups[groupName] = [];
-
-  objects.forEach(obj => {
-    // Filtering based on 'dateSent' and 'endDate'
-    if ('dateSent' in obj && date < new Date(obj.dateSent).getTime()) return;
-    if ('endDate' in obj && date > new Date(obj.endDate).getTime()) return;
-
-    // Calculate time difference
-    const timeDifference = date - new Date(obj.epoch).getTime();
-
-    // Adjusted RA, Dec, and R
-    const adjustedRA = obj.ra + obj.vra * timeDifference * 8.78e-15;
-    const adjustedDec = obj.dec + obj.vdec * timeDifference * 8.78e-15;
-    const adjustedR = obj.r + (6.68459e-9 * obj.vr) * timeDifference / 1000;
-
-    const position = radecToXYZ(adjustedRA, adjustedDec, adjustedR);
-
-    if (adjustedR < 0) return;
-
-    // Create and add object to visualization
-    const singleObject = viz.createObject(obj.id, {
-      position: position,
-      scale: [0.0001, 0.0001, 0.0001],
-      particleSize: 1,
-      labelText: obj.id,
-      textureUrl: textureUrl
-    });
-
-    singleObject.setLabelVisibility(labelVisible);
-
-    // Store in the global object group with both object and its position
-    objectGroups[groupName].push({
-      object: singleObject,
-      position: position
-    });
-  });
-}
-
-function unloadAllObjects() {
-  const scene = viz.getScene();
-
-  for (let group in objectGroups) {
-    objectGroups[group].forEach(objData => {
-      viz.removeObject(objData.object);
-      if (objData.attachedSphere) {
-        scene.remove(objData.attachedSphere);
-      }
-    });
-
-    objectGroups[group] = [];
-  }
 }
 
 
