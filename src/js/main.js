@@ -59,7 +59,7 @@ const camera = viz.getViewer().get3jsCamera();
 const scene = viz.getScene();
 const renderer = viz.getRenderer();
 //const viewer = viz.getViewer();
-
+renderer.autoClear = true;
 // Simulation settings
 viz.setJdPerSecond(30);
 viz.renderOnlyInViewport();
@@ -192,8 +192,8 @@ initObjectForDataset(stars100LY6Kmore, scene, 'point', {color: 'white', size: 3}
 }
 // Initialisations pour tous supports (ADD LINE ONTICK if moving)
 initObjectForDataset(allVoyagers, scene, 'point', {color: 'red', size: 3});
-initObjectForDataset(updatedMessages, scene, 'point', {color: 'red', size: 3});
-//initObjectForDataset(updatedMessages, scene, 'cone', {color: 'red'});
+//initObjectForDataset(updatedMessages, scene, 'point', {color: 'red', size: 3});
+initObjectForDataset(updatedMessages, scene, 'cone', {color: 'red'});
 
 console.log(updatedMessages.map(obj => obj.graphicalObject.type).join(', '));
 
