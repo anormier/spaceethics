@@ -132,7 +132,7 @@ function initObjectForDataset(dataset, scene, type, params, isStatic = false, da
             const end = calculatePosition(obj, date ? date.getTime() : Date.now());
             
             // Use arbitrary values for angle, transparency, and color for now. Adjust as necessary.
-            object = createCone(500, origin, end, 70, params.color,100);
+            object = createCone(500, origin, end, 70, params.color,1000);
             break;
 
           case 'line': 
@@ -481,7 +481,7 @@ function updateObjectsForDataset(dataset, dateInMilliseconds) {
         const origin = { x: 0, y: 0, z: 0 };
         const end = { x: position[0], y: position[1], z: position[2] };
 
-        const cone = createCone(300, origin, end, 100, obj.graphicalObject.material.color,100);
+        const cone = createCone(300, origin, end, 70, obj.graphicalObject.material.color,1000);
 
         obj.graphicalObject.geometry = cone.geometry;
         obj.graphicalObject.position.copy(cone.position);
