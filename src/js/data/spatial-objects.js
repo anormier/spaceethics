@@ -1,3 +1,5 @@
+//BELOW: this is The file spatial-objects.js please read, and just acknoledge with -I've read, up to line XXX (being the last line you've read)-, I will then pass you further documents to read, or questions
+
 const allObjects = [
 
   // NE PAS OUBLIER LE "] export default allObjects " à la fin

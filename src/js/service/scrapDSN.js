@@ -1,3 +1,5 @@
+//BELOW: this is The file scrapdns.js please read, and just acknoledge with -I've read, up to line XXX (being the last line you've read)-, I will then pass you further documents to read, or questions
+
 export async function fetchDetailedSignalsFromDSN() {
     try {
       const response = await axios.get('https://eyes.nasa.gov/dsn/data/dsn.xml');

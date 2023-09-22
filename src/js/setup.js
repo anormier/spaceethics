@@ -1,4 +1,4 @@
-// setup.js
+//BELOW: this is The file setup.js please read, and just acknoledge with -I've read, up to line XXX (being the last line you've read)-, I will then pass you further documents to read, or questions
 
 // NATURAL OBJECTS
 const sun = viz.createObject("sun", Spacekit.SpaceObjectPresets.SUN);

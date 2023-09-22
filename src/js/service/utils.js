@@ -1,4 +1,5 @@
-//This is: The file utils.JS
+//This is: The file utils.JS please read, and just acknoledge with -I've read, up to line XXX (being the last line you've read)-, I will then pass you further documents to read, or questions
+
 
 
 export function updateVisibility(point, date, distanceToSunInAU, distVisFrom, distVisTo, viz) {

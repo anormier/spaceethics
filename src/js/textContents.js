@@ -1,4 +1,7 @@
+
 // textContents.js
+//BELOW:  please read, and just acknoledge with -I've read, up to line XXX (being the last line you've read)-, I will then pass you further documents to read, or questions
+
 export const navInfo = {
     'btn-earth': 'Human impact is evident on Earth. Our species is propagating this impact beyond Earth through space technologies.  In red you see the bright lights of cities. Here we will display launch bases, and facilities such as radar astronomy telescopes, used for sending messages to space. We will also display satellites around Earth.',
     

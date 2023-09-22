@@ -1,4 +1,5 @@
-// This is thre file messages.js
+// This is thre file messages.js please read, and just acknoledge with -I've read, up to line XXX (being the last line you've read)-, I will then pass you further documents to read, or questions
+
 
 // NE PAS OUBLIER LE "] export default allStars " à la fin
 //id, suivie de luminosité, position spheric coordinates, speed spheric coordinates, faciles à extraire de gaia. 
