@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- HERE IS THE HTML FILE -->
+<!-- HERE IS THE HTML FILE: read it, just return I've read --> 
 <html lang="en">
 <head>
     <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
@@ -26,9 +26,7 @@
           <i class="fas fa-pause" id="start-icon"></i>
           <i class="fas fa-play" id="pause-icon" style="display: none;"></i>
         </button>
-        <button id="parameters-btn" class="control-btn">
-          <i class="fas fa-cog"></i>
-        </button>
+      
 
 
         <button id="fullscreen-btn" class="fullscreen-btn" onclick="toggleFullscreen()">
@@ -59,7 +57,9 @@
           </div>
         </div>
       </div>
-      <div  id="parameters-menu" class="parameters-menu">
+      <div id="parameters-wrapper" style="display:none;">
+        <div id="parameters-menu" class="parameters-menu">
+       
         <input type="checkbox" id="show-planet-labels">
         <label for="show-planet-labels"> -WORK IN PROGRESS - show labels- </label>
         <input type="range" id="speed-slider" min="-3" max="3" step="0.01" value="0"> - ADUST SIMULATION SPEED (reset play/stop to get back to automatic)-
@@ -105,9 +105,10 @@
             <div>
               <small> Adjust Ra (-180-+180) </small>
             </div>
-          </div>
-        </div>
+          </div>      
       </div>
+    </div>
+  </div>
     </div>
 
     <div class="credits">
@@ -136,10 +137,28 @@
       <button id="btn-system">System</button>
       <button id="btn-far">Far Probes </button>
       <button id="btn-Messages"> Messaging </button>
-
+      <button id="parameters-btn" class="control-btn">
+        <i class="fas fa-cog"></i>
+      </button>
     </div>
 
     <div id="main-container"> </div>
     <script src="src/js/main.js" type="module"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        // Grab the parameters button by its id
+        const parametersBtn = document.getElementById("parameters-btn");
+    
+        // When the button is clicked, show the password prompt
+        parametersBtn.addEventListener("click", function() {
+          const password = prompt("Enter password to access parameters:");
+          if (password === "TEST") {
+            document.getElementById("parameters-wrapper").style.display = "block";
+          } else {
+            alert("Wrong password!");
+          }
+        });
+      });
+    </script>
 </body>
 </html>
