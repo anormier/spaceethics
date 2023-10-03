@@ -179,9 +179,9 @@ const staticDate = new Date("2024-01-01")
 
 if (isMobile()) {
 // Initialisations pour low performance devices (STATIC) - no need to update ontick.
-  initObjectForDataset(modifiedStars100LY3K45K, scene, 'point', {color: 'white', size: 1}, true, staticDate);
-  initObjectForDataset(stars100LY45K6K, scene, 'point', {color: 'white', size: 2}, true, staticDate);
-  initObjectForDataset(stars100LY6Kmore, scene, 'point', {color: 'white', size: 3}, true, staticDate);
+ // initObjectForDataset(modifiedStars100LY3K45K, scene, 'point', {color: 'white', size: 1}, true, staticDate);
+  // initObjectForDataset(stars100LY45K6K, scene, 'point', {color: 'white', size: 2}, true, staticDate);
+  // initObjectForDataset(stars100LY6Kmore, scene, 'point', {color: 'white', size: 3}, true, staticDate);
 } else {
   // Initialisations for high performance devices (Dynamic) - update ontick.(ADD LINE ONTICK)
 initObjectForDataset(modifiedStars100LY3K45K, scene, 'point', {color: 'white', size: 1});
