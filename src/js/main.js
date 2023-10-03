@@ -192,8 +192,8 @@ initObjectForDataset(stars100LY6Kmore, scene, 'point', {color: 'white', size: 3}
 }
 // Initialisations pour tous supports (ADD LINE ONTICK if moving)
 initObjectForDataset(allVoyagers, scene, 'point', {color: 'red', size: 3});
-//initObjectForDataset(updatedMessages, scene, 'point', {color: 'red', size: 3});
-initObjectForDataset(updatedMessages, scene, 'cone', {color: 'red'});
+initObjectForDataset(updatedMessages, scene, 'point', {color: 'red', size: 3});
+//initObjectForDataset(updatedMessages, scene, 'cone', {color: 'red'});
 
 console.log(updatedMessages.map(obj => obj.graphicalObject.type).join(', '));
 
@@ -291,7 +291,7 @@ if (autoAdjustSpeed) {
       unloadAllObjects();
       //Lalbels
       placeObjectsUnified(allVoyagers, dateInMilliseconds, './assets/symbols/Red_Circle_full.png', false);
-      //placeObjectsUnified(updatedMessages, dateInMilliseconds, './assets/symbols/Red_Circle_full.png');
+      placeObjectsUnified(updatedMessages, dateInMilliseconds, './assets/symbols/Red_Circle_full.png');
       //points
       updateObjectsForDataset(allVoyagers, dateInMilliseconds);//Update Voyagers POINTS
      // updateLinesForDataset(updatedMessages, dateInMilliseconds); //Update MessagerPOINTS
