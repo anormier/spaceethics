@@ -230,10 +230,15 @@ viz.onTick = function () {
   const distanceToSunInAU = distToCam(cameraPosition, sunPosition);
   const distanceToSunInLY = distanceToSunInAU / 63241.1;  // Convert AU to LY directly
 
-    // THIS SETS THE MAX ZOOMIN
-  camera.near = 0.00001 * distanceToSunInAU; //  good setting: 0.00001
-  // THIS SETS THE MAX ZOOMOUT
-  camera.far = 10e100; // Example value
+  // Clipping plane camera RELATED TO FLICKERING/Z-FIGHTING
+  //good setting stars, objects and signal solar system: nea=1 far =10e8;
+  //good setting planet objects: 
+    if (distanceToSunInAU < 1) {
+  camera.near = 0.00001; //  good setting: 0.00001
+} else {
+  camera.near = 1 //good setting stars, objects and signal solar system: nea=1 far =10e8;
+}
+  camera.far = 10e8; // Example value
   camera.updateProjectionMatrix(); //needed after update of camera near:far
   
   const desiredPixelThreshold = 15;  // Adjust as needed.
