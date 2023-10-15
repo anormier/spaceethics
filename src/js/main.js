@@ -64,10 +64,10 @@ renderer.autoClear = true;
 viz.setJdPerSecond(30);
 viz.renderOnlyInViewport();
 // THIS SETS THE MAX ZOOMIN and prevents render of planets render when too low.
-camera.near = 0.00001; //  good setting: 0.00001
-// THIS SETS THE MAX ZOOMOUT
-camera.far = 10000000; // Example value
-camera.updateProjectionMatrix(); //needed after update of camera near:far
+// camera.near = 0.00001; //  good setting: 0.00001
+// // THIS SETS THE MAX ZOOMOUT
+// camera.far = 10000000; // Example value
+// camera.updateProjectionMatrix(); //needed after update of camera near:far
 
 // Camera settings
 camera.addEventListener('change', function() {
@@ -94,18 +94,17 @@ const end = [0, 0, LY_TO_AU*1000];
 function initObjectForDataset(dataset, scene, type, params, isStatic = false, date = null) {
   dataset.forEach(obj => {
       let object;
+      const basicMaterial = new THREE.MeshBasicMaterial({ color: params.color });
 
       switch (type) {
           case 'sphere':
               const sphereGeometry = new THREE.SphereGeometry(params.radius);
-              const sphereMaterial = new THREE.MeshBasicMaterial({ color: params.color });
-              object = new THREE.Mesh(sphereGeometry, sphereMaterial);
+              object = new THREE.Mesh(sphereGeometry, basicMaterial);
               break;
 
           case 'cube':
               const cubeGeometry = new THREE.BoxGeometry(params.size, params.size, params.size);
-              const cubeMaterial = new THREE.MeshBasicMaterial({ color: params.color });
-              object = new THREE.Mesh(cubeGeometry, cubeMaterial);
+              object = new THREE.Mesh(cubeGeometry, basicMaterial);
               break;
 
           case 'cone':
@@ -113,17 +112,17 @@ function initObjectForDataset(dataset, scene, type, params, isStatic = false, da
             const end = calculatePosition(obj, date ? date.getTime() : Date.now());
             
             // Use arbitrary values for angle, transparency, and color for now. Adjust as necessary.
-            object = createCone(500, origin, end, 70, params.color,1000);
+            object = createCone(500, origin, end, 70, params.color, 1000);
             break;
 
           case 'line': 
-          const geometry = new THREE.BufferGeometry().setFromPoints([
-              new THREE.Vector3(...params.origin), 
-              new THREE.Vector3(0, 0, 0)  // Placeholder, will be updated
-          ]);
-          const material = new THREE.LineBasicMaterial({ color: params.color });
-          object = new THREE.Line(geometry, material);
-          break;
+            const geometry = new THREE.BufferGeometry().setFromPoints([
+                new THREE.Vector3(...params.origin), 
+                new THREE.Vector3(0, 0, 0)  // Placeholder, will be updated
+            ]);
+            const material = new THREE.LineBasicMaterial({ color: params.color });
+            object = new THREE.Line(geometry, material);
+            break;
 
           case 'point': 
               object = new THREE.Points(
@@ -195,13 +194,22 @@ initObjectForDataset(allVoyagers, scene, 'point', {color: 'red', size: 3});
 // initObjectForDataset(updatedMessages, scene, 'point', {color: 'red', size: 3});
 initObjectForDataset(updatedMessages, scene, 'cone', {color: 'red'});
 
-console.log(updatedMessages.map(obj => obj.graphicalObject.type).join(', '));
+// console.log(updatedMessages.map(obj => obj.graphicalObject.type).join(', '));
 
 
 // SIM LOOP
 viz.onTick = function () {
+
+
+  // Pistes pour améliorer les performances :
+  //  - Faire en sorte que la fréquence de calculs de position initiée par updateObjectsForDataset soit moins élevée
+  //  - Ne plus calculer les positions etc quand la simulation est en pause
+  // console.log('on tick', isPaused)
   // Get current date and update UI
+// if (!isPaused) {
+  console.log('is Paused', isPaused)
   const currentDate = viz.getDate();
+  // console.log('currentdate', currentDate)
   dateElt.innerHTML = currentDate.toLocaleDateString();
 
   // Calculate the fractional year
@@ -220,6 +228,11 @@ viz.onTick = function () {
 
   // Calculate distance to sun in AU
   const distanceToSunInAU = distToCam(cameraPosition, sunPosition);
+
+  camera.near = 0.00001 * distanceToSunInAU; //  good setting: 0.00001
+  // THIS SETS THE MAX ZOOMOUT
+  camera.far = 10e100; // Example value
+  camera.updateProjectionMatrix(); //needed after update of camera near:far
   
   const desiredPixelThreshold = 15;  // Adjust as needed.
 raycaster.params.Points.threshold = pixelToSize(desiredPixelThreshold, distanceToSunInAU);
@@ -312,6 +325,7 @@ if (autoAdjustSpeed) {
   }
 
 
+// }
 
 
 };
@@ -321,8 +335,12 @@ if (autoAdjustSpeed) {
 
 //update functions
 function updateObjectsForDataset(dataset, dateInMilliseconds) {
+  // 
   dataset.forEach(obj => {
-    const position = calculatePosition(obj, dateInMilliseconds);
+    if (obj?.graphicalObject?.position) {
+      const position = calculatePosition(obj, dateInMilliseconds);
+    // console.log('xx obj', obj)
+    // console.log('xx position', position)
     if (position) {
       if (obj.graphicalObject instanceof THREE.Mesh && obj.graphicalObject.geometry instanceof THREE.ConeGeometry) {
        // console.log("Updating a Cone:", obj);
@@ -338,11 +356,13 @@ function updateObjectsForDataset(dataset, dateInMilliseconds) {
 
      //   console.log("Cone after update:", obj.graphicalObject);
       } else {
+        // console.log('position', position)
         obj.graphicalObject.position.set(...position);
       }
       obj.graphicalObject.visible = true;      
     } else {
       obj.graphicalObject.visible = false;
+    }
     }
   });
 }
@@ -389,6 +409,7 @@ function calculatePosition(obj, date) {
 
   // Calculate time difference
   const timeDifference = date - new Date(obj.epoch).getTime();
+  // console.log('timediff', timeDifference/1000/86400)
 
   // Adjusted RA, Dec, and R
   const adjustedRA = obj.ra + obj.vra * timeDifference * 8.78e-15;
@@ -477,7 +498,7 @@ function unloadAllObjects() {
  * @param {number} transparency - Transparency percentage: 0 (opaque) to 100 (fully transparent).
  * @param {number} color - Color of the cone.
  */
-function createCone(angle, origin, end, transparency, color, distCut = 0) {
+function createCone(angle, origin, end, transparency, color, distCut = 0, materialProvided) {
   // Convert angle from degrees to radians
   const angleInRadians = (angle / 60) * (Math.PI / 180);
   
@@ -503,11 +524,19 @@ function createCone(angle, origin, end, transparency, color, distCut = 0) {
 
   // Create the cone geometry with the new dimensions
   const geometry = new THREE.ConeGeometry(newRadius, newLength, 32);
-  const material = new THREE.MeshBasicMaterial({
+
+  let material;
+
+  if (materialProvided) {
+    material = materialProvided;
+  } else {
+    material = new THREE.MeshBasicMaterial({
       color: color,
       transparent: true,
       opacity: 1 - transparency / 100  // Convert percentage to a value between 0 and 1
-  });
+    });
+  }
+
   
   const cone = new THREE.Mesh(geometry, material);
   
