@@ -233,12 +233,15 @@ viz.onTick = function () {
   // Clipping plane camera RELATED TO FLICKERING/Z-FIGHTING
   //good setting stars, objects and signal solar system: nea=1 far =10e8;
   //good setting planet objects: 
-    if (distanceToSunInAU < 1) {
+    if (distanceToSunInAU < 2) {
   camera.near = 0.00001; //  good setting: 0.00001
+  camera.far = 10e5; // Example value
+
 } else {
   camera.near = 1 //good setting stars, objects and signal solar system: nea=1 far =10e8;
-}
   camera.far = 10e8; // Example value
+
+}
   camera.updateProjectionMatrix(); //needed after update of camera near:far
   
   const desiredPixelThreshold = 15;  // Adjust as needed.
