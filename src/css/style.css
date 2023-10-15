@@ -260,3 +260,21 @@ font-size: 16px;
   color: white; /* or any other color to indicate active state */
 }
 
+.custom-button {
+  display: inline-block;
+  padding: 10px 20px;
+  margin: 10px 0;
+  background-color: #2a2a2a; /* Dark gray based on the space theme */
+  color: #ff6363; /* Slightly reddish tint for text */
+  border: 2px solid #ff6363;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  text-decoration: none; /* Removes the underline from the anchor tags */
+  font-weight: bold; /* Making the text bold for visibility */
+}
+
+.custom-button:hover {
+  background-color: #ff6363;
+  color: #2a2a2a;
+  border: 2px solid #2a2a2a;
+}
