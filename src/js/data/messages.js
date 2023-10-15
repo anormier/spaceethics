@@ -11,40 +11,62 @@
 //extract: https://docs.google.com/spreadsheets/d/1JZJq8M9Yg2gfahe1NwU_fI7p-xS1J8Eub3L0Z_LCZgg/edit#gid=2136432496
 function addDefaultParams(messages) {
     const idTracker = {};
-  
+    const raSet = new Set();
+    const decSet = new Set();
+
+    function getRandomOffset() {
+        // Generates a random value between 1 and 2, can be positive or negative
+        return (Math.random() + 1) * (Math.random() < 0.5 ? -1 : 1);
+    }
+
+    function toFixedPrecision(value) {
+        // Convert the floating point number to string with fixed 4 decimal places
+        return parseFloat(value.toFixed(4));
+    }
+
     return messages.map(message => {
         const originalId = message.id;
   
-        // If the ID already exists, append "-X" to it
+        // Handle duplicate IDs
         if (idTracker[originalId]) {
             idTracker[originalId]++;
             message.id = `${originalId}-${idTracker[originalId]}`;
         } else {
             idTracker[originalId] = 1; // Initialize counter for the ID
         }
-  
-        // If dateSent in the message is just a year, convert it to a full date string
+
+        // Check and adjust RA if needed
+        message.ra = toFixedPrecision(message.ra);
+        while (raSet.has(message.ra)) {
+            message.ra = toFixedPrecision(message.ra + 3*getRandomOffset());
+        }
+        raSet.add(message.ra);
+
+        // Check and adjust DEC if needed
+        message.dec = toFixedPrecision(message.dec);
+        while (decSet.has(message.dec)) {
+            message.dec = toFixedPrecision(message.dec + getRandomOffset());
+        }
+        decSet.add(message.dec);
+
+        // Handle dateSent and epoch
         const dateSent = new Date(`${message.dateSent}-01-01`);
         const epoch = dateSent;
   
         return {
+            ...message, // Spread the existing message properties first
             r: 1,
-            ra: 258,
-            dec: 12,
             vra: 0,
             vdec: 0,
-            dateSent: new Date("1977-09-05"), // Default value
             vr: 300000,
-            epoch: "2024-01-01",
             nameSet: message.nameSet || "DefaultName", // Default value if not provided
             textSet: message.textSet || "DefaultText", // Default value if not provided
-            ...message, // Spread the existing message properties
-            dateSent, // Override the default value with the new Date object
-            epoch // Override the default epoch value
+            dateSent, // Override the value with the new Date object
+            epoch // Use dateSent as epoch
         };
     });
-  }
-  
+}
+
 
 export const allMessages = [
 

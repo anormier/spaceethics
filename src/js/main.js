@@ -112,7 +112,9 @@ function initObjectForDataset(dataset, scene, type, params, isStatic = false, da
             const end = calculatePosition(obj, date ? date.getTime() : Date.now());
             
             // Use arbitrary values for angle, transparency, and color for now. Adjust as necessary.
-            object = createCone(500, origin, end, 70, params.color, 1000);
+            object = createCone(500, origin, end, 10, params.color, 1000);
+           // object = createCone(500, origin, end, 70, params.color, 1000); marchait pas mal
+
             break;
 
           case 'line': 
@@ -233,15 +235,21 @@ viz.onTick = function () {
   // Clipping plane camera RELATED TO FLICKERING/Z-FIGHTING
   //good setting stars, objects and signal solar system: nea=1 far =10e8;
   //good setting planet objects: 
-    if (distanceToSunInAU < 2) {
-  camera.near = 0.00001; //  good setting: 0.00001
-  camera.far = 10e5; // Example value
+if (distanceToSunInAU < 2) {
+    camera.near = 0.00001; // good setting: 0.00001
+    camera.far = 100; // Example value
 
-} else {
-  camera.near = 1 //good setting stars, objects and signal solar system: nea=1 far =10e8;
-  camera.far = 10e8; // Example value
+} else if (distanceToSunInAU <= 2324110) { // <= 100 light years = 6324110
+    camera.near = 1; // good setting stars, objects and signal solar system: nea=1 far =10e8;
+    camera.far = 10e8; // Example value
 
+} else { // > 100 light years
+    // Adjust the camera settings as needed for distances > 100 light years.
+    // This is just a placeholder. Adjust as per your requirement.
+    camera.near = 10;
+    camera.far = 10e8;
 }
+
   camera.updateProjectionMatrix(); //needed after update of camera near:far
   
   const desiredPixelThreshold = 15;  // Adjust as needed.
