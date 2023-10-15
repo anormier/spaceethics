@@ -9,6 +9,7 @@ import stars100LY45K6K from "./data/stars100LY45K6K.js";
 import stars100LY6Kmore from "./data/stars100LY6Kmore.js";
 import {updatedMessages, allMessages} from "./data/messages.js";
 import allVoyagers from "./data/voyagers.js";
+import famousStars from "./data/famousStars.js";
 import {navInfo} from './textContents.js';
 import { fetchDetailedSignalsFromDSN,augmentAndExportSignals } from './service/scrapDSN.js';
 
@@ -309,8 +310,8 @@ if (autoAdjustSpeed) {
     if (distanceToSunInAU < 1*LY_TO_AU) {
       setPlanetLabelsVisible(true);  //solar system planets labels
       unloadAllObjects(); // unload all objects
-     placeObjectsUnified(allVoyagers, dateInMilliseconds, './assets/symbols/Red_Circle_full.png');
-    // placeObjectsUnified(updatedMessages, dateInMilliseconds, './assets/symbols/Red_Circle_full.png', false);
+     placeSpaceKitObject(allVoyagers, dateInMilliseconds, './assets/symbols/Red_Circle_full.png');
+    // placeSpaceKitObject(updatedMessages, dateInMilliseconds, './assets/symbols/Red_Circle_full.png', false);
      updateObjectsForDataset(allVoyagers, dateInMilliseconds);//Update Voyagers POINTS
 
      allObjects.forEach((point) => {
@@ -321,8 +322,10 @@ if (autoAdjustSpeed) {
       setPlanetLabelsVisible(false);  
       unloadAllObjects();
       //Lalbels
-      placeObjectsUnified(allVoyagers, dateInMilliseconds, './assets/symbols/Red_Circle_full.png', false);
-      placeObjectsUnified(updatedMessages, dateInMilliseconds, './assets/symbols/Red_Circle_full.png');
+      placeSpaceKitObject(allVoyagers, dateInMilliseconds, './assets/symbols/Red_Circle_full.png', false);
+      placeSpaceKitObject(updatedMessages, dateInMilliseconds, './assets/symbols/Red_Circle_full.png');
+      placeSpaceKitObject(famousStars, dateInMilliseconds, './assets/symbols/Red_Circle_full.png');
+
       //points
       updateObjectsForDataset(allVoyagers, dateInMilliseconds);//Update Voyagers POINTS
      // updateLinesForDataset(updatedMessages, dateInMilliseconds); //Update MessagerPOINTS
@@ -430,6 +433,7 @@ function calculatePosition(obj, date) {
   // console.log('timediff', timeDifference/1000/86400)
 
   // Adjusted RA, Dec, and R
+  // r:UA, ra:deg, dec:deg, vra:mas/yr, vdec:mas/yr, vr:km/s
   const adjustedRA = obj.ra + obj.vra * timeDifference * 8.78e-15;
   const adjustedDec = obj.dec + obj.vdec * timeDifference * 8.78e-15;
   const adjustedR = obj.r + (6.68459e-9 * obj.vr) * timeDifference / 1000;
@@ -441,7 +445,7 @@ function calculatePosition(obj, date) {
 
 
 // Main function to place objects
-function placeObjectsUnified(objects, date, textureUrl, labelVisible = true) {
+function placeSpaceKitObject(objects, date, textureUrl, labelVisible = true) {
   const groupName = hashObjectArray(objects);  // Generate a unique groupName
 
   // Remove previously added objects for this group
@@ -455,9 +459,16 @@ function placeObjectsUnified(objects, date, textureUrl, labelVisible = true) {
   objectGroups[groupName] = [];
 
   objects.forEach(obj => {
+
+    if (obj.id === "Proxima Centauri") {
+      console.log('Processing Proxima Centauri.');
+  }
     // Filtering based on 'dateSent' and 'endDate'
-    if ('dateSent' in obj && date < new Date(obj.dateSent).getTime()) return;
-    if ('endDate' in obj && date > new Date(obj.endDate).getTime()) return;
+     // If 'dateSent' exists and the given date is earlier than 'dateSent', skip this object.
+  if (obj.dateSent && date < new Date(obj.dateSent).getTime()) return;
+
+  // If 'endDate' exists and the given date is later than 'endDate', skip this object.
+  if (obj.endDate && date > new Date(obj.endDate).getTime()) return;
 
     // Calculate time difference
     const timeDifference = date - new Date(obj.epoch).getTime();
@@ -470,7 +481,9 @@ function placeObjectsUnified(objects, date, textureUrl, labelVisible = true) {
     const position = radecToXYZ(adjustedRA, adjustedDec, adjustedR);
 
     if (adjustedR < 0) return;
-
+    if (obj.id === "Proxima Centauri") {
+      console.log(`Adjusted values for Proxima Centauri - RA: ${adjustedRA}, Dec: ${adjustedDec}, R: ${adjustedR}`);
+  }
     // Create and add object to visualization
     const singleObject = viz.createObject(obj.id, {
       position: position,
