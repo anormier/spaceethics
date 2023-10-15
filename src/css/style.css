@@ -245,7 +245,9 @@ font-size: 16px;
 
 .parameters-menu {
   display: none;
-  position: absolute;
+  position: fixed;
+  bottom: 0;
+  right: 0;
   /* Other styling as you desire */
 }
 

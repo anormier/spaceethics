@@ -207,7 +207,7 @@ viz.onTick = function () {
   // console.log('on tick', isPaused)
   // Get current date and update UI
 // if (!isPaused) {
-  console.log('is Paused', isPaused)
+  // console.log('is Paused', isPaused)
   const currentDate = viz.getDate();
   // console.log('currentdate', currentDate)
   dateElt.innerHTML = currentDate.toLocaleDateString();
