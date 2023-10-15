@@ -189,6 +189,7 @@ if (isMobile()) {
 initObjectForDataset(modifiedStars100LY3K45K, scene, 'point', {color: 'white', size: 1});
 initObjectForDataset(stars100LY45K6K, scene, 'point', {color: 'white', size: 2});
 initObjectForDataset(stars100LY6Kmore, scene, 'point', {color: 'white', size: 3});
+initObjectForDataset(famousStars, scene, 'point', {color: 'white', size: 4});
 //initObjectForDataset(updatedMessages, scene, 'line', {origin: [0, 0, 0], color: 0xff0000});
 
 }
@@ -295,6 +296,7 @@ if (autoAdjustSpeed) {
     updateObjectsForDataset(modifiedStars100LY3K45K, dateInMilliseconds);
     updateObjectsForDataset(stars100LY45K6K, dateInMilliseconds);
     updateObjectsForDataset(stars100LY6Kmore, dateInMilliseconds);
+    updateObjectsForDataset(famousStars, dateInMilliseconds);
   }
 
 //UPDATE HUMAN IMPACT
