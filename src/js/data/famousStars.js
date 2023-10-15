@@ -2,7 +2,7 @@
 const famousStars = [
     {
     id: "Proxima Centauri",
-    r: 268301944,  // Distance in  UA (Astronomical Units), it's approximately 268,770,000,000 UA.
+    r: 268770,  // Distance in  UA (Astronomical Units), it's approximately 268,770,000,000 UA.
     ra: 217.4289,  // Right Ascension in degrees
     dec: -62.6794,  // Declination in degrees
     vra: -3.85,  // Proper motion in right ascension in milliarcseconds/year
