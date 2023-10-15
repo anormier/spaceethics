@@ -228,7 +228,9 @@ viz.onTick = function () {
 
   // Calculate distance to sun in AU
   const distanceToSunInAU = distToCam(cameraPosition, sunPosition);
+  const distanceToSunInLY = distanceToSunInAU / 63241.1;  // Convert AU to LY directly
 
+    // THIS SETS THE MAX ZOOMIN
   camera.near = 0.00001 * distanceToSunInAU; //  good setting: 0.00001
   // THIS SETS THE MAX ZOOMOUT
   camera.far = 10e100; // Example value
@@ -251,7 +253,7 @@ let distanceDisplay = document.getElementById("sunDistanceDisplay");
 if (distanceToSunInAU < 7000) {  // Threshold set to 7000 AU
   distanceDisplay.innerHTML = `Distance from Sun: ${distanceToSunInAU.toFixed(1)} AU`;
 } else {
-  const distanceToSunInLY = distanceToSunInAU / 63241.1;  // Convert AU to LY directly
+  
   distanceDisplay.innerHTML = `Distance from Sun: ${distanceToSunInLY.toFixed(1)} LY`;
 }
 
