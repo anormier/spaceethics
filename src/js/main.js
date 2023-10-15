@@ -112,8 +112,8 @@ function initObjectForDataset(dataset, scene, type, params, isStatic = false, da
             const end = calculatePosition(obj, date ? date.getTime() : Date.now());
             
             // Use arbitrary values for angle, transparency, and color for now. Adjust as necessary.
-            object = createCone(500, origin, end, 10, params.color, 1000);
-           // object = createCone(500, origin, end, 70, params.color, 1000); marchait pas mal
+            object = createCone(500, origin, end, 0, params.color, 1000);
+           // object = createCone(500, origin, end, 0, params.color, 1000); marchait pas mal
 
             break;
 
@@ -710,47 +710,52 @@ let pixelToSize = (pixelWidth, distanceToCamera) => {
   const heightPerPixel = height / window.innerHeight;
   return pixelWidth * heightPerPixel;
 }
+// Utility function to check if an element or its parents have a certain class
+function hasParentWithClass(element, classname) {
+  if (element.classList && element.classList.contains(classname)) {
+      return true;
+  }
+  return element.parentNode && hasParentWithClass(element.parentNode, classname);
+}
+
 document.addEventListener('click', function(event) {
+  // Check if the clicked element or its parents have the "ui-interface" class
+  if (hasParentWithClass(event.target, 'ui-interface')) {
+      return; // Exit early if user clicked on a UI interface
+  }
+
   if (!raycastingActive) 
-  return; // Skip raycasting if it's not active
+      return; // Skip raycasting if it's not active
+  
   console.log('Number of objects in scene:', viz.getScene().children.length); 
+
   // Convert mouse position to NDC (Normalized Device Coordinates)
   mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
   mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
 
-  // Set raycaster threshold based on scene's scale
   const averageDistance = 6000000;
   raycaster.params.Points.threshold = pixelToSize(15, averageDistance);
   raycaster.setFromCamera(mouse, viz.getViewer().get3jsCamera());
 
-  // Get the list of objects that have a nameSet or textSet in their userData
   const objectsToCheck = viz.getScene().children.filter(obj => obj.userData && (obj.userData.nameSet || obj.userData.textSet));
   const intersects = raycaster.intersectObjects(objectsToCheck);
   console.log(`raycaster used`);
 
-  // Go through all intersected objects
   for (let intersect of intersects) {
       const userData = intersect.object.userData;
 
-      // Get name, text, and refURL from userData, using fallback values if not available
       const name = userData.nameSet !== "DefaultName" ? userData.nameSet : "Placeholder Name";
       const text = userData.textSet !== "DefaultText" ? userData.textSet : "Placeholder Text";
       const refURL = userData.refURL && userData.refURL !== "DefaultText" ? userData.refURL : "#";
 
-      // Update the infobox with obtained values
       document.getElementById('nameSet').textContent = name;
       document.getElementById('textSet').textContent = text;
       document.getElementById('refURL').href = refURL;
       document.getElementById('refURL').textContent = refURL !== "#" ? "more on this object" : "Placeholder URL";
 
-      // Log the values being set
-      //console.log(`Setting infobox with - Name: ${name}, Text: ${text}, Ref URL: ${refURL}`);
-
-      // Show the infobox
       document.getElementById('info-box').style.display = 'block';
   }
 });
-
 
 // UI HTML
 // loops the console (CA SERAIT BIEN POUR LES QUESTION, NON ?)
