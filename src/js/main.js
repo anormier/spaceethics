@@ -320,7 +320,7 @@ if (autoAdjustSpeed) {
       updateVisibility(point, dateInMilliseconds, distanceToSunInAU, distVisFrom, distVisTo, viz);
       });
 
-    } else if (distanceToSunInAU > 1*LY_TO_AU && distanceToSunInAU < 300*LY_TO_AU) {
+    } else if (distanceToSunInAU > 1*LY_TO_AU && distanceToSunInAU < 100*LY_TO_AU) {
       setPlanetLabelsVisible(false);  
       unloadAllObjects();
       //Lalbels
@@ -335,6 +335,7 @@ if (autoAdjustSpeed) {
     } else {
 
         unloadAllObjects();
+        placeSpaceKitObject(famousStars, dateInMilliseconds, './assets/symbols/Red_Circle_full.png');
         setPlanetLabelsVisible(false);  
     }
 
