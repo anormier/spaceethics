@@ -425,25 +425,30 @@ function updateLinesForDataset(dataset, dateInMilliseconds) {
   });
 }
 
-
 function calculatePosition(obj, date) {
-  // Filtering based on 'dateSent' and 'endDate'
-  if ('dateSent' in obj && date < new Date(obj.dateSent).getTime()) return false;
-  if ('endDate' in obj && date > new Date(obj.endDate).getTime()) return false;
+    if ('dateSent' in obj && date < new Date(obj.dateSent).getTime()) return false;
+    if ('endDate' in obj && date > new Date(obj.endDate).getTime()) return false;
 
-  // Calculate time difference
-  const timeDifference = date - new Date(obj.epoch).getTime();
-  // console.log('timediff', timeDifference/1000/86400)
+    // Calculate time difference
+    const timeDifference = date - new Date(obj.epoch).getTime(); 
 
-  // Adjusted RA, Dec, and R
-  // r:UA, ra:deg, dec:deg, vra:mas/yr, vdec:mas/yr, vr:km/s
-  const adjustedRA = obj.ra + obj.vra * timeDifference * 8.78e-15;
-  const adjustedDec = obj.dec + obj.vdec * timeDifference * 8.78e-15;
-  const adjustedR = obj.r + (6.68459e-9 * obj.vr) * timeDifference / 1000;
+    // Compute the result of the proper motion over the entire time difference first
+    const deltaRAmas = obj.vra * timeDifference;
+    const deltaDecmas = obj.vdec * timeDifference;
 
-  if (adjustedR < 0) return false;
+    // Convert from mas to degrees
+    const deltaRAdeg = deltaRAmas * 8.7957e-18; 
+    const deltaDecdeg = deltaDecmas * 8.7957e-18;
 
-  return radecToXYZ(adjustedRA, adjustedDec, adjustedR);
+    const adjustedRA = obj.ra + deltaRAdeg;
+    const adjustedDec = obj.dec + deltaDecdeg;
+
+    // Adjust distance
+    const adjustedR = obj.r + (6.68459e-9 * obj.vr) * timeDifference / 1000;
+
+    if (adjustedR < 0) return false;
+
+    return radecToXYZ(adjustedRA, adjustedDec, adjustedR);
 }
 
 
@@ -477,8 +482,8 @@ function placeSpaceKitObject(objects, date, textureUrl, labelVisible = true) {
     const timeDifference = date - new Date(obj.epoch).getTime();
 
     // Adjusted RA, Dec, and R
-    const adjustedRA = obj.ra + obj.vra * timeDifference * 8.78e-15;
-    const adjustedDec = obj.dec + obj.vdec * timeDifference * 8.78e-15;
+    const adjustedRA = obj.ra + obj.vra * timeDifference *  8.7957e-18;
+    const adjustedDec = obj.dec + obj.vdec * timeDifference  * 8.7957e-18;
     const adjustedR = obj.r + (6.68459e-9 * obj.vr) * timeDifference / 1000;
 
     const position = radecToXYZ(adjustedRA, adjustedDec, adjustedR);

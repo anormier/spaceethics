@@ -168,7 +168,21 @@ const famousStars = [
     nameSet: "Algenib",
     textSet: "Algenib is a prominent star in the constellation Pegasus, marking the southeastern point of the 'Great Square of Pegasus'.",
     refURL: "https://en.wikipedia.org/wiki/Gamma_Pegasi"
+},
+{
+    id: "Barnard's Star",
+    r: 182300,  // Distance in UA (Astronomical Units). As of my last training data (2022), the distance is approximately 5.958 light-years, which is about 182,300,000,000 UA.
+    ra: 269.4540,  // Right Ascension in degrees
+    dec: 4.6683,  // Declination in degrees
+    vra: -798.58,  // Proper motion in right ascension in milliarcseconds/year
+    vdec: 10328.12,  // Proper motion in declination in milliarcseconds/year
+    vr: -110.6,  // Radial velocity in km/s (towards Earth)
+    epoch: "2000-01-01",  // Reference epoch for these coordinates; commonly J2000.0
+    nameSet: "Barnard",
+    textSet: "Barnard's Star is a red dwarf about six light-years away from Earth in the constellation of Ophiuchus.\nIt has the largest proper motion of any known star relative to the Sun.\nIt's named after the American astronomer E. E. Barnard.",
+    refURL: "https://en.wikipedia.org/wiki/Barnard%27s_Star"
 }
+
 
 
 
