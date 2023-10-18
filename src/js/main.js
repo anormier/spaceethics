@@ -107,14 +107,16 @@ function initObjectForDataset(dataset, scene, type, params, isStatic = false, da
               const cubeGeometry = new THREE.BoxGeometry(params.size, params.size, params.size);
               object = new THREE.Mesh(cubeGeometry, basicMaterial);
               break;
-
           case 'cone':
             const origin = { x: 0, y: 0, z: 0 };
             const end = calculatePosition(obj, date ? date.getTime() : Date.now());
             
             // Use arbitrary values for angle, transparency, and color for now. Adjust as necessary.
-            object = createCone(500, origin, end, 0, params.color, 1000);
-           // object = createCone(500, origin, end, 0, params.color, 1000); marchait pas mal
+           // parameters createCone(angle, origin, end, color, distCut = 0, materialProvided, sideTransparency = 50, baseTransparency = 0)
+
+            object = createCone(300, origin, end, params.color,1000,null, 90, 0);
+            
+           // object = createCone(500, origin, end,  params.color, 1000); marchait pas mal
 
             break;
 
@@ -372,7 +374,7 @@ function updateObjectsForDataset(dataset, dateInMilliseconds) {
         const origin = { x: 0, y: 0, z: 0 };
         const end = { x: position[0], y: position[1], z: position[2] };
 
-        const cone = createCone(300, origin, end, 70, obj.graphicalObject.material.color,1000);
+        const cone = createCone(300, origin, end, obj.graphicalObject.material.color,1000, null, 90, 0);
 
         obj.graphicalObject.geometry = cone.geometry;
         obj.graphicalObject.position.copy(cone.position);
@@ -526,75 +528,29 @@ function unloadAllObjects() {
   }
 }
  
-
-
-
-//GEOMETRY FUNCTIONS
-/**
- * @param {number} angle - Angle is half the angular resolution, specified in arcminutes.
- * @param {Object} origin - Coordinates {x, y, z} of the tip of the cone.
- * @param {Object} end - Coordinates {x, y, z} of the center of the base of the cone.
- * @param {number} transparency - Transparency percentage: 0 (opaque) to 100 (fully transparent).
- * @param {number} color - Color of the cone.
- */
-function createCone(angle, origin, end, transparency, color, distCut = 0, materialProvided) {
-  // Convert angle from degrees to radians
+function createCone(angle, origin, end, color, distCut = 0, materialProvided, sideTransparency = 50, baseTransparency = 0) {
   const angleInRadians = (angle / 60) * (Math.PI / 180);
+  const direction = new THREE.Vector3(end.x - origin.x, end.y - origin.y, end.z - origin.z);
+  const length = direction.length() - distCut;
+  const newRadius = length * Math.tan(angleInRadians / 2);
+  const geometry = new THREE.ConeBufferGeometry(newRadius, length, 32);
+
+  geometry.addGroup(0, geometry.index.count - 96, 0);
+  geometry.addGroup(geometry.index.count - 96, 96, 1);
+
+  const sideMaterial = materialProvided || new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 1 - sideTransparency / 100, side: THREE.DoubleSide });
+  const baseMaterial = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 1 - baseTransparency / 100, side: THREE.DoubleSide });
   
-  // Calculate the height (length) of the cone based on origin and end positions
-  const direction = new THREE.Vector3(
-      end.x - origin.x,
-      end.y - origin.y,
-      end.z - origin.z
-  );
-  const length = direction.length();
+  const cone = new THREE.Mesh(geometry, [sideMaterial, baseMaterial]);
 
-  // Calculate the remaining length of the cone after cutting
-  const newLength = length - distCut;
-
-  // Check if distCut is within the length of the cone
-  if (newLength <= 0) {
-    console.warn('distCut is greater than or equal to the length of the cone. Cone will not be visible.');
-    return;
-  }
-
-  // Calculate the new radius of the base using the angle and new length
-  const newRadius = newLength * Math.tan(angleInRadians / 2);
-
-  // Create the cone geometry with the new dimensions
-  const geometry = new THREE.ConeGeometry(newRadius, newLength, 32);
-
-  let material;
-
-  if (materialProvided) {
-    material = materialProvided;
-  } else {
-    material = new THREE.MeshBasicMaterial({
-      color: color,
-      transparent: true,
-      opacity: 1 - transparency / 100  // Convert percentage to a value between 0 and 1
-    });
-  }
-
-  
-  const cone = new THREE.Mesh(geometry, material);
-  
-  // Calculate the position offset due to the cutting
   const offset = direction.clone().normalize().multiplyScalar(distCut / 2);
-
-  // Set new position of the cone
-  cone.position.set(
-      (origin.x + end.x) / 2 + offset.x,
-      (origin.y + end.y) / 2 + offset.y,
-      (origin.z + end.z) / 2 + offset.z
-  );
-
-  // Rotate cone to correct orientation
-  const up = new THREE.Vector3(0, -1, 0);
-  cone.quaternion.setFromUnitVectors(up, direction.normalize());
+  cone.position.set((origin.x + end.x) / 2 + offset.x, (origin.y + end.y) / 2 + offset.y, (origin.z + end.z) / 2 + offset.z);
+  cone.quaternion.setFromUnitVectors(new THREE.Vector3(0, -1, 0), direction.normalize());
   
   return cone;
 }
+
+
 
 
 // NATURAL OBJECTS
