@@ -369,7 +369,10 @@ function updateObjectsForDataset(dataset, dateInMilliseconds) {
     // console.log('xx position', position)
     if (position) {
       if (obj.graphicalObject instanceof THREE.Mesh && obj.graphicalObject.geometry instanceof THREE.ConeGeometry) {
-       // console.log("Updating a Cone:", obj);
+        if (obj.graphicalObject.geometry) {
+          obj.graphicalObject.geometry.dispose();
+        }
+        // console.log("Updating a Cone:", obj);
 
         const origin = { x: 0, y: 0, z: 0 };
         const end = { x: position[0], y: position[1], z: position[2] };
