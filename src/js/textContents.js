@@ -16,3 +16,5 @@ export const navInfo = {
     'btn-Messages': 'Messages sent to the stars encapsulate our hopes and dreams. These signals, beamed into space, travel lightyears away, aiming to communicate with potential extraterrestrial civilizations.'
   };
   
+  export const password = 'ARECIBO1974';
+  export const passwordPrompt = "Access denied. Incorrect password. If you don't have a password, request access through the form.";

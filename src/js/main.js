@@ -10,12 +10,34 @@ import stars100LY6Kmore from "./data/stars100LY6Kmore.js";
 import {updatedMessages, allMessages} from "./data/messages.js";
 import allVoyagers from "./data/voyagers.js";
 import famousStars from "./data/famousStars.js";
-import {navInfo} from './textContents.js';
+import {navInfo,password} from './textContents.js';
 import { fetchDetailedSignalsFromDSN,augmentAndExportSignals } from './service/scrapDSN.js';
 
 
 // Get the Spacekit version of THREE.js.
 const THREE = Spacekit.THREE;
+
+// BLOCKscreen
+window.onload = function() {
+  setTimeout(function() {
+      document.getElementById("overlay").style.display = "block";
+  }, 15000);
+};
+function submitResponse() {
+  var enteredPassword = document.getElementById('password-input').value;
+  if (enteredPassword) {
+    if (enteredPassword === password) {
+      // Logic for correct password
+      alert("Access granted. Enjoy using this fantastic tool.");
+      document.getElementById("overlay").style.display = "none";
+    } else {
+      // Logic for incorrect password
+      alert(passwordPrompt);
+    }
+  } else {
+    alert("Please enter a password.");
+  }
+}
 
 
 // CONSTANTS
@@ -25,7 +47,10 @@ let manIcon = document.getElementById("man-icon");
 
 
 document.addEventListener("DOMContentLoaded", async function(){
-
+  var submitButton = document.querySelector("#popup button[type='button']");
+  if (submitButton) {
+    submitButton.addEventListener("click", submitResponse);
+  }
   try {
     const detailedDSNData = await fetchDetailedSignalsFromDSN();
     console.log('Fetched detailed DSN signal data:', detailedDSNData);
@@ -39,6 +64,7 @@ try {
 } catch (error) {
   console.error('Error fetching detailed DSN signal data:', error);
 }
+
 
 //INIT SIM
 const viz = new Spacekit.Simulation(document.getElementById("main-container"), {
