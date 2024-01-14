@@ -263,20 +263,22 @@ viz.onTick = function () {
   const distanceToSunInLY = distanceToSunInAU / 63241.1;  // Convert AU to LY directly
 
   // Clipping plane camera RELATED TO FLICKERING/Z-FIGHTING
-  //good setting stars, objects and signal solar system: nea=1 far =10e8;
-  //good setting planet objects: 
 if (distanceToSunInAU < 2) {
     camera.near = 0.00001; // good setting: 0.00001
     camera.far = 100; // Example value
 
-} else if (distanceToSunInAU <= 2324110) { // <= 100 light years = 6324110
+} else if (distanceToSunInAU <= 1e3) { // <= 100 light years = 6324110
     camera.near = 1; // good setting stars, objects and signal solar system: nea=1 far =10e8;
     camera.far = 10e8; // Example value
+
+} else if (distanceToSunInAU <= 1e6) { // <= 100 light years = 6324110
+  camera.near = 10; // good setting stars, objects and signal solar system: nea=1 far =10e8;
+  camera.far = 10e8; // Example value
 
 } else { // > 100 light years
     // Adjust the camera settings as needed for distances > 100 light years.
     // This is just a placeholder. Adjust as per your requirement.
-    camera.near = 10;
+    camera.near = 100;
     camera.far = 10e8;
 }
 
