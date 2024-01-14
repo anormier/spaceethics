@@ -119,6 +119,8 @@ function initObjectForDataset(dataset, scene, type, params, isStatic = false, da
               const cubeGeometry = new THREE.BoxGeometry(params.size, params.size, params.size);
               object = new THREE.Mesh(cubeGeometry, basicMaterial);
               break;
+
+
           case 'cone':
             const origin = { x: 0, y: 0, z: 0 };
             const end = calculatePosition(obj, date ? date.getTime() : Date.now());
@@ -545,7 +547,7 @@ function unloadAllObjects() {
   }
 }
  
-function createCone(angle, origin, end, color, distCut = 0, materialProvided, sideTransparency = 50, baseTransparency = 0) {
+function createCone(angle, origin, end,  color = 0xffffff, distCut = 0, materialProvided, sideTransparency = 50, baseTransparency = 0) {
   const angleInRadians = (angle / 60) * (Math.PI / 180);
   const direction = new THREE.Vector3(end.x - origin.x, end.y - origin.y, end.z - origin.z);
   const length = direction.length() - distCut;
