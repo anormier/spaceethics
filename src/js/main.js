@@ -17,18 +17,34 @@ import { fetchDetailedSignalsFromDSN,augmentAndExportSignals } from './service/s
 // Get the Spacekit version of THREE.js.
 const THREE = Spacekit.THREE;
 
-<<<<<<< HEAD
-=======
+// BLOCKscreen
+window.onload = function() {
+  setTimeout(function() {
+      document.getElementById("overlay").style.display = "block";
+  }, 15000);
+};
+function submitResponse() {
+  var enteredPassword = document.getElementById('password-input').value;
+  if (enteredPassword) {
+    if (enteredPassword === password) {
+      // Logic for correct password
+      alert("Access granted. Enjoy using this fantastic tool.");
+      document.getElementById("overlay").style.display = "none";
+    } else {
+      // Logic for incorrect password
+      alert(passwordPrompt);
+    }
+  } else {
+    alert("Please enter a password.");
+  }
+}
 
-
->>>>>>> 9385f34 (removed password)
 
 // CONSTANTS
 const LY_TO_AU = 63241.16; 
 let autoAdjustSpeed = true;
 let manIcon = document.getElementById("man-icon");
-const params = {}; // Initialize params as an object
-params.color = 'red'; // Set the color property to 'red'
+
 
 document.addEventListener("DOMContentLoaded", async function(){
   var submitButton = document.querySelector("#popup button[type='button']");
@@ -98,14 +114,13 @@ function drawLine(viz, start, end, color = 0xff0000) {
 // USAGE EXAMPLE
 const start = [0, 0, 0];
 const end = [0, 0, LY_TO_AU*1000];
-// drawLine(viz, start, end)
+// drawLine(viz, start, end);
+
 
 // // Initialization - run this once when your application loads.
 function initObjectForDataset(dataset, scene, type, params, isStatic = false, date = null) {
   dataset.forEach(obj => {
       let object;
-
-  
       const basicMaterial = new THREE.MeshBasicMaterial({ color: params.color });
 
       switch (type) {
@@ -114,13 +129,10 @@ function initObjectForDataset(dataset, scene, type, params, isStatic = false, da
               object = new THREE.Mesh(sphereGeometry, basicMaterial);
               break;
 
-              
           case 'cube':
               const cubeGeometry = new THREE.BoxGeometry(params.size, params.size, params.size);
               object = new THREE.Mesh(cubeGeometry, basicMaterial);
               break;
-
-
           case 'cone':
             const origin = { x: 0, y: 0, z: 0 };
             const end = calculatePosition(obj, date ? date.getTime() : Date.now());
@@ -547,7 +559,7 @@ function unloadAllObjects() {
   }
 }
  
-function createCone(angle, origin, end,  color = 0xffffff, distCut = 0, materialProvided, sideTransparency = 50, baseTransparency = 0) {
+function createCone(angle, origin, end, color, distCut = 0, materialProvided, sideTransparency = 50, baseTransparency = 0) {
   const angleInRadians = (angle / 60) * (Math.PI / 180);
   const direction = new THREE.Vector3(end.x - origin.x, end.y - origin.y, end.z - origin.z);
   const length = direction.length() - distCut;
