@@ -17,27 +17,7 @@ import { fetchDetailedSignalsFromDSN,augmentAndExportSignals } from './service/s
 // Get the Spacekit version of THREE.js.
 const THREE = Spacekit.THREE;
 
-// BLOCKscreen
-window.onload = function() {
-  setTimeout(function() {
-      document.getElementById("overlay").style.display = "block";
-  }, 15000);
-};
-function submitResponse() {
-  var enteredPassword = document.getElementById('password-input').value;
-  if (enteredPassword) {
-    if (enteredPassword === password) {
-      // Logic for correct password
-      alert("Access granted. Enjoy using this fantastic tool.");
-      document.getElementById("overlay").style.display = "none";
-    } else {
-      // Logic for incorrect password
-      alert(passwordPrompt);
-    }
-  } else {
-    alert("Please enter a password.");
-  }
-}
+
 
 
 // CONSTANTS
@@ -74,6 +54,7 @@ const viz = new Spacekit.Simulation(document.getElementById("main-container"), {
   startPaused: false,
   renderOnlyInViewport: true,
   maxNumParticles: 2**16,
+  debugAxis: true,
   camera: {
     enableDrift: false,
     initialPosition: [2, -2, 1],
@@ -81,7 +62,7 @@ const viz = new Spacekit.Simulation(document.getElementById("main-container"), {
 });
 
 // Initialization of simulation controls and refernces
-const skybox = viz.createSkybox(Spacekit.SkyboxPresets.ESO_GIGAGALAXY);
+//const skybox = viz.createSkybox(Spacekit.SkyboxPresets.ESO_GIGAGALAXY);
 const camera = viz.getViewer().get3jsCamera();
 const scene = viz.getScene();
 const renderer = viz.getRenderer();
@@ -101,94 +82,143 @@ camera.addEventListener('change', function() {
     autoAdjustSpeed = true;
 });
 
-// // Milkyway model
-// // Load the Milky Way Image as a Texture
-// const textureLoader = new THREE.TextureLoader();
-// const milkyWayTexture = textureLoader.load('https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Milky_Way_Galaxy.jpg/768px-Milky_Way_Galaxy.jpg');
+// Milkyway model
+// Load the Milky Way Image as a Texture
+const textureLoader = new THREE.TextureLoader();
+const milkyWayTexture = textureLoader.load('https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Milky_Way_Galaxy.jpg/768px-Milky_Way_Galaxy.jpg');
 
-// const a = 100; // Base width of the triangle
-// const b = 100; // Base height of the triangle
-// const c = 1;   // Thickness for the disk
+const a = 100; // Base width of the triangle
+const b = 100; // Base height of the triangle
+const c = 1;   // Thickness for the disk
 
-// const bulgeRadius = 15; // Radius for the inner bulge
+const bulgeRadius = 15; // Radius for the inner bulge
 
-// const points = [];
-// const numPoints = 100000; // Adjust as needed for disk and bulge
+const points = [];
+const numPoints = 1000000; // Adjust as needed for disk and bulge
 
-// // Function to add points for the triangular disk
-// function addTriangularDiskPoints(num) {
-//     for (let i = 0; i < num; i++) {
-//         const z = (Math.random() - 0.5) * 2 * c; // Random z within the thickness
-//         const maxRadiusAtZ = (1 - Math.abs(z) / c) * a / 2; // Radius decreases with z
+// Function to add points for the triangular disk
+function addTriangularDiskPoints(num) {
+    for (let i = 0; i < num; i++) {
+        const z = (Math.random() - 0.5) * 2 * c; // Random z within the thickness
+        const maxRadiusAtZ = (1 - Math.abs(z) / c) * a / 2; // Radius decreases with z
 
-//         const r = Math.sqrt(Math.random()) * maxRadiusAtZ; // Random radius, sqrt for density
-//         const theta = Math.random() * 2 * Math.PI; // Random angle
+        const r = Math.sqrt(Math.random()) * maxRadiusAtZ; // Random radius, sqrt for density
+        const theta = Math.random() * 2 * Math.PI; // Random angle
 
-//         const x = r * Math.cos(theta);
-//         const y = r * Math.sin(theta);
+        const x = r * Math.cos(theta);
+        const y = r * Math.sin(theta);
 
-//         points.push(new THREE.Vector3(x, y, z));
-//     }
-// }
+        points.push(new THREE.Vector3(x, y, z));
+    }
+}
 
-// // Function to add points for the bulge
-// function addBulgePoints(num) {
-//   for (let i = 0; i < num; i++) {
-//       const theta = Math.random() * 2 * Math.PI;
-//       const phi = Math.random() * Math.PI;
-//       // Non-linear scaling for radial distance to increase density towards center
-//       const r = bulgeRadius * Math.pow(Math.random(), 0.1); // Square root for denser center
-//       const x = r * Math.sin(phi) * Math.cos(theta);
-//       const y = r * Math.sin(phi) * Math.sin(theta);
-//       const z = (c * 5) * Math.cos(phi); // Flattened z-coordinate
+// Function to add points for the bulge
+function addBulgePoints(num) {
+  for (let i = 0; i < num; i++) {
+      const theta = Math.random() * 2 * Math.PI;
+      const phi = Math.random() * Math.PI;
+      // Non-linear scaling for radial distance to increase density towards center
+      const r = bulgeRadius * Math.pow(Math.random(), 0.1); // Square root for denser center
+      const x = r * Math.sin(phi) * Math.cos(theta);
+      const y = r * Math.sin(phi) * Math.sin(theta);
+      const z = (c * 2) * Math.cos(phi); // Flattened z-coordinate
 
-//       points.push(new THREE.Vector3(x, y, z));
-//   }
-// }
+      points.push(new THREE.Vector3(x, y, z));
+  }
+}
 
 
-// // Add points to the geometry
-// addTriangularDiskPoints(numPoints * 0.8); // 80% of points for the disk
-// addBulgePoints(numPoints * 0.2); // 20% of points for the bulge
+// Add points to the geometry
+addTriangularDiskPoints(numPoints * 0.8); // 80% of points for the disk
+addBulgePoints(numPoints * 0.5); // 20% of points for the bulge
 
-// const geometry = new THREE.BufferGeometry().setFromPoints(points);
-// const vertexShader = `
-//     varying vec3 vPosition;
-//     void main() {
-//         vPosition = position;
-//         vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
-//         gl_PointSize = 2.0; // Adjust point size as needed
-//         gl_Position = projectionMatrix * mvPosition;
-//     }
-// `;
+const geometry = new THREE.BufferGeometry().setFromPoints(points);
+const vertexShader = `
+    varying vec3 vPosition;
+    void main() {
+        vPosition = position;
+        vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+        gl_PointSize = 2.0; // Adjust point size as needed
+        gl_Position = projectionMatrix * mvPosition;
+    }
+`;
 
-// const fragmentShader = `
-//     uniform sampler2D texture;
-//     varying vec3 vPosition;
+const fragmentShader = `
+    uniform sampler2D texture;
+    varying vec3 vPosition;
 
-//     void main() {
-//         // Project the texture from above onto the x-y plane
-//         // Normalize the x and y coordinates to the range [0, 1]
-//         float u = (vPosition.x / (2.0 * 100.0)) + 0.5; // Assuming 'a' is 100, as per your ellipsoid size
-//         float v = (vPosition.y / (2.0 * 100.0)) + 0.5; // Assuming 'b' is 100, as per your ellipsoid size
+    void main() {
+        // Project the texture from above onto the x-y plane
+        // Normalize the x and y coordinates to the range [0, 1]
+        float u = (vPosition.x / (2.0 * 65.0)) + 0.5; // Assuming 'a' is 100, as per your ellipsoid size
+        float v = (vPosition.y / (2.0 * 65.0)) + 0.5; // Assuming 'b' is 100, as per your ellipsoid size
 
-//         gl_FragColor = texture2D(texture, vec2(u, v));
-//     }
-// `;
+        gl_FragColor = texture2D(texture, vec2(u, v));
+    }
+`;
 
-// const material = new THREE.ShaderMaterial({
-//     uniforms: {
-//         texture: { value: milkyWayTexture }
-//     },
-//     vertexShader: vertexShader,
-//     fragmentShader: fragmentShader,
-//     transparent: true
-// });
+const material = new THREE.ShaderMaterial({
+    uniforms: {
+        texture: { value: milkyWayTexture }
+    },
+    vertexShader: vertexShader,
+    fragmentShader: fragmentShader,
+    transparent: true
+});
 
-// // Create and Add the Point Cloud to the Scene
-// const pointCloud = new THREE.Points(geometry, material);
-// scene.add(pointCloud);
+// Create and Add the Point Cloud to the Scene
+const milkyWayModel = new THREE.Points(geometry, material);
+scene.add(milkyWayModel);
 
+// Sagittarius A* coordinates
+// Convert Right Ascension from hours to degrees // 1 hour = 15 degrees
+const Mra = (17 + (45 / 60) + (40.0409 / 3600)) * 15; // RA in degrees
+// Declination is already in degrees
+const Mdec = -29 - (0 / 60) - (28.118 / 3600); // Dec in degrees
+const Mdistance = 26*1000*63241; // Assuming a scaled distance, not actual light-years
+
+// Calculate RA and Dec in radians directly from degrees
+const raInRadians = Mra * (Math.PI / 180); // RA in degrees to radians
+const decInRadians = Mdec * (Math.PI / 180); // Dec in degrees to radians
+const inclinationAngle = Mdec * (Math.PI / 180)
+function arrayToVector3(array) {
+  return new THREE.Vector3(array[0], array[1], array[2]);
+}
+const sgrAPositionArray = radecToXYZ(Mra, Mdec, Mdistance);
+const sgrAPosition = arrayToVector3(sgrAPositionArray);
+
+// Now sgrAPosition is a THREE.Vector3 object
+
+// Assuming milkyWayModel and sgrAPosition are defined earlier
+
+// Add AxesHelper to visualize orientation
+const axesHelper = new THREE.AxesHelper(5);
+// Red represents the X-axis.
+// Green represents the Y-axis.
+// Blue represents the Z-axis.
+milkyWayModel.add(axesHelper);
+
+// Reset milkyWayModel rotation
+milkyWayModel.rotation.set(0, 0, 0);
+
+// Apply rotations
+milkyWayModel.rotateOnAxis(new THREE.Vector3(0, 1, 0), raInRadians); // Rotate around Y-axis
+milkyWayModel.rotateOnAxis(new THREE.Vector3(0, 0, 1), decInRadians); // Rotate around Z-axis
+
+// Calculate the rotation axis from the scene center to Sagittarius A*
+const rotationAxis = new THREE.Vector3().subVectors( new THREE.Vector3(0, 0, 0),sgrAPosition).normalize();
+
+// Apply the rotation around the calculated axis
+milkyWayModel.rotateOnAxis(rotationAxis, inclinationAngle);
+
+// Translate the model towards Sagittarius A*
+// It's important to apply this after rotation to ensure the model's orientation remains consistent
+milkyWayModel.position.set(sgrAPosition.x, sgrAPosition.y, sgrAPosition.z);
+
+milkyWayModel.scale.set(1000*63241, 1000*63241, 1000*63241);
+
+
+// Ensure the camera is positioned and pointed to view the model correctly
 
 // FUNCTION: Draw a line
 function drawLine(viz, start, end, color = 0xff0000) {
@@ -367,7 +397,7 @@ if (distanceToSunInAU < 2) {
     // Adjust the camera settings as needed for distances > 100 light years.
     // This is just a placeholder. Adjust as per your requirement.
     camera.near = 100;
-    camera.far = 10e8;
+    camera.far = 10e10;
 }
 
   camera.updateProjectionMatrix(); //needed after update of camera near:far
