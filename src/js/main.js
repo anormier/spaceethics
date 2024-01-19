@@ -174,7 +174,7 @@ const sgrAPosition = arrayToVector3(sgrAPositionArray);
 // Assuming milkyWayModel and sgrAPosition are defined earlier
 
 // Add AxesHelper to visualize orientation
-const axesHelper = new THREE.AxesHelper(5);
+// const axesHelper = new THREE.AxesHelper(5);
 // Red represents the X-axis.
 // Green represents the Y-axis.
 // Blue represents the Z-axis.
@@ -422,12 +422,12 @@ if (autoAdjustSpeed) {
   const distVisTo = 300;  // Upper limit in AU
 
 //UPDATE STAR POSITIONS
-  if (!isMobile()){
-    updateObjectsForDataset(modifiedStars100LY3K45K, dateInMilliseconds);
-    updateObjectsForDataset(stars100LY45K6K, dateInMilliseconds);
-    updateObjectsForDataset(stars100LY6Kmore, dateInMilliseconds);
-    updateObjectsForDataset(famousStars, dateInMilliseconds);
-  }
+if (!isMobile()) {
+  updateObjectsForDataset(modifiedStars100LY3K45K, dateInMilliseconds, distanceToSunInLY);
+  updateObjectsForDataset(stars100LY45K6K, dateInMilliseconds, distanceToSunInLY);
+  updateObjectsForDataset(stars100LY6Kmore, dateInMilliseconds, distanceToSunInLY);
+  updateObjectsForDataset(famousStars, dateInMilliseconds, distanceToSunInLY);
+}
 
 //UPDATE HUMAN IMPACT
 
@@ -488,75 +488,52 @@ if (autoAdjustSpeed) {
 // POSITIONS AND LOADING FUNCTIONS
 
 //update functions
-function updateObjectsForDataset(dataset, dateInMilliseconds) {
-  // 
+function updateObjectsForDataset(dataset, dateInMilliseconds, distanceToSunInLY = null) {
+  const fadeStartDistance = 60; // Distance in light years where fading starts
+  const maxDistance = 300; // Distance in light years where stars are fully transparent
+
   dataset.forEach(obj => {
     if (obj?.graphicalObject?.position) {
       const position = calculatePosition(obj, dateInMilliseconds);
-    // console.log('xx obj', obj)
-    // console.log('xx position', position)
-    if (position) {
-      if (obj.graphicalObject instanceof THREE.Mesh && obj.graphicalObject.geometry instanceof THREE.ConeGeometry) {
-        if (obj.graphicalObject.geometry) {
-          obj.graphicalObject.geometry.dispose();
-        }
-        // console.log("Updating a Cone:", obj);
+      if (position) {
+        // Update positions for cones
+        if (obj.graphicalObject instanceof THREE.Mesh && obj.graphicalObject.geometry instanceof THREE.ConeGeometry) {
+          if (obj.graphicalObject.geometry) {
+            obj.graphicalObject.geometry.dispose();
+          }
 
-        const origin = { x: 0, y: 0, z: 0 };
-        const end = { x: position[0], y: position[1], z: position[2] };
+          const origin = { x: 0, y: 0, z: 0 };
+          const end = { x: position[0], y: position[1], z: position[2] };
+          const cone = createCone(300, origin, end, obj.graphicalObject.material.color, 1000, null, 90, 0);
 
-        const cone = createCone(300, origin, end, obj.graphicalObject.material.color,1000, null, 90, 0);
-
-        obj.graphicalObject.geometry = cone.geometry;
-        obj.graphicalObject.position.copy(cone.position);
-        obj.graphicalObject.quaternion.copy(cone.quaternion);
-
-     //   console.log("Cone after update:", obj.graphicalObject);
-      } else {
-        // console.log('position', position)
-        obj.graphicalObject.position.set(...position);
-      }
-      obj.graphicalObject.visible = true;      
-    } else {
-      obj.graphicalObject.visible = false;
-    }
-    }
-  });
-}
-// New function to update lines
-function updateLinesForDataset(dataset, dateInMilliseconds) {
-  dataset.forEach((obj, index) => {
-    const position = calculatePosition(obj, dateInMilliseconds);
-    console.log(`Updating line object for index ${index}, name: ${obj.nameSet}`);
-    console.log('New position:', position);
-
-    if (position) {
-      try {
-        // Explicitly check for each property's existence
-        if (!obj || !obj.graphicalObject || !obj.graphicalObject.geometry || !obj.graphicalObject.geometry.getAttribute('position')) {
-          console.error(`Error updating line for index ${index}, name: ${obj.nameSet}`);
-          return; // Skip this iteration
+          obj.graphicalObject.geometry = cone.geometry;
+          obj.graphicalObject.position.copy(cone.position);
+          obj.graphicalObject.quaternion.copy(cone.quaternion);
+        } else {
+          obj.graphicalObject.position.set(...position);
         }
 
-        const positions = obj.graphicalObject.geometry.getAttribute('position').array;
-        positions[3] = position[0];
-        positions[4] = position[1];
-        positions[5] = position[2];
-        obj.graphicalObject.geometry.getAttribute('position').needsUpdate = true;
+        // Handle fading based on distance
+        if (distanceToSunInLY !== null) {
+          let transparency = 0;
+          if (distanceToSunInLY > fadeStartDistance) {
+            transparency = Math.min(1, (distanceToSunInLY - fadeStartDistance) / (maxDistance - fadeStartDistance));
+          }
+
+          if (obj.graphicalObject.material) {
+            obj.graphicalObject.material.opacity = 1 - transparency;
+            obj.graphicalObject.material.transparent = transparency > 0;
+          }
+        }
+
         obj.graphicalObject.visible = true;
-        console.log("Updated object:", obj.graphicalObject);
-
-      } catch (err) {
-        console.error(`Exception thrown while updating line for index ${index}, name: ${obj.nameSet}: ${err}`);
-      }
-
-    } else {
-      if (obj && obj.graphicalObject) {
+      } else {
         obj.graphicalObject.visible = false;
       }
     }
   });
 }
+
 
 function calculatePosition(obj, date) {
     if ('dateSent' in obj && date < new Date(obj.dateSent).getTime()) return false;
