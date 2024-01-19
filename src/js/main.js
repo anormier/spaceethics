@@ -88,10 +88,8 @@ const textureLoader = new THREE.TextureLoader();
 const milkyWayTexture = textureLoader.load('https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Milky_Way_Galaxy.jpg/768px-Milky_Way_Galaxy.jpg');
 
 const a = 100; // Base width of the triangle
-const b = 100; // Base height of the triangle
 const c = 1;   // Thickness for the disk
 
-const bulgeRadius = 15; // Radius for the inner bulge
 
 const points = [];
 const numPoints = 1000000; // Adjust as needed for disk and bulge
@@ -112,25 +110,9 @@ function addTriangularDiskPoints(num) {
     }
 }
 
-// Function to add points for the bulge
-function addBulgePoints(num) {
-  for (let i = 0; i < num; i++) {
-      const theta = Math.random() * 2 * Math.PI;
-      const phi = Math.random() * Math.PI;
-      // Non-linear scaling for radial distance to increase density towards center
-      const r = bulgeRadius * Math.pow(Math.random(), 0.1); // Square root for denser center
-      const x = r * Math.sin(phi) * Math.cos(theta);
-      const y = r * Math.sin(phi) * Math.sin(theta);
-      const z = (c * 2) * Math.cos(phi); // Flattened z-coordinate
-
-      points.push(new THREE.Vector3(x, y, z));
-  }
-}
-
 
 // Add points to the geometry
 addTriangularDiskPoints(numPoints * 0.8); // 80% of points for the disk
-addBulgePoints(numPoints * 0.5); // 20% of points for the bulge
 
 const geometry = new THREE.BufferGeometry().setFromPoints(points);
 const vertexShader = `
