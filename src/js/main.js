@@ -174,7 +174,7 @@ const sgrAPosition = arrayToVector3(sgrAPositionArray);
 // Assuming milkyWayModel and sgrAPosition are defined earlier
 
 // Add AxesHelper to visualize orientation
-// const axesHelper = new THREE.AxesHelper(5);
+const axesHelper = new THREE.AxesHelper(5);
 // Red represents the X-axis.
 // Green represents the Y-axis.
 // Blue represents the Z-axis.
