@@ -1073,13 +1073,22 @@ const startStopButton = document.getElementById('start-stop-btn');
 const startIcon = document.getElementById('start-icon');
 const pauseIcon = document.getElementById('pause-icon');
 
-startStopButton.onclick = function () {
-    autoAdjustSpeed = true;  
-    isPaused ? viz.start() : viz.stop();
-    startIcon.style.display = isPaused ? "inline-block" : "none";
-    pauseIcon.style.display = isPaused ? "none" : "inline-block";
-    isPaused = !isPaused;
+
+startStopButton.onclick = function() {
+  if (isPaused || viz.getJdPerSecond() == (1/86400)) {
+      viz.start();
+      startIcon.style.display = "none";
+      pauseIcon.style.display = "inline-block";
+      isPaused = false;
+  } else {
+      viz.stop();
+      startIcon.style.display = "inline-block";
+      pauseIcon.style.display = "none";
+      isPaused = true;
+  }
+  autoAdjustSpeed = true;
 };
+
 
 document.getElementById('live-btn').addEventListener('click', function() {
   // Set the simulation to the current time
@@ -1110,10 +1119,13 @@ document.getElementById('live-btn').addEventListener('click', function() {
   pauseIcon.style.display = 'inline-block';
   
   // Ensure the simulation is set to play
+
   if (isPaused) {
     viz.start();
-    isPaused = false;
-  }
+    startIcon.style.display = "none";
+    pauseIcon.style.display = "inline-block";
+    isPaused = false; // Ensure isPaused is synchronized
+}
 });
 
 // UI ELEMENTS III info Box, nav buttons
