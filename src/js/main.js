@@ -11,7 +11,7 @@ import {updatedMessages, allMessages} from "./data/messages.js";
 import allVoyagers from "./data/voyagers.js";
 import famousStars from "./data/famousStars.js";
 import {navInfo,password} from './textContents.js';
-import { fetchDetailedSignalsFromDSN,augmentAndExportSignals } from './service/scrapDSN.js';
+import { processSpacecraftPositionData, fetchDetailedSignalsFromDSN, augmentAndExportSignals } from './service/scrapDSN-2.js';
 
 
 // Get the Spacekit version of THREE.js.
@@ -81,6 +81,7 @@ viz.renderOnlyInViewport();
 camera.addEventListener('change', function() {
     autoAdjustSpeed = true;
 });
+
 
 // Milkyway model
 // Load the Milky Way Image as a Texture
@@ -764,6 +765,63 @@ const jupiter3 = createCelestialSphere("jupiter3", {
   atmosphere:'true'
 });
 
+
+
+//SPACECRAFTS
+// Assuming you have a function that initializes your scene and Earth object
+async function initSpacecraftPositions() {
+  const signals = await augmentAndExportSignals();
+  const spacecraftData = processSpacecraftPositionData(signals);
+  
+  // Create the points material
+  const material = new THREE.PointsMaterial({
+    color: 0xFFC0CB, // Pink color
+    size: 1, // Size of the dots
+   // sizeAttenuation: true
+  });
+
+  const pointsGeometry = new THREE.BufferGeometry();
+  const positions = [];
+
+  // Convert spacecraft data to positions with respect to Earth
+  spacecraftData.forEach(data => {
+    if (data.r !== null && data.ra !== null && data.dec !== null) {
+      // Convert spherical coordinates (r, ra, dec) to Cartesian coordinates (x, y, z)
+      const position = convertRaDecDistToVector3(data.ra, data.dec, data.r);
+      positions.push(position.x, position.y, position.z);
+    }
+  });
+
+  pointsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+
+  // Create the points object and add it to the scene
+  const spacecraftPoints = new THREE.Points(pointsGeometry, material);
+  // Assuming you have an Earth object in your scene named 'earth'
+  const earthObject = scene.getObjectByName('earthV');
+  if (earthObject) {
+    // Set the position of the points relative to Earth
+    spacecraftPoints.position.copy(earthObject.position);
+  }
+  scene.add(spacecraftPoints);
+}
+
+// Convert RA and DEC to a position in 3D space
+function convertRaDecDistToVector3(ra, dec, distance) {
+  const raInRadians = THREE.MathUtils.degToRad(ra);
+  const decInRadians = THREE.MathUtils.degToRad(dec);
+
+  // Assuming distance is in astronomical units and Earth is at the origin
+  const x = distance * Math.cos(decInRadians) * Math.cos(raInRadians);
+  const y = distance * Math.cos(decInRadians) * Math.sin(raInRadians);
+  const z = distance * Math.sin(decInRadians);
+
+  return new THREE.Vector3(x, y, z);
+}
+
+// Call this function to add the spacecraft to the scene
+initSpacecraftPositions();
+
+
  // PARTIE III
 
 // UI: RAYCASTER
@@ -905,8 +963,10 @@ function getSpeedBasedOnDistance(distanceToSunInAU) {
     speed = 10;  // Whatever value you want
   } else if (distanceToSunInAU < 200) {
     speed = 500; // Adjust values as needed
-  } else {
+  } else if (distanceToSunInAU < 400*LY_TO_AU) {
     speed = 600; // Adjust values as needed
+  } else {
+    speed = 100000; // Adjust values as needed
   }
   return speed;
 }
@@ -920,9 +980,13 @@ function getDateBoundariesBasedOnDistance(distanceToSunInAU) {
   } else if (distanceToSunInAU < 200) {
       boundaryDate = new Date('2030-01-01');
       resetDate = new Date('1990-01-01');
-  } else {
+  } else if (distanceToSunInAU < 400*LY_TO_AU) {
       boundaryDate = new Date('2030-01-01');
       resetDate = new Date('2000-01-01');
+ }
+   else  {
+        boundaryDate = new Date('6000-01-01');
+        resetDate = new Date('2000-01-01');
   }
 
   return { boundaryDate, resetDate };
