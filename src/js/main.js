@@ -789,7 +789,7 @@ async function initSpacecraftPositions() {
   
     // Create the points material
     const material = new THREE.PointsMaterial({
-        color: 0xFFC0CB, // Pink color
+        color: 'green', // Pink color
         size: 1, // Size of the dots
         // sizeAttenuation: true
     });
@@ -799,8 +799,8 @@ async function initSpacecraftPositions() {
 
     // Convert spacecraft data to positions with respect to Earth
     spacecraftData.forEach(data => {
-        if (data.r !== null && data.ra !== null && data.dec !== null) {
-            const position = convertRaDecDistToVector3(data.ra, data.dec, data.r);
+        if (data.r !== null && data.lambda !== null && data.beta !== null) {
+            const position = convertRaDecDistToVector3(data.lambda, data.beta, data.r);
             positions.push(position.x, position.y, position.z);
         }
     });

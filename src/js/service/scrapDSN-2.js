@@ -164,7 +164,7 @@ export async function augmentAndExportSignals() {
 
       // Proceed with calculations if all required data is available
       const { azimuthAngle, elevationAngle, timeUTC, uplegRange, timeZoneOffset } = signal;
-      let ra = null, dec = null;
+      let lambda = null, beta = null;
       if (azimuthAngle && elevationAngle && timeUTC) {
         const date = new Date(parseInt(timeUTC) + parseInt(timeZoneOffset)); // Adjusting for timezone
         const equatorialCoords = horizontalToEquatorial(
@@ -174,16 +174,17 @@ export async function augmentAndExportSignals() {
           stationCoord.lon,
           date
         );
-        ra = equatorialCoords.ra;
-        dec = equatorialCoords.dec;
+        const eclipticCoords = equatorialToEcliptic(equatorialCoords.ra, equatorialCoords.dec);
+        lambda = eclipticCoords.lambda; // Ecliptic longitude
+        beta = eclipticCoords.beta;     // Ecliptic latitude
       }
 
       return {
         ...signal,
         stationName: friendlyStationName, // Use the friendly name
         r: uplegRange ? kmToAU(parseFloat(uplegRange)) : null,
-        ra,
-        dec,
+        lambda,
+        beta,
         vra: 0,
         vdec: 0,
         dateSent: new Date().toUTCString(),
@@ -192,7 +193,7 @@ export async function augmentAndExportSignals() {
         nameSet: `Upload to/Download from ${signal.spacecraft}`,
         textSet: `Information about ${signal.spacecraft}, Transmission Power: XX dBm`
       };
-    }).filter(signal => signal && signal.ra !== null && signal.dec !== null);
+    }).filter(signal => signal && signal.lambda !== null && signal.beta !== null);
 
     console.log(augmentedSignals); // For demonstration
     return augmentedSignals;
@@ -200,6 +201,29 @@ export async function augmentAndExportSignals() {
     console.error('Error in augmenting DSN signal data:', error);
     return null;
   }
+}
+
+// Function to convert from equatorial to ecliptic coordinates
+function equatorialToEcliptic(ra, dec) {
+  // Constants for the obliquity of the ecliptic
+  const epsilon = 23.439281; // This value might change slightly over time
+  const raRad = (ra * Math.PI) / 180;
+  const decRad = (dec * Math.PI) / 180;
+  const epsilonRad = (epsilon * Math.PI) / 180;
+
+  // Calculate ecliptic longitude (lambda) and latitude (beta)
+  const sinBeta = Math.sin(decRad) * Math.cos(epsilonRad) - Math.cos(decRad) * Math.sin(epsilonRad) * Math.sin(raRad);
+  const beta = Math.asin(sinBeta);
+
+  const y = Math.sin(raRad) * Math.cos(epsilonRad) + Math.tan(decRad) * Math.sin(epsilonRad);
+  const x = Math.cos(raRad);
+  const lambda = Math.atan2(y, x);
+
+  // Convert to degrees and normalize
+  const lambdaDeg = (lambda * 180 / Math.PI + 360) % 360;
+  const betaDeg = beta * 180 / Math.PI;
+
+  return { lambda: lambdaDeg, beta: betaDeg };
 }
 
 // Function to convert from horizontal to equatorial coordinates
@@ -230,27 +254,25 @@ function horizontalToEquatorial(azimuth, elevation, observerLat, observerLon, da
 
   return { ra: RA, dec: decDeg };
 }
-
 /**
- * Processes DSN signal data to extract and format data for spacecraft positioning.
+ * Processes DSN signal data to extract and format data for spacecraft positioning in ecliptic coordinates.
  * @param {Array} signals - Array of signal data objects.
- * @returns {Array} Array of objects containing spacecraft name, r, ra, and dec.
+ * @returns {Array} Array of objects containing spacecraft name, radial distance, ecliptic longitude, and ecliptic latitude.
  */
 export function processSpacecraftPositionData(signals) {
   return signals.map(signal => {
-      // Extract the necessary attributes for each spacecraft.
-      const { spacecraft, r, ra, dec } = signal;
-      
-      // Return a new object with just the required attributes.
-      // Assuming r is the radial distance, ra is right ascension, and dec is declination.
-      return {
-          spacecraft,
-          r: r ? parseFloat(r) : null, // Convert km to AU if r is provided.
-          ra: ra ? parseFloat(ra) : null,
-          dec: dec ? parseFloat(dec) : null,
-
-
-      };
-
+    // Extract the necessary attributes for each spacecraft.
+    const { spacecraft, r, lambda, beta } = signal;
+    
+    // Return a new object with just the required attributes.
+    // r is the radial distance, lambda is ecliptic longitude, and beta is ecliptic latitude.
+    return {
+      spacecraft,
+      r: r ? parseFloat(r) : null,       // Radial distance in astronomical units
+      lambda: lambda ? parseFloat(lambda) : null, // Ecliptic longitude
+      beta: beta ? parseFloat(beta) : null,       // Ecliptic latitude
+    };
   });
 }
+
+
