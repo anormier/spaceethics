@@ -991,19 +991,33 @@ function getDateBoundariesBasedOnDistance(distanceToSunInAU) {
 
   return { boundaryDate, resetDate };
 }
-
-function updateSpeedDisplay(daysPerSecond) {
+function updateSpeedDisplay(julianDaysPerSecond, isSimulationPaused) {
   let speedText;
-  if (daysPerSecond < 30) {
-      speedText = `Speed: ${daysPerSecond.toFixed(1)} day/sec`;
-  } else if (daysPerSecond < 365.25) {
-      const monthsPerSecond = daysPerSecond / 30.44;
-      speedText = `Speed: ${monthsPerSecond.toFixed(1)} month/sec`;
+
+  if (isSimulationPaused) {
+    // Simulation is paused
+    speedText = "Speed: Stopped";
+  } else if (julianDaysPerSecond === (1 / 86400)) {
+    // Real-time speed (1 Julian Day per real-time day)
+    speedText = "Speed: Real-time";
   } else {
-      const yearsPerSecond = daysPerSecond / 365.25;
-      speedText = `Speed: ${yearsPerSecond.toFixed(1)} year/sec`;
+    const daysPerSecond = julianDaysPerSecond; // Convert Julian Days per second to Earth days per second
+    const yearsPerSecond = daysPerSecond / 365.25; // Convert days per second to years per second
+
+    if (daysPerSecond < 365.25) {
+      // Less than a year per second
+      speedText = `Speed: ${julianDaysPerSecond.toFixed()} days/sec`;
+    } else if (yearsPerSecond < 100) {
+      // Less than a century per second
+      speedText = `Speed: ${yearsPerSecond.toFixed(1)} years/sec`;
+    } else {
+      // More than a century per second
+      const centuriesPerSecond = yearsPerSecond / 100;
+      speedText = `Speed: ${centuriesPerSecond.toFixed(1)} centuries/sec`;
+    }
   }
 
+  // Update the speed display element with the new speed text
   speedDisplay.textContent = speedText;
 }
 
@@ -1066,6 +1080,41 @@ startStopButton.onclick = function () {
     pauseIcon.style.display = isPaused ? "none" : "inline-block";
     isPaused = !isPaused;
 };
+
+document.getElementById('live-btn').addEventListener('click', function() {
+  // Set the simulation to the current time
+  const now = new Date();
+  viz.setDate(now);
+
+  // Update the date slider to today's date
+  const yearSlider = document.getElementById('year-slider');
+  yearSlider.value = now.getFullYear() + (now.getMonth() / 12) + (now.getDate() / 365.25);
+
+  // Set the simulation speed to real-time pace (1 second per simulation second)
+  const realTimeSpeed = 1/86400; // 1 Julian Day per real-time day
+  autoAdjustSpeed = false; // Disable auto speed adjustment
+  viz.setJdPerSecond(realTimeSpeed); // Set the simulation to real-time speed
+
+  // Manually update the speed display and slider since autoAdjustSpeed is off
+  updateSpeedDisplay(realTimeSpeed);
+  const speedFactor = realTimeSpeed / initialSpeed;
+  speedSlider.value = Math.log10(speedFactor);
+
+  // Load the spacecrafts
+  initSpacecraftPositions(); // Assuming this function is responsible for loading the spacecrafts
+
+  // Ensure the play/pause button is set to show 'Play'
+  const startIcon = document.getElementById('start-icon');
+  const pauseIcon = document.getElementById('pause-icon');
+  startIcon.style.display = 'none';
+  pauseIcon.style.display = 'inline-block';
+  
+  // Ensure the simulation is set to play
+  if (isPaused) {
+    viz.start();
+    isPaused = false;
+  }
+});
 
 // UI ELEMENTS III info Box, nav buttons
 const infoBox = document.getElementById('info-box');
