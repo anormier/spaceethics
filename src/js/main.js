@@ -765,45 +765,62 @@ const jupiter3 = createCelestialSphere("jupiter3", {
   atmosphere:'true'
 });
 
+let spacecraftPoints; // Global variable to keep track of the spacecraft points object
 
-
-//SPACECRAFTS
-// Assuming you have a function that initializes your scene and Earth object
-async function initSpacecraftPositions() {
-  const signals = await augmentAndExportSignals();
-  const spacecraftData = processSpacecraftPositionData(signals);
-  
-  // Create the points material
-  const material = new THREE.PointsMaterial({
-    color: 0xFFC0CB, // Pink color
-    size: 1, // Size of the dots
-   // sizeAttenuation: true
-  });
-
-  const pointsGeometry = new THREE.BufferGeometry();
-  const positions = [];
-
-  // Convert spacecraft data to positions with respect to Earth
-  spacecraftData.forEach(data => {
-    if (data.r !== null && data.ra !== null && data.dec !== null) {
-      // Convert spherical coordinates (r, ra, dec) to Cartesian coordinates (x, y, z)
-      const position = convertRaDecDistToVector3(data.ra, data.dec, data.r);
-      positions.push(position.x, position.y, position.z);
+async function loadSpacecrafts() {
+    if (!spacecraftPoints) {
+        spacecraftPoints = await initSpacecraftPositions();
+    } else {
+        // If spacecraftPoints already exists, simply add it back to the scene
+        scene.add(spacecraftPoints);
     }
-  });
-
-  pointsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-
-  // Create the points object and add it to the scene
-  const spacecraftPoints = new THREE.Points(pointsGeometry, material);
-  // Assuming you have an Earth object in your scene named 'earth'
-  const earthObject = scene.getObjectByName('earthV');
-  if (earthObject) {
-    // Set the position of the points relative to Earth
-    spacecraftPoints.position.copy(earthObject.position);
-  }
-  scene.add(spacecraftPoints);
 }
+
+function unloadSpacecrafts() {
+    if (spacecraftPoints) {
+        scene.remove(spacecraftPoints);
+    }
+}
+
+// SPACECRAFTS
+async function initSpacecraftPositions() {
+    const signals = await augmentAndExportSignals();
+    const spacecraftData = processSpacecraftPositionData(signals);
+  
+    // Create the points material
+    const material = new THREE.PointsMaterial({
+        color: 0xFFC0CB, // Pink color
+        size: 1, // Size of the dots
+        // sizeAttenuation: true
+    });
+
+    const pointsGeometry = new THREE.BufferGeometry();
+    const positions = [];
+
+    // Convert spacecraft data to positions with respect to Earth
+    spacecraftData.forEach(data => {
+        if (data.r !== null && data.ra !== null && data.dec !== null) {
+            const position = convertRaDecDistToVector3(data.ra, data.dec, data.r);
+            positions.push(position.x, position.y, position.z);
+        }
+    });
+
+    pointsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+
+    // Create the points object
+    spacecraftPoints = new THREE.Points(pointsGeometry, material);
+
+    // Assuming you have an Earth object in your scene named 'earthV'
+    const earthObject = scene.getObjectByName('earthV');
+    if (earthObject) {
+        spacecraftPoints.position.copy(earthObject.position);
+    }
+
+    scene.add(spacecraftPoints);
+
+    return spacecraftPoints;
+}
+
 
 // Convert RA and DEC to a position in 3D space
 function convertRaDecDistToVector3(ra, dec, distance) {
@@ -818,8 +835,6 @@ function convertRaDecDistToVector3(ra, dec, distance) {
   return new THREE.Vector3(x, y, z);
 }
 
-// Call this function to add the spacecraft to the scene
-initSpacecraftPositions();
 
 
  // PARTIE III
@@ -1077,6 +1092,7 @@ const pauseIcon = document.getElementById('pause-icon');
 startStopButton.onclick = function() {
   if (isPaused || viz.getJdPerSecond() == (1/86400)) {
       viz.start();
+      unloadSpacecrafts();
       startIcon.style.display = "none";
       pauseIcon.style.display = "inline-block";
       isPaused = false;
@@ -1110,7 +1126,7 @@ document.getElementById('live-btn').addEventListener('click', function() {
   speedSlider.value = Math.log10(speedFactor);
 
   // Load the spacecrafts
-  initSpacecraftPositions(); // Assuming this function is responsible for loading the spacecrafts
+  loadSpacecrafts(); // Assuming this function handles the loading of spacecrafts
 
   // Ensure the play/pause button is set to show 'Play'
   const startIcon = document.getElementById('start-icon');
