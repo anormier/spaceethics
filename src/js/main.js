@@ -20,7 +20,10 @@ const THREE = Spacekit.THREE;
 // IMPORTANT: DEFAULT COORDINATE FRAME FROM SPACEKIT IS ECLIPTICHELIOCENTRIC
 // -> GAIA STARS and FAR PROBES need to be converted
 // -> SGNALS FROM DSN are converted to Eclpitic and transferred to geocentric.
-
+//   to correct for obliquity: (equatorial to ecliptic):
+//   spacecraftPoints.rotation.x = -obliquity;
+//   in the case of LIVE, spacecrafts, rotation 15deg on Z, aligns with known positions (TO SOLVE)
+//   spacecraftPoints.rotation.z = -15* Math.PI / 180;
 
 // CONSTANTS
 const LY_TO_AU = 63241.16; 
@@ -830,6 +833,12 @@ async function initSpacecraftPositions() {
         console.log("No Earth Three.js objects found.");
     }
     
+    // Define the obliquity of the ecliptic
+   const obliquity = 23.4 * Math.PI / 180; // Convert degrees to radians
+// Rotating around the x-axis by to compensate fo
+   spacecraftPoints.rotation.x = -obliquity;
+   spacecraftPoints.rotation.z = -15* Math.PI / 180;
+
     scene.add(spacecraftPoints);
     console.log("Spacecraft points added to the scene.");
 
