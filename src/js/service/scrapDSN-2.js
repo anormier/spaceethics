@@ -266,6 +266,8 @@ export function processSpacecraftPositionData(signals) {
     
     // Return a new object with just the required attributes.
     // r is the radial distance, lambda is ecliptic longitude, and beta is ecliptic latitude.
+    console.log(spacecraft, r, lambda, beta); // For demonstration
+
     return {
       spacecraft,
       r: r ? parseFloat(r) : null,       // Radial distance in astronomical units

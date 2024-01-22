@@ -601,7 +601,7 @@ function placeSpaceKitObject(objects, date, textureUrl, labelVisible = true) {
 
     if (adjustedR < 0) return;
     if (obj.id === "Proxima Centauri") {
-      console.log(`Adjusted values for Proxima Centauri - RA: ${adjustedRA}, Dec: ${adjustedDec}, R: ${adjustedR}`);
+    //  console.log(`Adjusted values for Proxima Centauri - RA: ${adjustedRA}, Dec: ${adjustedDec}, R: ${adjustedR}`);
   }
     // Create and add object to visualization
     const singleObject = viz.createObject(obj.id, {
@@ -647,9 +647,14 @@ function createCone(angle, origin, end, color, distCut = 0, materialProvided, si
   geometry.addGroup(0, geometry.index.count - 96, 0);
   geometry.addGroup(geometry.index.count - 96, 96, 1);
 
-  const sideMaterial = materialProvided || new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 1 - sideTransparency / 100, side: THREE.DoubleSide });
-  const baseMaterial = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 1 - baseTransparency / 100, side: THREE.DoubleSide });
-  
+  const sideMaterial = materialProvided || new THREE.MeshBasicMaterial({  color: color || 'blue', // Fallback to white if color is not provided
+ transparent: true, 
+    opacity: 1 - sideTransparency / 100, 
+    side: THREE.DoubleSide 
+});
+
+  const baseMaterial = new THREE.MeshBasicMaterial({ color:color || 'blue', transparent: true, opacity: 1 - baseTransparency / 100, side: THREE.DoubleSide });
+ 
   const cone = new THREE.Mesh(geometry, [sideMaterial, baseMaterial]);
 
   const offset = direction.clone().normalize().multiplyScalar(distCut / 2);
@@ -765,6 +770,7 @@ const jupiter3 = createCelestialSphere("jupiter3", {
   atmosphere:'true'
 });
 
+//SPACECRAFTS
 let spacecraftPoints; // Global variable to keep track of the spacecraft points object
 
 async function loadSpacecrafts() {
