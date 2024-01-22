@@ -817,14 +817,21 @@ async function initSpacecraftPositions() {
 
     // Create the points object
     spacecraftPoints = new THREE.Points(pointsGeometry, material);
-
-    // Assuming you have an Earth object in your scene named 'earthV'
-    const earthObject = scene.getObjectByName('earthV');
-    if (earthObject) {
-        spacecraftPoints.position.copy(earthObject.position);
+    const earthThreeJSObjects = earthV.get3jsObjects();
+    if (earthThreeJSObjects.length > 0) {
+        const primaryEarthObject = earthThreeJSObjects[0];
+        if (primaryEarthObject) {
+            spacecraftPoints.position.copy(primaryEarthObject.position);
+            console.log("Earth object found, setting spacecraft position relative to Earth:", primaryEarthObject.position);
+        } else {
+            console.log("Primary Earth object not found.");
+        }
+    } else {
+        console.log("No Earth Three.js objects found.");
     }
-
+    
     scene.add(spacecraftPoints);
+    console.log("Spacecraft points added to the scene.");
 
     return spacecraftPoints;
 }
