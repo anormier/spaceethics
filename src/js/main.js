@@ -17,7 +17,9 @@ import { processSpacecraftPositionData, fetchDetailedSignalsFromDSN, augmentAndE
 // Get the Spacekit version of THREE.js.
 const THREE = Spacekit.THREE;
 
-
+// IMPORTANT: DEFAULT COORDINATE FRAME FROM SPACEKIT IS ECLIPTICHELIOCENTRIC
+// -> GAIA STARS and FAR PROBES need to be converted
+// -> SGNALS FROM DSN are converted to Eclpitic and transferred to geocentric.
 
 
 // CONSTANTS
