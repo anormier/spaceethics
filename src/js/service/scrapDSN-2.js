@@ -206,7 +206,7 @@ export async function augmentAndExportSignals() {
 // Function to convert from equatorial to ecliptic coordinates
 function equatorialToEcliptic(ra, dec) {
   // Constants for the obliquity of the ecliptic
-  const epsilon = 23.439281; // This value might change slightly over time
+  const epsilon = 0; // This value might change slightly over time
   const raRad = (ra * Math.PI) / 180;
   const decRad = (dec * Math.PI) / 180;
   const epsilonRad = (epsilon * Math.PI) / 180;

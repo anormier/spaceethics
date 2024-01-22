@@ -834,10 +834,11 @@ async function initSpacecraftPositions() {
     }
     
     // Define the obliquity of the ecliptic
-   const obliquity = 23.4 * Math.PI / 180; // Convert degrees to radians
+   const obliquity = -23.4 * Math.PI / 180; // Convert degrees to radians
+   const zRotateAdjust = -17 * Math.PI / 180
 // Rotating around the x-axis by to compensate fo
-   spacecraftPoints.rotation.x = -obliquity;
-   spacecraftPoints.rotation.z = -15* Math.PI / 180;
+   spacecraftPoints.rotation.x = obliquity;
+   spacecraftPoints.rotation.z = zRotateAdjust;
 
     scene.add(spacecraftPoints);
     console.log("Spacecraft points added to the scene.");
