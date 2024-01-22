@@ -795,55 +795,64 @@ function unloadSpacecrafts() {
 
 // SPACECRAFTS
 async function initSpacecraftPositions() {
-    const signals = await augmentAndExportSignals();
-    const spacecraftData = processSpacecraftPositionData(signals);
-  
-    // Create the points material
-    const material = new THREE.PointsMaterial({
-        color: 'green', // Pink color
-        size: 20, // Size of the dots
-        sizeAttenuation: false
-    });
+  const signals = await augmentAndExportSignals();
+  const spacecraftData = processSpacecraftPositionData(signals);
+  const material = new THREE.PointsMaterial({ color: 0x00ff00, size: 20, sizeAttenuation: false });
+  const pointsGeometry = new THREE.BufferGeometry();
+  const positions = [];
 
-    const pointsGeometry = new THREE.BufferGeometry();
-    const positions = [];
+  spacecraftData.forEach(data => {
+      if (data.r !== null && data.lambda !== null && data.beta !== null) {
+          const position = convertRaDecDistToVector3(data.lambda, data.beta, data.r);
+          positions.push(position.x, position.y, position.z);
+      }
+  });
 
-    // Convert spacecraft data to positions with respect to Earth
-    spacecraftData.forEach(data => {
-        if (data.r !== null && data.lambda !== null && data.beta !== null) {
-            const position = convertRaDecDistToVector3(data.lambda, data.beta, data.r);
-            positions.push(position.x, position.y, position.z);
-        }
-    });
+  pointsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  spacecraftPoints = new THREE.Points(pointsGeometry, material);
 
-    pointsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  // Handle Earth object positioning and rotation
+  const earthThreeJSObjects = earthV.get3jsObjects();
+  const primaryEarthObject = earthThreeJSObjects.length > 0 ? earthThreeJSObjects[0] : null;
+  if (primaryEarthObject) {
+      spacecraftPoints.position.copy(primaryEarthObject.position);
+      spacecraftPoints.rotation.x = -23.4 * Math.PI / 180;
+      spacecraftPoints.rotation.z = -50 * Math.PI / 180;
+  }
 
-    // Create the points object
-    spacecraftPoints = new THREE.Points(pointsGeometry, material);
-    const earthThreeJSObjects = earthV.get3jsObjects();
-    if (earthThreeJSObjects.length > 0) {
-        const primaryEarthObject = earthThreeJSObjects[0];
-        if (primaryEarthObject) {
-            spacecraftPoints.position.copy(primaryEarthObject.position);
-            console.log("Earth object found, setting spacecraft position relative to Earth:", primaryEarthObject.position);
-        } else {
-            console.log("Primary Earth object not found.");
-        }
-    } else {
-        console.log("No Earth Three.js objects found.");
-    }
-    
-    // Define the obliquity of the ecliptic
-   const obliquity = -23.4 * Math.PI / 180; // Convert degrees to radians
-   const zRotateAdjust = -17 * Math.PI / 180
-// Rotating around the x-axis by to compensate fo
-   spacecraftPoints.rotation.x = obliquity;
-   spacecraftPoints.rotation.z = zRotateAdjust;
+  // Add labels
+  spacecraftData.forEach(data => {
+      if (data.r !== null && data.lambda !== null && data.beta !== null) {
+          const label = createTextSprite(data.spacecraft); // Replace with correct property
+          label.position.copy(convertRaDecDistToVector3(data.lambda, data.beta, data.r));
+          spacecraftPoints.add(label);
+      }
+  });
 
-    scene.add(spacecraftPoints);
-    console.log("Spacecraft points added to the scene.");
+  scene.add(spacecraftPoints);
+  return spacecraftPoints;
+}
 
-    return spacecraftPoints;
+function createTextSprite(text) {
+  const canvas = document.createElement('canvas');
+  const context = canvas.getContext('2d');
+  context.font = '50px Arial';
+  context.fillStyle = 'white';
+  context.fillText(text, 0, 50);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.needsUpdate = true;
+
+  const spriteMaterial = new THREE.SpriteMaterial({ 
+      map: texture,
+      sizeAttenuation: false // This makes the sprite size constant
+  });
+  const sprite = new THREE.Sprite(spriteMaterial);
+
+  // Set a default scale, this will define the size of the label
+  sprite.scale.set(0.1, 0.05, 1); // Adjust these values as needed
+
+  return sprite;
 }
 
 
