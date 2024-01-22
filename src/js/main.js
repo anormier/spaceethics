@@ -796,8 +796,8 @@ async function initSpacecraftPositions() {
     // Create the points material
     const material = new THREE.PointsMaterial({
         color: 'green', // Pink color
-        size: 1, // Size of the dots
-        // sizeAttenuation: true
+        size: 20, // Size of the dots
+        sizeAttenuation: false
     });
 
     const pointsGeometry = new THREE.BufferGeometry();
