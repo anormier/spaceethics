@@ -816,8 +816,8 @@ async function initSpacecraftPositions() {
   const primaryEarthObject = earthThreeJSObjects.length > 0 ? earthThreeJSObjects[0] : null;
   if (primaryEarthObject) {
       spacecraftPoints.position.copy(primaryEarthObject.position);
+      spacecraftPoints.rotation.z = -17 * Math.PI / 180;
       spacecraftPoints.rotation.x = -23.4 * Math.PI / 180;
-      spacecraftPoints.rotation.z = -50 * Math.PI / 180;
   }
 
   // Add labels
