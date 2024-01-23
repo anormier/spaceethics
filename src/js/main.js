@@ -1144,7 +1144,12 @@ document.getElementById('live-btn').addEventListener('click', function() {
   // Set the simulation to the current time
   const now = new Date();
   viz.setDate(now);
-
+  
+  //update container
+  const navInfoContent = document.getElementById('navInfoContent');
+  navInfoContent.innerHTML = '<iframe src="https://docs.google.com/document/d/1lXWUyKpkU-a5PJhRQYRKYGFdX0TOHHr43ouzhtManao/preview" style="width:100%; height:100%; border:none;"></iframe>';
+  infoBox.style.display = 'block';
+  
   // Update the date slider to today's date
   const yearSlider = document.getElementById('year-slider');
   yearSlider.value = now.getFullYear() + (now.getMonth() / 12) + (now.getDate() / 365.25);
