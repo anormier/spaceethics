@@ -40,8 +40,8 @@
       
       <button id="screenshot-btn" class="control-btn">
         <i class="fas fa-camera"></i> 
-        <div class="dropdown-content" id="screenshot-options" style="display:none;">
-            <ul>
+        <div class="dropdown-content" id="screenshot-options" style="display:none;" onclick="event.stopPropagation();">
+          <ul>
                 <li>
                     <input type="radio" id="viewport-size" name="screenshot-size" value="viewport" checked>
                     <label for="viewport-size">Viewport</label>

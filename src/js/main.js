@@ -1216,76 +1216,90 @@ closeBtn.addEventListener('click', closeInfoBox);
 document.getElementById('fullscreen-btn').addEventListener('click', toggleFullscreen);
 
 // Screencapture
-document.getElementById('screenshot-btn').addEventListener('click', function() {
-  const renderer = viz.getRenderer();
-  const scene = viz.getScene();
-  const camera = viz.getViewer().get3jsCamera();
+// Ensuring that the screenshot is only captured when the camera button is clicked
+document.getElementById('screenshot-btn').addEventListener('click', function(event) {
+  if (event.target === this) {  // Ensuring that the event target is the button itself, not its children
+    event.stopPropagation(); // Prevent any parent handlers from being executed
 
-  if (renderer && scene && camera) {
-      // Force a render
-      renderer.render(scene, camera);
+    const renderer = viz.getRenderer();
+    const scene = viz.getScene();
+    const camera = viz.getViewer().get3jsCamera();
 
-      const canvas = renderer.domElement;
-      const image = canvas.toDataURL('image/jpeg', 1.0); // Capture the image
+    if (renderer && scene && camera) {
+        renderer.render(scene, camera); // Force a render
+        const canvas = renderer.domElement;
+        const image = canvas.toDataURL('image/jpeg', 1.0); // Capture the image
 
-      // Create a temporary link element and trigger a download
-      const link = document.createElement('a');
-      link.download = 'three-js-screenshot.jpg';
-      link.href = image;
-      link.click();
-      link.remove();
-  } else {
-      console.error('Renderer, scene, or camera not found.');
+        const link = document.createElement('a'); // Create a temporary link element
+        link.download = 'three-js-screenshot.jpg';
+        link.href = image;
+        link.click();
+        link.remove();
+    } else {
+        console.error('Renderer, scene, or camera not found.');
+    }
   }
 });
 
-// Mousover screencapture
-let dropdownTimeout;
 
+// Set up for the dropdown to show screenshot options with delay
+let dropdownTimeout;  // Variable to hold the timeout, ensuring it can be cleared if needed
+
+// Event listener for mouseover on the screenshot button
 document.getElementById('screenshot-btn').addEventListener('mouseover', function() {
+  // Clear any existing timeout to reset the timer whenever mouse re-enters
   clearTimeout(dropdownTimeout);
+  // Set the timeout to display the dropdown after 0.5 seconds of hover
   dropdownTimeout = setTimeout(() => {
-      document.getElementById('screenshot-options').style.display = 'block';
-  }, 500); // Delay set to 500 milliseconds
+    document.getElementById('screenshot-options').style.display = 'block';
+  }, 500);
 });
 
-// Change from mouseout on the button to mouseleave on the container including the dropdown
-document.getElementById('screenshot-btn').addEventListener('mouseleave', function(event) {
-    // Check if the new hover target is outside the button or the dropdown
-    if (!event.relatedTarget || 
-        (!event.relatedTarget.closest('#screenshot-btn') && !event.relatedTarget.closest('#screenshot-options'))) {
-        document.getElementById('screenshot-options').style.display = 'none';
-    }
+// Event listener for mouseout on the screenshot button
+document.getElementById('screenshot-btn').addEventListener('mouseout', function(event) {
+  // Check if the new hover target is outside the button or the dropdown
+  if (!event.relatedTarget || 
+      (!event.relatedTarget.closest('#screenshot-btn') && !event.relatedTarget.closest('#screenshot-options'))) {
+    clearTimeout(dropdownTimeout);  // Clear the timeout to prevent showing dropdown after leaving
+    document.getElementById('screenshot-options').style.display = 'none';  // Hide dropdown immediately
+  }
 });
 
-// Add mouseover listener to the dropdown to reset the timeout when hovered
+// Add similar listeners to the dropdown to handle mouse leaving directly from the dropdown
 document.getElementById('screenshot-options').addEventListener('mouseover', function() {
-    clearTimeout(dropdownTimeout);
+  clearTimeout(dropdownTimeout);  // Prevent the dropdown from hiding when hovered over
 });
 
-// Add mouseleave listener to the dropdown to hide it when the mouse leaves
-document.getElementById('screenshot-options').addEventListener('mouseleave', function() {
-    document.getElementById('screenshot-options').style.display = 'none';
+document.getElementById('screenshot-options').addEventListener('mouseout', function(event) {
+  // Immediate hide if the mouse leaves the dropdown and not entering the button again
+  if (!event.relatedTarget || 
+      (!event.relatedTarget.closest('#screenshot-btn') && !event.relatedTarget.closest('#screenshot-options'))) {
+    document.getElementById('screenshot-options').style.display = 'none';  // Hide dropdown immediately
+  }
 });
 
-// Event listener for custom size toggle
+// Toggle display of custom size inputs based on selection
 document.getElementById('custom-size').addEventListener('change', function() {
   const isChecked = document.getElementById('custom-size').checked;
   document.getElementById('custom-size-options').style.display = isChecked ? 'block' : 'none';
 });
 
-// Functionality for capturing screenshot
+// Monitor changes in the screenshot size options and log dimensions if custom size is selected
 document.querySelectorAll('input[name="screenshot-size"]').forEach(input => {
   input.addEventListener('change', function(event) {
-      if (event.target.value === 'viewport') {
-          // Implement viewport screenshot functionality
-      } else if (event.target.value === 'custom') {
-          // Implement custom size screenshot functionality
-          const width = document.getElementById('custom-width').value;
-          const height = document.getElementById('custom-height').value;
-          console.log(`Custom dimensions: ${width}x${height}`);
-      } else if (event.target.value === 'svg') {
-          // Implement SVG export functionality
+      switch (event.target.value) {
+          case 'viewport':
+              // Logic for viewport size screenshot
+              break;
+          case 'custom':
+              // Logic for custom size screenshot
+              const width = document.getElementById('custom-width').value;
+              const height = document.getElementById('custom-height').value;
+              console.log(`Custom dimensions: ${width}x${height}`);
+              break;
+          case 'svg':
+              // Logic for SVG export
+              break;
       }
   });
 });
