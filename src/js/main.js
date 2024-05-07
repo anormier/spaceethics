@@ -1147,7 +1147,7 @@ document.getElementById('live-btn').addEventListener('click', function() {
   
   //update container
   const navInfoContent = document.getElementById('navInfoContent');
-  navInfoContent.innerHTML = '<iframe src="https://docs.google.com/document/d/1lXWUyKpkU-a5PJhRQYRKYGFdX0TOHHr43ouzhtManao/preview" style="width:100%; height:100%; border:none;"></iframe>';
+  navInfoContent.innerHTML = '<iframe src="https://docs.google.com/document/d/1sOsycn0026lo6qcvGRsMKqHv_iOVoeimZvWOVdNVxP0/preview" style="width:100%; height:100%; border:none;"></iframe>';
   infoBox.style.display = 'block';
   
   // Update the date slider to today's date
