@@ -36,11 +36,33 @@
           <i class="fas fa-expand"></i>
         </button>
 
-        <button id="screenshot-btn" class="control-btn">
-          <i class="fas fa-camera"></i>
-      </button>
       
       
+      <button id="screenshot-btn" class="control-btn">
+        <i class="fas fa-camera"></i> 
+        <div class="dropdown-content" id="screenshot-options" style="display:none;">
+            <ul>
+                <li>
+                    <input type="radio" id="viewport-size" name="screenshot-size" value="viewport" checked>
+                    <label for="viewport-size">Viewport</label>
+                </li>
+                <li>
+                    <input type="radio" id="custom-size" name="screenshot-size" value="custom">
+                    <label for="custom-size">Custom Size</label>
+                    <!-- Hidden custom size inputs -->
+                    <div id="custom-size-options" style="display:none;">
+                        <input type="number" id="custom-width" placeholder="Width (px)" value="1920">
+                        <input type="number" id="custom-height" placeholder="Height (px)" value="1080">
+                    </div>
+                </li>
+                <li>
+                    <input type="radio" id="vector-format" name="screenshot-size" value="svg">
+                    <label for="vector-format">SVG</label>
+                </li>
+            </ul>
+        </div>
+    </button>
+    
      
 
       </div>       <br />

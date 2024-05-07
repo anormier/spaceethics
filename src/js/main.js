@@ -1239,6 +1239,57 @@ document.getElementById('screenshot-btn').addEventListener('click', function() {
   }
 });
 
+// Mousover screencapture
+let dropdownTimeout;
+
+document.getElementById('screenshot-btn').addEventListener('mouseover', function() {
+  clearTimeout(dropdownTimeout);
+  dropdownTimeout = setTimeout(() => {
+      document.getElementById('screenshot-options').style.display = 'block';
+  }, 500); // Delay set to 500 milliseconds
+});
+
+// Change from mouseout on the button to mouseleave on the container including the dropdown
+document.getElementById('screenshot-btn').addEventListener('mouseleave', function(event) {
+    // Check if the new hover target is outside the button or the dropdown
+    if (!event.relatedTarget || 
+        (!event.relatedTarget.closest('#screenshot-btn') && !event.relatedTarget.closest('#screenshot-options'))) {
+        document.getElementById('screenshot-options').style.display = 'none';
+    }
+});
+
+// Add mouseover listener to the dropdown to reset the timeout when hovered
+document.getElementById('screenshot-options').addEventListener('mouseover', function() {
+    clearTimeout(dropdownTimeout);
+});
+
+// Add mouseleave listener to the dropdown to hide it when the mouse leaves
+document.getElementById('screenshot-options').addEventListener('mouseleave', function() {
+    document.getElementById('screenshot-options').style.display = 'none';
+});
+
+// Event listener for custom size toggle
+document.getElementById('custom-size').addEventListener('change', function() {
+  const isChecked = document.getElementById('custom-size').checked;
+  document.getElementById('custom-size-options').style.display = isChecked ? 'block' : 'none';
+});
+
+// Functionality for capturing screenshot
+document.querySelectorAll('input[name="screenshot-size"]').forEach(input => {
+  input.addEventListener('change', function(event) {
+      if (event.target.value === 'viewport') {
+          // Implement viewport screenshot functionality
+      } else if (event.target.value === 'custom') {
+          // Implement custom size screenshot functionality
+          const width = document.getElementById('custom-width').value;
+          const height = document.getElementById('custom-height').value;
+          console.log(`Custom dimensions: ${width}x${height}`);
+      } else if (event.target.value === 'svg') {
+          // Implement SVG export functionality
+      }
+  });
+});
+
 
 // FUNCTION: PLACE OBJECTS
 // Global storage for object groups
