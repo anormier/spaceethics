@@ -1217,6 +1217,7 @@ document.getElementById('fullscreen-btn').addEventListener('click', toggleFullsc
 
 // Screencapture
 // Ensuring that the screenshot is only captured when the camera button is clicked
+// Ensuring that the screenshot is only captured when the camera button is clicked
 document.getElementById('screenshot-btn').addEventListener('click', function(event) {
   if (event.target === this) {  // Ensuring that the event target is the button itself, not its children
     event.stopPropagation(); // Prevent any parent handlers from being executed
@@ -1224,6 +1225,15 @@ document.getElementById('screenshot-btn').addEventListener('click', function(eve
     const renderer = viz.getRenderer();
     const scene = viz.getScene();
     const camera = viz.getViewer().get3jsCamera();
+
+    // Check if custom size is selected and adjust renderer size accordingly
+    if (document.getElementById('custom-size').checked) {
+      const width = parseInt(document.getElementById('custom-width').value, 10);
+      const height = parseInt(document.getElementById('custom-height').value, 10);
+      renderer.setSize(width, height);  // Set renderer to custom size
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+    }
 
     if (renderer && scene && camera) {
         renderer.render(scene, camera); // Force a render
@@ -1235,11 +1245,19 @@ document.getElementById('screenshot-btn').addEventListener('click', function(eve
         link.href = image;
         link.click();
         link.remove();
+
+        // Reset renderer size to default if custom size was used
+        if (document.getElementById('custom-size').checked) {
+          renderer.setSize(window.innerWidth, window.innerHeight);  // Reset to viewport size
+          camera.aspect = window.innerWidth / window.innerHeight;
+          camera.updateProjectionMatrix();
+        }
     } else {
         console.error('Renderer, scene, or camera not found.');
     }
   }
 });
+
 
 
 // Set up for the dropdown to show screenshot options with delay
