@@ -1215,6 +1215,29 @@ closeBtn.addEventListener('click', closeInfoBox);
 // Fullscreen mode
 document.getElementById('fullscreen-btn').addEventListener('click', toggleFullscreen);
 
+// Screencapture
+document.getElementById('screenshot-btn').addEventListener('click', function() {
+  const renderer = viz.getRenderer();
+  const scene = viz.getScene();
+  const camera = viz.getViewer().get3jsCamera();
+
+  if (renderer && scene && camera) {
+      // Force a render
+      renderer.render(scene, camera);
+
+      const canvas = renderer.domElement;
+      const image = canvas.toDataURL('image/jpeg', 1.0); // Capture the image
+
+      // Create a temporary link element and trigger a download
+      const link = document.createElement('a');
+      link.download = 'three-js-screenshot.jpg';
+      link.href = image;
+      link.click();
+      link.remove();
+  } else {
+      console.error('Renderer, scene, or camera not found.');
+  }
+});
 
 
 // FUNCTION: PLACE OBJECTS
