@@ -88,27 +88,37 @@ camera.addEventListener('change', function() {
 });
 
 
-// Milkyway model
-// Load the Milky Way Image as a Texture
+// Milkyway model// Milkyway model
+// Variables
 const textureLoader = new THREE.TextureLoader();
 const milkyWayTexture = textureLoader.load('https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Milky_Way_Galaxy.jpg/768px-Milky_Way_Galaxy.jpg');
 
 const a = 100; // Base width of the triangle
 const c = 1;   // Thickness for the disk
+const numPoints = 500000; // Adjust as needed for disk and bulge
+const brownianScaleFactor = 10000; // Scale factor for Brownian movement
+const brownianSpeedFactor = 0.000001; // Speed factor for Brownian movement
+const rotationalSpeedFactor = 0.0000000000001; // Speed factor for rotational movement
+const sunEarthDistance = 27000 * 63241; // Distance from the center of the galaxy to Sun/Earth in AU
 
+const Mra = (17 + (45 / 60) + (40.0409 / 3600)) * 15; // RA in degrees
+const Mdec = -29 - (0 / 60) - (28.118 / 3600); // Dec in degrees
+const Mdistance = 26 * 1000 * 63241; // Assuming a scaled distance, not actual light-years
 
+// Utility function
+function arrayToVector3(array) {
+    return new THREE.Vector3(array[0], array[1], array[2]);
+}
+
+// Add points for the triangular disk
 const points = [];
-const numPoints = 1000000; // Adjust as needed for disk and bulge
 
-// Function to add points for the triangular disk
 function addTriangularDiskPoints(num) {
     for (let i = 0; i < num; i++) {
         const z = (Math.random() - 0.5) * 2 * c; // Random z within the thickness
         const maxRadiusAtZ = (1 - Math.abs(z) / c) * a / 2; // Radius decreases with z
-
         const r = Math.sqrt(Math.random()) * maxRadiusAtZ; // Random radius, sqrt for density
         const theta = Math.random() * 2 * Math.PI; // Random angle
-
         const x = r * Math.cos(theta);
         const y = r * Math.sin(theta);
 
@@ -116,8 +126,6 @@ function addTriangularDiskPoints(num) {
     }
 }
 
-
-// Add points to the geometry
 addTriangularDiskPoints(numPoints * 0.8); // 80% of points for the disk
 
 const geometry = new THREE.BufferGeometry().setFromPoints(points);
@@ -136,11 +144,8 @@ const fragmentShader = `
     varying vec3 vPosition;
 
     void main() {
-        // Project the texture from above onto the x-y plane
-        // Normalize the x and y coordinates to the range [0, 1]
         float u = (vPosition.x / (2.0 * 65.0)) + 0.5; // Assuming 'a' is 100, as per your ellipsoid size
         float v = (vPosition.y / (2.0 * 65.0)) + 0.5; // Assuming 'b' is 100, as per your ellipsoid size
-
         gl_FragColor = texture2D(texture, vec2(u, v));
     }
 `;
@@ -154,56 +159,66 @@ const material = new THREE.ShaderMaterial({
     transparent: true
 });
 
-// Create and Add the Point Cloud to the Scene
 const milkyWayModel = new THREE.Points(geometry, material);
 scene.add(milkyWayModel);
 
-// Sagittarius A* coordinates
-// Convert Right Ascension from hours to degrees // 1 hour = 15 degrees
-const Mra = (17 + (45 / 60) + (40.0409 / 3600)) * 15; // RA in degrees
-// Declination is already in degrees
-const Mdec = -29 - (0 / 60) - (28.118 / 3600); // Dec in degrees
-const Mdistance = 26*1000*63241; // Assuming a scaled distance, not actual light-years
-
-// Calculate RA and Dec in radians directly from degrees
 const raInRadians = Mra * (Math.PI / 180); // RA in degrees to radians
 const decInRadians = Mdec * (Math.PI / 180); // Dec in degrees to radians
-const inclinationAngle = Mdec * (Math.PI / 180)
-function arrayToVector3(array) {
-  return new THREE.Vector3(array[0], array[1], array[2]);
-}
+const inclinationAngle = Mdec * (Math.PI / 180);
+
 const sgrAPositionArray = radecToXYZ(Mra, Mdec, Mdistance);
 const sgrAPosition = arrayToVector3(sgrAPositionArray);
 
-// Now sgrAPosition is a THREE.Vector3 object
-
-// Assuming milkyWayModel and sgrAPosition are defined earlier
-
-// Add AxesHelper to visualize orientation
 const axesHelper = new THREE.AxesHelper(5);
-// Red represents the X-axis.
-// Green represents the Y-axis.
-// Blue represents the Z-axis.
 milkyWayModel.add(axesHelper);
 
-// Reset milkyWayModel rotation
 milkyWayModel.rotation.set(0, 0, 0);
+milkyWayModel.rotateOnAxis(new THREE.Vector3(0, 1, 0), raInRadians);
+milkyWayModel.rotateOnAxis(new THREE.Vector3(0, 0, 1), decInRadians);
 
-// Apply rotations
-milkyWayModel.rotateOnAxis(new THREE.Vector3(0, 1, 0), raInRadians); // Rotate around Y-axis
-milkyWayModel.rotateOnAxis(new THREE.Vector3(0, 0, 1), decInRadians); // Rotate around Z-axis
-
-// Calculate the rotation axis from the scene center to Sagittarius A*
-const rotationAxis = new THREE.Vector3().subVectors( new THREE.Vector3(0, 0, 0),sgrAPosition).normalize();
-
-// Apply the rotation around the calculated axis
+const rotationAxis = new THREE.Vector3().subVectors(new THREE.Vector3(0, 0, 0), sgrAPosition).normalize();
 milkyWayModel.rotateOnAxis(rotationAxis, inclinationAngle);
 
-// Translate the model towards Sagittarius A*
-// It's important to apply this after rotation to ensure the model's orientation remains consistent
 milkyWayModel.position.set(sgrAPosition.x, sgrAPosition.y, sgrAPosition.z);
+milkyWayModel.scale.set(1000 * 63241, 1000 * 63241, 1000 * 63241);
 
-milkyWayModel.scale.set(1000*63241, 1000*63241, 1000*63241);
+// Add Brownian movement and rotational movement
+function animate() {
+    requestAnimationFrame(animate);
+    
+    const positions = geometry.attributes.position.array;
+    const time = Date.now() * 0.001;
+
+    for (let i = 0; i < positions.length; i += 3) {
+        // Brownian movement
+        positions[i] += (Math.random() - 0.5) * brownianScaleFactor * brownianSpeedFactor;
+        positions[i + 1] += (Math.random() - 0.5) * brownianScaleFactor * brownianSpeedFactor;
+        positions[i + 2] += (Math.random() - 0.5) * brownianScaleFactor * brownianSpeedFactor;
+
+        // Rotational movement around the Milky Way axis
+        const vertex = new THREE.Vector3(positions[i], positions[i + 1], positions[i + 2]);
+        const distanceFromCenter = vertex.distanceTo(sgrAPosition);
+        const distanceFromSun = vertex.distanceTo(new THREE.Vector3(0, 0, 0));
+        const rotationalSpeed = distanceFromSun === sunEarthDistance ? 0 : rotationalSpeedFactor * (sunEarthDistance - distanceFromSun) / sunEarthDistance;
+        const angle = rotationalSpeed * time;
+        const cosAngle = Math.cos(angle);
+        const sinAngle = Math.sin(angle);
+
+        // Apply rotation around Z-axis (Milky Way axis)
+        const newX = vertex.x * cosAngle - vertex.y * sinAngle;
+        const newY = vertex.x * sinAngle + vertex.y * cosAngle;
+
+        positions[i] = newX;
+        positions[i + 1] = newY;
+    }
+
+    geometry.attributes.position.needsUpdate = true;
+
+    renderer.render(scene, camera);
+}
+
+animate();
+
 
 
 // Ensure the camera is positioned and pointed to view the model correctly
