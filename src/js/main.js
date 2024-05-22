@@ -1110,6 +1110,7 @@ function setupButton(id, obj1, params1, zoom1, obj2, params2, zoom2) {
 }
 
 // Assign actions to buttons
+setupButton("btn-Milkyway", sun, [1, 2, 1], 300000000);
 setupButton("btn-Messages", sun, [1, 2, 1], 3000000);
 setupButton("btn-far", sun, [2, 2, 2], 150);
 setupButton("btn-system",sun, [2, 2, 2], 2);
