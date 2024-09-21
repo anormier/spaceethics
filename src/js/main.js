@@ -29,6 +29,7 @@ const THREE = Spacekit.THREE;
 const LY_TO_AU = 63241.16; 
 let autoAdjustSpeed = true;
 let manIcon = document.getElementById("man-icon");
+const isLowPerformance = isMobile() || !isDesktop();
 
 
 document.addEventListener("DOMContentLoaded", async function(){
@@ -182,42 +183,44 @@ milkyWayModel.rotateOnAxis(rotationAxis, inclinationAngle);
 milkyWayModel.position.set(sgrAPosition.x, sgrAPosition.y, sgrAPosition.z);
 milkyWayModel.scale.set(1000 * 63241, 1000 * 63241, 1000 * 63241);
 
-// Add Brownian movement and rotational movement
+// Add Brownian movement and rotational movementfor Hi perf
 function animate() {
-    requestAnimationFrame(animate);
-    
-    const positions = geometry.attributes.position.array;
-    const time = Date.now() * 0.001;
+  requestAnimationFrame(animate);
 
-    for (let i = 0; i < positions.length; i += 3) {
-        // Brownian movement
-        positions[i] += (Math.random() - 0.5) * brownianScaleFactor * brownianSpeedFactor;
-        positions[i + 1] += (Math.random() - 0.5) * brownianScaleFactor * brownianSpeedFactor;
-        positions[i + 2] += (Math.random() - 0.5) * brownianScaleFactor * brownianSpeedFactor;
+  // Skip star movements for low-performance devices
+  if (!isLowPerformance) {
+      const positions = geometry.attributes.position.array;
+      const time = Date.now() * 0.001;
 
-        // Rotational movement around the Milky Way axis
-        const vertex = new THREE.Vector3(positions[i], positions[i + 1], positions[i + 2]);
-        const distanceFromCenter = vertex.distanceTo(sgrAPosition);
-        const distanceFromSun = vertex.distanceTo(new THREE.Vector3(0, 0, 0));
-        const rotationalSpeed = distanceFromSun === sunEarthDistance ? 0 : rotationalSpeedFactor * (sunEarthDistance - distanceFromSun) / sunEarthDistance;
-        const angle = rotationalSpeed * time;
-        const cosAngle = Math.cos(angle);
-        const sinAngle = Math.sin(angle);
+      for (let i = 0; i < positions.length; i += 3) {
+          // Brownian movement
+          positions[i] += (Math.random() - 0.5) * brownianScaleFactor * brownianSpeedFactor;
+          positions[i + 1] += (Math.random() - 0.5) * brownianScaleFactor * brownianSpeedFactor;
+          positions[i + 2] += (Math.random() - 0.5) * brownianScaleFactor * brownianSpeedFactor;
 
-        // Apply rotation around Z-axis (Milky Way axis)
-        const newX = vertex.x * cosAngle - vertex.y * sinAngle;
-        const newY = vertex.x * sinAngle + vertex.y * cosAngle;
+          // Rotational movement around the Milky Way axis
+          const vertex = new THREE.Vector3(positions[i], positions[i + 1], positions[i + 2]);
+          const distanceFromCenter = vertex.distanceTo(sgrAPosition);
+          const distanceFromSun = vertex.distanceTo(new THREE.Vector3(0, 0, 0));
+          const rotationalSpeed = distanceFromSun === sunEarthDistance ? 0 : rotationalSpeedFactor * (sunEarthDistance - distanceFromSun) / sunEarthDistance;
+          const angle = rotationalSpeed * time;
+          const cosAngle = Math.cos(angle);
+          const sinAngle = Math.sin(angle);
 
-        positions[i] = newX;
-        positions[i + 1] = newY;
-    }
+          // Apply rotation around Z-axis (Milky Way axis)
+          const newX = vertex.x * cosAngle - vertex.y * sinAngle;
+          const newY = vertex.x * sinAngle + vertex.y * cosAngle;
 
-    geometry.attributes.position.needsUpdate = true;
+          positions[i] = newX;
+          positions[i + 1] = newY;
+      }
 
-    renderer.render(scene, camera);
+      geometry.attributes.position.needsUpdate = true;
+  }
+
+  renderer.render(scene, camera);
 }
 
-animate();
 
 
 
