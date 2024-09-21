@@ -1159,48 +1159,48 @@ startStopButton.onclick = function() {
 };
 
 
-document.getElementById('live-btn').addEventListener('click', function() {
-  // Set the simulation to the current time
-  const now = new Date();
-  viz.setDate(now);
+// document.getElementById('live-btn').addEventListener('click', function() {
+//   // Set the simulation to the current time
+//   const now = new Date();
+//   viz.setDate(now);
   
-  //update container
-  const navInfoContent = document.getElementById('info-box');
-  navInfoContent.innerHTML = '<iframe src="https://docs.google.com/presentation/d/e/2PACX-1vQl4eIl13VOA0v8Ip09VVW6y9GuvJUz4rZfYNIK-KonIPD4eSIppG3uSF1tYL86Y24WGcu46LmcwsuU/embed?start=true&loop=true&delayms=3000&rm=minimal" frameborder="0" width="300" height="200" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>';
-  infoBox.style.display = 'block';
+//   //update container
+//   const navInfoContent = document.getElementById('info-box');
+//   navInfoContent.innerHTML = '<iframe src="https://docs.google.com/presentation/d/e/2PACX-1vQl4eIl13VOA0v8Ip09VVW6y9GuvJUz4rZfYNIK-KonIPD4eSIppG3uSF1tYL86Y24WGcu46LmcwsuU/embed?start=true&loop=true&delayms=3000&rm=minimal" frameborder="0" width="300" height="200" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>';
+//   infoBox.style.display = 'block';
   
-  // Update the date slider to today's date
-  const yearSlider = document.getElementById('year-slider');
-  yearSlider.value = now.getFullYear() + (now.getMonth() / 12) + (now.getDate() / 365.25);
+//   // Update the date slider to today's date
+//   const yearSlider = document.getElementById('year-slider');
+//   yearSlider.value = now.getFullYear() + (now.getMonth() / 12) + (now.getDate() / 365.25);
 
-  // Set the simulation speed to real-time pace (1 second per simulation second)
-  const realTimeSpeed = 1/86400; // 1 Julian Day per real-time day
-  autoAdjustSpeed = false; // Disable auto speed adjustment
-  viz.setJdPerSecond(realTimeSpeed); // Set the simulation to real-time speed
+//   // Set the simulation speed to real-time pace (1 second per simulation second)
+//   const realTimeSpeed = 1/86400; // 1 Julian Day per real-time day
+//   autoAdjustSpeed = false; // Disable auto speed adjustment
+//   viz.setJdPerSecond(realTimeSpeed); // Set the simulation to real-time speed
 
-  // Manually update the speed display and slider since autoAdjustSpeed is off
-  updateSpeedDisplay(realTimeSpeed);
-  const speedFactor = realTimeSpeed / initialSpeed;
-  speedSlider.value = Math.log10(speedFactor);
+//   // Manually update the speed display and slider since autoAdjustSpeed is off
+//   updateSpeedDisplay(realTimeSpeed);
+//   const speedFactor = realTimeSpeed / initialSpeed;
+//   speedSlider.value = Math.log10(speedFactor);
 
-  // Load the spacecrafts
-  loadSpacecrafts(); // Assuming this function handles the loading of spacecrafts
+//   // Load the spacecrafts
+//   loadSpacecrafts(); // Assuming this function handles the loading of spacecrafts
 
-  // Ensure the play/pause button is set to show 'Play'
-  const startIcon = document.getElementById('start-icon');
-  const pauseIcon = document.getElementById('pause-icon');
-  startIcon.style.display = 'none';
-  pauseIcon.style.display = 'inline-block';
+//   // Ensure the play/pause button is set to show 'Play'
+//   const startIcon = document.getElementById('start-icon');
+//   const pauseIcon = document.getElementById('pause-icon');
+//   startIcon.style.display = 'none';
+//   pauseIcon.style.display = 'inline-block';
   
-  // Ensure the simulation is set to play
+//   // Ensure the simulation is set to play
 
-  if (isPaused) {
-    viz.start();
-    startIcon.style.display = "none";
-    pauseIcon.style.display = "inline-block";
-    isPaused = false; // Ensure isPaused is synchronized
-}
-});
+//   if (isPaused) {
+//     viz.start();
+//     startIcon.style.display = "none";
+//     pauseIcon.style.display = "inline-block";
+//     isPaused = false; // Ensure isPaused is synchronized
+// }
+// });
 
 // UI ELEMENTS III info Box, nav buttons
 const infoBox = document.getElementById('info-box');
