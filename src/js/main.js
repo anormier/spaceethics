@@ -1207,6 +1207,8 @@ const infoBox = document.getElementById('info-box');
 const closeBtn = document.getElementById('close-btn');
 
 const showInfoOnClick = (event) => {
+  return; // (Add this line to disable the info box temporarily)
+
   if (navInfo[event.target.id]) {
       const navInfoContent = document.getElementById('navInfoContent');
       navInfoContent.textContent = navInfo[event.target.id];
