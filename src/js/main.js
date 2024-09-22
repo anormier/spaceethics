@@ -3,13 +3,13 @@
 import { updateVisibility, checkIfVisible, radecToXYZ, isDesktop, toggleFullscreen, updateInfoBox,isMobile } from "./service/utils.js";
 import { distToCam } from './service/simCalc.js'; 
 
-import allObjects from "./data/spatial-objects.js";
+import allObjects from "./data/spatial-objects.js";//those are the satellites
 import modifiedStars100LY3K45K from "./data/stars100LY3K45K.js";
 import stars100LY45K6K from "./data/stars100LY45K6K.js";
 import stars100LY6Kmore from "./data/stars100LY6Kmore.js";
 import {updatedMessages, allMessages} from "./data/messages.js";
-import allVoyagers from "./data/voyagers.js";
-import famousStars from "./data/famousStars.js";
+import allVoyagers from "./data/voyagers.js"; //those are the far probes
+import famousStars from "./data/famousStars.js"; //named stars
 import {navInfo,password} from './textContents.js';
 import { processSpacecraftPositionData, fetchDetailedSignalsFromDSN, augmentAndExportSignals } from './service/scrapDSN-2.js';
 
@@ -408,7 +408,7 @@ if (distanceToSunInAU < 2) {
     // Adjust the camera settings as needed for distances > 100 light years.
     // This is just a placeholder. Adjust as per your requirement.
     camera.near = 1000000;
-    camera.far = 10e9;
+    camera.far = 10e10;
 }
 
   camera.updateProjectionMatrix(); //needed after update of camera near:far
@@ -494,12 +494,16 @@ if (!isMobile()) {
     } else {
 
         unloadAllObjects();
+        allObjects.forEach((point) => {
+          point.visible = false;
+          viz.removeObject(point.newObject);
+          });
         // placeSpaceKitObject(famousStars, dateInMilliseconds, './assets/symbols/Red_Circle_full.png');
         setPlanetLabelsVisible(false);  
     }
 
   } else {
-    
+    // man related objects: load unload
     allObjects.forEach((point) => {
       point.visible = false;
       viz.removeObject(point.newObject);
