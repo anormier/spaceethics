@@ -52,6 +52,7 @@ try {
 }
 
 
+
 //INIT SIM
 const viz = new Spacekit.Simulation(document.getElementById("main-container"), {
   basePath: "https://typpo.github.io/spacekit/src",

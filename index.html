@@ -14,7 +14,8 @@
     </script>  </head>
 <body>
  
-  
+
+
     <div class="sim-info ui-interface">
       <br />
       <input type="range" id="year-slider" min="1950" max="2029" value="2023" step="0.1" />
@@ -184,6 +185,18 @@
     </div>
 
     <div id="main-container"> </div>
+
+<!-- LIGHTBOX CALL TO SIGN OPEN LETTER -->
+<div id="lightbox" class="lightbox" style="display:none;">
+  <div class="lightbox-content">
+      <h2>Opt-in to be amongst the first to co-endorse!</h2>
+      <p>Let’s responsibly handle our Cosmic Footprint!</p>
+      <img src="assets/callToAction.png" alt="Call to Action" style="width: 100%; height: auto;">
+      <button onclick="openForm()" class="lightbox-button">Review Now</button>
+      <button onclick="closeLightbox()" class="lightbox-button close">Close</button>
+  </div>
+</div>
+
     <script src="src/js/main.js" type="module"></script>
     <script>
       document.addEventListener("DOMContentLoaded", function() {
@@ -200,6 +213,30 @@
           }
         });
       });
+ <!-- LIGHTBOX SCRIPT TO SIGN OPEN LETTER -->
+      window.onload = function() {
+      console.log("Page has fully loaded. Waiting to show the lightbox...");
+      setTimeout(function() {
+          console.log("Showing the lightbox now.");
+          document.getElementById('lightbox').style.display = 'flex';
+      }, 30000); // 2 seconds delay before showing the lightbox
+  }
+  
+  function openForm() {
+      console.log("Open Form button clicked");
+      window.open('https://docs.google.com/forms/d/e/1FAIpQLSeyJaVrcf4kKUvSLm7GixTwknQPM9kfDXeZn9TA84jrlHyrEw/viewform', '_blank');
+  }
+  
+  function closeLightbox() {
+      console.log("Close button clicked");
+      document.getElementById('lightbox').style.display = 'none';
+  }
+  
     </script>
+
+  
+
 </body>
+
+
 </html>
