@@ -494,7 +494,7 @@ if (!isMobile()) {
     } else {
 
         unloadAllObjects();
-        placeSpaceKitObject(famousStars, dateInMilliseconds, './assets/symbols/Red_Circle_full.png');
+        // placeSpaceKitObject(famousStars, dateInMilliseconds, './assets/symbols/Red_Circle_full.png');
         setPlanetLabelsVisible(false);  
     }
 
