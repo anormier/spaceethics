@@ -61,7 +61,7 @@ const viz = new Spacekit.Simulation(document.getElementById("main-container"), {
   startPaused: false,
   renderOnlyInViewport: true,
   maxNumParticles: 2**16,
-  debugAxis: true,
+  debugAxis: false,
   camera: {
     enableDrift: false,
     initialPosition: [2, -2, 1],
@@ -170,9 +170,9 @@ const inclinationAngle = Mdec * (Math.PI / 180);
 
 const sgrAPositionArray = radecToXYZ(Mra, Mdec, Mdistance);
 const sgrAPosition = arrayToVector3(sgrAPositionArray);
-
-const axesHelper = new THREE.AxesHelper(5);
-milkyWayModel.add(axesHelper);
+// AXIS milkyway
+// const axesHelper = new THREE.AxesHelper(5);
+// milkyWayModel.add(axesHelper);
 
 milkyWayModel.rotation.set(0, 0, 0);
 milkyWayModel.rotateOnAxis(new THREE.Vector3(0, 1, 0), raInRadians);
