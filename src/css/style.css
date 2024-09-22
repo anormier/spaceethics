@@ -391,3 +391,37 @@ font-size: 16px;
 .lightbox-button.close {
   background-color: #666;
 }
+
+
+.dynamic-text {
+  position: relative;
+  background: url('/Images/ingenuity.jpg') no-repeat center center;
+  background-size: cover;
+  color: white;
+  text-align: center;
+  padding: 1rem;
+  margin-bottom: 0rem;
+  height: 25vh; /* Fixed height to 25% of the window height */
+  display: flex;
+  align-items: center; /* Center the text vertically */
+  justify-content: center; /* Center the text horizontally */
+}
+
+.dynamic-text p {
+  font-size: calc(25vh * 0.2); /* Adjust font size based on height */
+  animation: fadeInOut 10s infinite;
+  margin: 0; /* Remove default margin */
+  padding: 0; /* Remove default padding */
+  position: absolute;
+  top: 10px; /* Adjust as needed */
+  right: 10px; /* Adjust as needed */
+  z-index: 1000; /* 
+}
+
+.dynamic-text .overlay-text {
+  position: center;
+  top: 10px;
+  left: 0px;
+  font-size: 1rem;
+  font-weight: bold;
+}

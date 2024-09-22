@@ -11,10 +11,31 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
       window.axios = axios;
-    </script>  </head>
+    </script> 
+    
+    <script>
+      let phrases = ["What footprint do we want, out there?", "Should we spread life to other worlds ? Or avoid this ? How ?",
+      "How to address consequences, at the largest scales?", "Who is in charge, at the United Nations?",
+      "Shall we wave to the stars?"];
+      let phraseIndex = 0;
+
+      function switchPhrase() {
+          document.getElementById("dynamic-text").innerText = phrases[phraseIndex];
+          phraseIndex = (phraseIndex + 1) % phrases.length;
+      }
+
+      function openPage(url, isExternal) {
+          if (isExternal) {
+              window.open(url, '_blank');
+          } else {
+              window.location.href = url;
+          }
+      }
+
+      setInterval(switchPhrase, 10000);
+  </script></head>
 <body>
  
-
 
     <div class="sim-info ui-interface">
       <br />
@@ -37,8 +58,6 @@
           <i class="fas fa-expand"></i>
         </button>
 
-      
-      
       <button id="screenshot-btn" class="control-btn">
         <i class="fas fa-camera"></i> 
         <div class="dropdown-content" id="screenshot-options" style="display:none;" onclick="event.stopPropagation();">
@@ -64,8 +83,9 @@
         </div>
     </button>
     
-     
+    <br />
 
+ 
       </div>       <br />
       <span id="speed-display">Change Simulation Speed</span>
       <br />
@@ -88,6 +108,10 @@
           </div>
         </div>
       </div>
+
+
+
+  
       <div id="parameters-wrapper" style="display:none;">
         <div id="parameters-menu" class="parameters-menu">
  
@@ -172,6 +196,8 @@
       <div id="navInfoContent">
       </div> <!-- Add this -->
   </div>    <div class="Nav ui-interface">
+    <p id="dynamic-text">What will be our legacy, to the Solar System?</p>
+
       <button id="btn-earth">Earth</button>
       <button id="btn-moon">Moon</button>
       <button id="btn-mars">Mars</button>
