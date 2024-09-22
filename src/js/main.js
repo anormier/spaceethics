@@ -390,7 +390,7 @@ viz.onTick = function () {
   // Clipping plane camera RELATED TO FLICKERING/Z-FIGHTING
 if (distanceToSunInAU < 2) {
     camera.near = 0.00001; // good setting: 0.00001
-    camera.far = 10e8; // Example value
+    camera.far = 100; // Example value
 
 } else if (distanceToSunInAU <= LY_TO_AU) { // <= 100 light years = 6324110
     camera.near = 1; // good setting stars, objects and signal solar system: nea=1 far =10e8;
