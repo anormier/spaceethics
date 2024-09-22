@@ -407,7 +407,7 @@ if (distanceToSunInAU < 2) {
 } else { // > 100 light years
     // Adjust the camera settings as needed for distances > 100 light years.
     // This is just a placeholder. Adjust as per your requirement.
-    camera.near = 100000;
+    camera.near = 10000000;
     camera.far = 10e9;
 }
 
