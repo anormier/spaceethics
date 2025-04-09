@@ -1,160 +1,268 @@
 <!DOCTYPE html>
+<!-- HERE IS THE HTML FILE: read it, just return I've read --> 
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spaceship Survival Game</title>
-    <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            background: black;
-            color: white;
-            font-family: Arial, sans-serif;
-            text-align: center;
-        }
-        .hud {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            text-align: left;
-        }
-        .stars {
-            position: absolute;
-            width: 100vw;
-            height: 100vh;
-            overflow: hidden;
-        }
-        .star {
-            position: absolute;
-            width: 2px;
-            height: 2px;
-            background: white;
-            animation: moveStar linear infinite;
-        }
-        @keyframes moveStar {
-            from { transform: translateY(-100vh); }
-            to { transform: translateY(100vh); }
-        }
-        .ship {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background: white;
-            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-        }
-    </style>
-</head>
-<body>
-    <div class="stars"></div>
-    <h1>Website in construction</h1>
-    <p>How long will you survive this wait ?</p>
-
-    <div class="hud">
-        <div class="timer">Survival Time: <span id="time">0</span> s</div>
-        <div class="crash-counter" id="crash-counter" style="display:none;">Crashes: <span id="crashes">0</span></div>
-        <div class="best-time" id="best-time" style="display:none;">Best Survival: <span id="best">0</span> s</div>
-        <div class="loss-counter" id="loss-counter" style="display:none;">Sorry for your <span id="losses">0</span> loss(es)</div>
-        <div class="difficulty">Kessler Effect Multiplier: <span id="difficulty">1.0</span>x</div>
-    </div>
-    <div class="ship" id="ship"></div>
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="src/css/style.css" />
+     <script src="https://typpo.github.io/spacekit/build/spacekit.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
-        const ship = document.getElementById("ship");
-        let shipX = window.innerWidth / 2;
-        let shipY = window.innerHeight * 0.7;
-        let shipSpeed = 5;
-        let moveLeft = false, moveRight = false, moveUp = false, moveDown = false;
-        let timeSurvived = 0;
-        let bestSurvival = 0;
-        let gameRunning = true;
-        let losses = 0;
-        let difficultyMultiplier = 1.0;
-        let starSpawnRate = 200;
+      window.axios = axios;
+    </script> 
+    
+    <script>
+      let phrases = ["What footprint do we want, out there?", "Should we spread life to other worlds ? Or avoid this ? How ?",
+      "How to address consequences, at the largest scales?", "Who is in charge, at the United Nations?",
+      "Shall we wave to the stars?"];
+      let phraseIndex = 0;
 
-        document.addEventListener("keydown", (e) => {
-            if (e.key === "ArrowLeft") moveLeft = true;
-            if (e.key === "ArrowRight") moveRight = true;
-            if (e.key === "ArrowUp") moveUp = true;
-            if (e.key === "ArrowDown") moveDown = true;
+      function switchPhrase() {
+          document.getElementById("dynamic-text").innerText = phrases[phraseIndex];
+          phraseIndex = (phraseIndex + 1) % phrases.length;
+      }
+
+      function openPage(url, isExternal) {
+          if (isExternal) {
+              window.open(url, '_blank');
+          } else {
+              window.location.href = url;
+          }
+      }
+
+      setInterval(switchPhrase, 10000);
+  </script></head>
+<body>
+ 
+
+    <div class="sim-info ui-interface">
+      <br />
+      <input type="range" id="year-slider" min="1950" max="2029" value="2023" step="0.1" />
+      <span id="current-date"></span>
+      <br />
+      <br />
+      <div class="btn-container">
+        <button id="start-stop-btn" class="control-btn">
+          <i class="fas fa-pause" id="start-icon"></i>
+          <i class="fas fa-play" id="pause-icon" style="display: none;"></i>
+        </button>
+      
+        <!-- <button id="live-btn" class="control-btn">
+          <i class="fas fa-satellite-dish"></i> Live
+        </button>
+         -->
+
+        <button id="fullscreen-btn" class="fullscreen-btn" onclick="toggleFullscreen()">
+          <i class="fas fa-expand"></i>
+        </button>
+
+      <button id="screenshot-btn" class="control-btn">
+        <i class="fas fa-camera"></i> 
+        <div class="dropdown-content" id="screenshot-options" style="display:none;" onclick="event.stopPropagation();">
+          <ul>
+                <li>
+                    <input type="radio" id="viewport-size" name="screenshot-size" value="viewport" checked>
+                    <label for="viewport-size">Viewport</label>
+                </li>
+                <li>
+                    <input type="radio" id="custom-size" name="screenshot-size" value="custom">
+                    <label for="custom-size">Custom Size</label>
+                    <!-- Hidden custom size inputs -->
+                    <div id="custom-size-options" style="display:none;">
+                        <input type="number" id="custom-width" placeholder="Width (px)" value="1920">
+                        <input type="number" id="custom-height" placeholder="Height (px)" value="1080">
+                    </div>
+                </li>
+                <li>
+                    <input type="radio" id="vector-format" name="screenshot-size" value="svg">
+                    <label for="vector-format">SVG</label>
+                </li>
+            </ul>
+        </div>
+    </button>
+    
+    <br />
+
+ 
+      </div>       <br />
+      <span id="speed-display">Change Simulation Speed</span>
+      <br />
+      <div id="sunDistanceDisplay"></div>
+     
+      <div class="menu-container ui-interface">
+        More...
+        <div class="dropdown-content">
+          Ethics beyond Earth: think large
+          <a href="https://www.spaceethics.org/">Spaceethics.org</a> <br />
+          <div class="extra-info">
+            Dev: A.Normier - J.Justman - V.Nakache <br />
+            Data: <br />
+            - Manmade objects in the solar system: J. McDowell
+            - Position and proper motions of nearby stars: GAIA DR3
+            - Outbound probes: A.Normier
+            - Outbound messaging: A.Normier
+            - Lighted areas on earth: NASA
+            <a href="https://planet4589.org/space/gcat/">GCAT</a> catalog <br />
+          </div>
+        </div>
+      </div>
+
+
+
+  
+      <div id="parameters-wrapper" style="display:none;">
+        <div id="parameters-menu" class="parameters-menu">
+ 
+<a class="custom-button" href="https://spaceethics-git-dev-anormier-gmailcom.vercel.app/">CHECK PROTOTYPE STATUS</a>
+<br />
+<a class="custom-button" href="https://spaceethics.vercel.app/">BACK TO MAIN</a>        
+ <br />
+<a class="custom-button" href="https://docs.google.com/document/d/1K-XqoG3q9OVQQc-STkKvWLet1penyha8HyK0K5aL68c/edit">CHECK DO-LIST</a>
+<br />
+<input type="checkbox" id="show-planet-labels">       <br>
+
+        <label for="show-planet-labels"> -WORK IN PROGRESS -       <br>
+          show labels- </label>       <br>
+
+        <input type="range" id="speed-slider" min="-3" max="3" step="0.01" value="0"> 
+        <br />
+        SIMULATION SPEED
+        <div class="debug">
+          DEBUG:
+          <button id="info-btn" class="control-btn" onclick="toggleInfoDropdown()">
+            <i class="fas fa-info"></i>
+        </button>
+    
+                      <!-- Man Icon Button -->
+            <button id="human-icon-btn" class="control-btn" onclick="toggleManColor()">
+              <i class="fas fa-fingerprint" id="man-icon"></i>
+          </button>
+          <div id="console-output" style="border: 1px solid black; height: 150px; overflow: auto;"></div>
+          <div id="objectNameDiv">Hover over an object to see its name here.</div>
+          <div class="slider-container">
+            <div class="slider-container">
+              <input type="checkbox" id="debugAxesCheckbox">
+              <label for="debugAxesCheckbox">Show Debug Axes</label>
+          </div>
+            <input
+              type="range"
+              id="DECSLIDER"
+              min="-90"
+              max="90"
+              value="0"
+              step="0.1"
+            />
+            <div>
+              <small> Adjust Dec (-90-+90) </small>
+            </div>
+          </div>
+          <div class="slider-container">
+            <input
+              type="range"
+              id="RASLIDER"
+              min="-180"
+              max="180"
+              value="0"
+              step="0.1"
+            />
+            <div>
+              <small> Adjust Ra (-180-+180) </small>
+            </div>
+          </div>      
+      </div>
+    </div>
+  </div>
+    </div>
+
+    <div class="credits">
+      <a href="https://www.spaceethics.org/" target="_blank">
+        <img src="./assets/logos/Logo manifesto.png"/>
+      </a>
+    </div>
+    <div class="info-box ui-interface" id="info-box">
+      <strong>Selected: </strong>
+     <span id="nameSet">Placeholder Name</span>
+      <br>    <strong> Dist to Sun (at clic): </strong>:<span id="distToSun">work in progress</span>
+      <br>      <br>
+       <span id="textSet">Placeholder Text</span>
+      <br>
+      <strong>Reference:</strong> <a id="refURL" href="#" target="_blank">Placeholder URL</a>
+      <br>
+      <span class="close-btn" id="close-btn">&times;</span>  
+      <br>
+      <strong>Context: </strong>
+      <div id="navInfoContent">
+      </div> <!-- Add this -->
+  </div>    <div class="Nav ui-interface">
+    <p id="dynamic-text">What will be our legacy, to the Solar System?</p>
+
+      <button id="btn-earth">Earth</button>
+      <button id="btn-moon">Moon</button>
+      <button id="btn-mars">Mars</button>
+      <button id="btn-system">System</button>
+      <button id="btn-far">Far Probes </button>
+      <button id="btn-Messages"> Messaging </button>
+      <button id="btn-Milkyway"> Milky Way </button>
+      <button id="parameters-btn" class="control-btn">
+        <i class="fas fa-cog ui-interface"></i>
+      </button>
+    </div>
+
+    <div id="main-container"> </div>
+
+<!-- LIGHTBOX CALL TO SIGN OPEN LETTER -->
+<div id="lightbox" class="lightbox" style="display:none;">
+  <div class="lightbox-content">
+      <h2>Opt-in to be amongst the first to co-endorse!</h2>
+      <p>Let’s responsibly handle our Cosmic Footprint!</p>
+      <img src="assets/callToAction.png" alt="Call to Action" style="width: 100%; height: auto;">
+      <button onclick="openForm()" class="lightbox-button">Review Now</button>
+      <button onclick="closeLightbox()" class="lightbox-button close">Close</button>
+  </div>
+</div>
+
+    <script src="src/js/main.js" type="module"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        // Grab the parameters button by its id
+        const parametersBtn = document.getElementById("parameters-btn");
+    
+        // When the button is clicked, show the password prompt
+        parametersBtn.addEventListener("click", function() {
+          const password = prompt("Enter password to access parameters:");
+          if (password === "TEST") {
+            document.getElementById("parameters-wrapper").style.display = "block";
+          } else {
+            alert("Wrong password!");
+          }
         });
-        document.addEventListener("keyup", (e) => {
-            if (e.key === "ArrowLeft") moveLeft = false;
-            if (e.key === "ArrowRight") moveRight = false;
-            if (e.key === "ArrowUp") moveUp = false;
-            if (e.key === "ArrowDown") moveDown = false;
-        });
-
-        function moveShip() {
-            if (moveLeft) shipX -= shipSpeed;
-            if (moveRight) shipX += shipSpeed;
-            if (moveUp) shipY -= shipSpeed;
-            if (moveDown) shipY += shipSpeed;
-            ship.style.transform = `translate(${shipX}px, ${shipY}px)`;
-            requestAnimationFrame(moveShip);
-        }
-        moveShip();
-
-        function createStar() {
-            const star = document.createElement("div");
-            star.classList.add("star");
-            star.style.left = `${Math.random() * 100}vw`;
-            star.style.top = `-5px`;
-            star.style.animationDuration = `${(Math.random() * 3 + 2) / difficultyMultiplier}s`;
-            document.querySelector(".stars").appendChild(star);
-            setTimeout(() => star.remove(), 5000);
-        }
-        setInterval(() => {
-            for (let i = 0; i < Math.ceil(difficultyMultiplier); i++) {
-                createStar();
-            }
-        }, starSpawnRate);
-
-        function updateTimer() {
-            if (gameRunning) {
-                timeSurvived++;
-                difficultyMultiplier += 0.05;
-                document.getElementById("time").textContent = timeSurvived;
-                document.getElementById("difficulty").textContent = difficultyMultiplier.toFixed(1);
-            }
-        }
-        setInterval(updateTimer, 1000);
-
-        function checkCollision() {
-            if (!gameRunning) return;
-            let shipRect = ship.getBoundingClientRect();
-            document.querySelectorAll(".star").forEach(star => {
-                let starRect = star.getBoundingClientRect();
-                if (
-                    shipRect.left < starRect.right &&
-                    shipRect.right > starRect.left &&
-                    shipRect.top < starRect.bottom &&
-                    shipRect.bottom > starRect.top
-                ) {
-                    resetGame();
-                }
-            });
-        }
-        setInterval(checkCollision, 100);
-
-        function resetGame() {
-            gameRunning = false;
-            if (timeSurvived > bestSurvival) {
-                bestSurvival = timeSurvived;
-                document.getElementById("best").textContent = bestSurvival;
-                document.getElementById("best-time").style.display = "block";
-            }
-            losses++;
-            document.getElementById("losses").textContent = losses;
-            document.getElementById("loss-counter").style.display = "block";
-            
-            timeSurvived = 0;
-            difficultyMultiplier = 1.0;
-            document.getElementById("time").textContent = timeSurvived;
-            document.getElementById("difficulty").textContent = difficultyMultiplier.toFixed(1);
-            shipX = window.innerWidth / 2;
-            shipY = window.innerHeight * 0.7;
-            setTimeout(() => gameRunning = true, 3000);
-        }
+      });
+//  <!-- LIGHTBOX SCRIPT TO SIGN OPEN LETTER -->
+//       window.onload = function() {
+//       console.log("Page has fully loaded. Waiting to show the lightbox...");
+//       setTimeout(function() {
+//           console.log("Showing the lightbox now.");
+//           document.getElementById('lightbox').style.display = 'flex';
+//       }, 30000); // 2 seconds delay before showing the lightbox
+//   }
+  
+//   function openForm() {
+//       console.log("Open Form button clicked");
+//       window.open('https://docs.google.com/forms/d/e/1FAIpQLSeyJaVrcf4kKUvSLm7GixTwknQPM9kfDXeZn9TA84jrlHyrEw/viewform', '_blank');
+//   }
+  
+//   function closeLightbox() {
+//       console.log("Close button clicked");
+//       document.getElementById('lightbox').style.display = 'none';
+//   }
+  
     </script>
+
+  
+
 </body>
+
+
 </html>
