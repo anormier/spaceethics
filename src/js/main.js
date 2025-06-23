@@ -52,7 +52,6 @@ try {
 }
 
 
-
 //INIT SIM
 const viz = new Spacekit.Simulation(document.getElementById("main-container"), {
   basePath: "https://typpo.github.io/spacekit/src",
@@ -1371,6 +1370,19 @@ function setPlanetLabelsVisible(isVisible) {
   });
 }
 
-
-
+// === TOGGLE UI (U) ===
+let uiVisible = true;
+function setUIVisible(visible) {
+  uiVisible = visible;
+  document.querySelectorAll('.ui-interface').forEach(el => {
+    // On ne masque pas le bouton fullscreen
+    if (el.querySelector('#fullscreen-btn') || el.id === 'fullscreen-btn') return;
+    el.style.display = visible ? '' : 'none';
+  });
+}
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'u' || e.key === 'U') {
+    setUIVisible(!uiVisible);
+  }
+});
 });
