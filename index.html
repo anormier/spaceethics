@@ -259,8 +259,44 @@
 //   }
   
     </script>
+    <script>
+      // === UI/VIEW CONTROL VIA URL QUERY ===
+function getQueryParams() {
+  const params = {};
+  // Support both ?noUI&Mars and ?noUI=true&Mars=true
+  window.location.search.replace(/[?&]+([^=&]+)(=([^&]*))?/gi, function(m, key, _eq, value) {
+    params[decodeURIComponent(key).toLowerCase()] = value === undefined ? true : decodeURIComponent(value);
+  });
+  return params;
+}
 
-  
+function handleQueryUIAndView() {
+  const params = getQueryParams();
+  // Hide all UI if ?noUI is present (case-insensitive)
+  if ('noui' in params) {
+    document.querySelectorAll('.ui-interface, .Nav, .sim-info, .credits, .info-box').forEach(el => el.style.display = 'none');
+  }
+  // Simulate view button click if a view param is present (case-insensitive)
+  const viewButtons = ['earth', 'moon', 'mars', 'system', 'far', 'messages', 'milkyway'];
+  let triggered = false;
+  for (const view of viewButtons) {
+    if (view in params && !triggered) {
+      // Only trigger the first found view param
+      triggered = true;
+      window.addEventListener('load', function() {
+        setTimeout(function() {
+          // Try both lowercase and capitalized button IDs
+          let btn = document.getElementById('btn-' + view);
+          if (!btn) btn = document.getElementById('btn-' + view.charAt(0).toUpperCase() + view.slice(1));
+          if (btn) btn.click();
+        }, 400); // Slightly longer delay
+      });
+    }
+  }
+}
+
+document.addEventListener('DOMContentLoaded', handleQueryUIAndView);
+    </script>
 
 </body>
 
