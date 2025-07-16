@@ -82,7 +82,7 @@
       max-width: 95vw;
       width: 95vw;
       text-align: center;
-      z-index: 10;
+      z-index: 10001;
       display: none;
     }
     #orbit-overlay {
@@ -139,26 +139,52 @@
     <div id="fade-black"></div>
   </div>
   <script>
-    // Map view button names to legend text
-    const legendMap = {
-      'earth': 'Earth: Rocket launch sites (in red: light emissions). Radar/radio arrays and Kessler debris cloud: pending.',
-      'moon': 'Moon: Landed missions shown. Orbiters, rover tracks, anthropic impact craters, and exhaust plume deposits: to be added.',
-      'mars': 'Mars: Landers visible. Still missing: orbiters, crash sites, rover trails, and contamination traces.',
-      'system': 'System: Human-made objects scattered across the Solar System. The architecture of our expansion beyond Earth.',
-      'far': 'Far Probes: Voyager, Pioneer, and New Horizons—our furthest emissaries leaving the Solar System.',
-      'messages': 'Messages: Intentional signals sent into space. Includes radio beacons and interstellar messages.',
-      'milkyway': 'Milky Way: Signals in transit across the galaxy. Humanity’s voice, spreading at lightspeed.'
-    };
-    const viewOrder = ['earth','moon','mars','system','far','messages','milkyway'];
+    // Presets: contextual legends
+    const presets = [
+      {
+        name: 'Earth',
+        query: 'earth',
+        legend: 'Earth: Rocket launch sites (in red: light emissions). Radar/radio arrays and Kessler debris cloud: pending.'
+      },
+      {
+        name: 'Moon',
+        query: 'moon',
+        legend: 'Moon: Landed missions shown. Orbiters, rover tracks, anthropic impact craters, and exhaust plume deposits: to be added.'
+      },
+      {
+        name: 'Mars',
+        query: 'mars',
+        legend: 'Mars: Landers visible. Still missing: orbiters, crash sites, rover trails, and contamination traces.'
+      },
+      {
+        name: 'System',
+        query: 'system',
+        legend: 'System: Human-made objects scattered across the Solar System. The architecture of our expansion beyond Earth.'
+      },
+      {
+        name: 'Far Probes',
+        query: 'far',
+        legend: 'Far Probes: Voyager, Pioneer, and New Horizons—our furthest emissaries leaving the Solar System.'
+      },
+      {
+        name: 'Messages',
+        query: 'messages',
+        legend: 'Messages: Intentional signals sent into space. Includes radio beacons and interstellar messages.'
+      },
+      {
+        name: 'Milky Way',
+        query: 'milkyway',
+        legend: 'Milky Way: Signals in transit across the galaxy. Humanity’s voice, spreading at lightspeed.'
+      }
+    ];
     let current = 0;
     const iframe = document.getElementById('main-iframe');
     const legend = document.getElementById('legend');
     const fadeBlack = document.getElementById('fade-black');
 
     function updateLegend() {
-      const view = viewOrder[current];
-      legend.innerHTML = `<span style=\"font-size:1.1em;font-weight:bold;color:#ffb347;\">${view.charAt(0).toUpperCase()+view.slice(1)}</span><br>${legendMap[view]}`;
-      legend.style.display = '';
+      legend.innerHTML = `<span style="font-size:1.1em;font-weight:bold;color:#ffb347;">${presets[current].name}</span><br>${presets[current].legend}`;
+      legend.style.display = 'block'; // Always show legend
     }
 
     function fadeTransition(callback) {
@@ -173,18 +199,17 @@
 
     function gotoSlide(idx) {
       current = idx;
-      const view = viewOrder[current];
       fadeTransition(() => {
-        iframe.src = `index.html?${view}&noUI`;
+        iframe.src = `index.html?${presets[current].query}&noUI`;
         updateLegend();
       });
     }
 
     document.getElementById('prev-btn').onclick = function() {
-      gotoSlide((current - 1 + viewOrder.length) % viewOrder.length);
+      gotoSlide((current - 1 + presets.length) % presets.length);
     };
     document.getElementById('next-btn').onclick = function() {
-      gotoSlide((current + 1) % viewOrder.length);
+      gotoSlide((current + 1) % presets.length);
     };
 
     // Keyboard navigation
@@ -203,7 +228,7 @@
     setTimeout(() => {
       fadeBlack.classList.remove('active');
     }, 1000);
-    legend.style.display = '';
+    legend.style.display = 'block'; // Always show legend on load
   </script>
 </body>
 </html>
