@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dynamic SpaceEthics Slideshow</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: #111;
+      color: #fff;
+      font-family: 'Roboto', Arial, sans-serif;
+      overflow: hidden;
+    }
+    #slideshow-container {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #111;
+    }
+    #iframe-wrapper {
+      flex: 1 1 auto;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: visible;
+      position: relative;
+    }
+    iframe {
+      width: 100vw;
+      height: 100vw;
+      border: none;
+      background: #000;
+      display: block;
+      position: relative;
+      top: 0;
+      left: 0;
+    }
+    #controls {
+      position: absolute;
+      top: 0;
+      left: 0; right: 0;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+      pointer-events: none;
+    }
+    .arrow-btn {
+      background: rgba(0,0,0,0.7);
+      color: #fff;
+      border: none;
+      font-size: 2.5em;
+      border-radius: 50%;
+      width: 60px; height: 60px;
+      cursor: pointer;
+      pointer-events: auto;
+      transition: background 0.2s;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      margin: 0;
+    }
+    #prev-btn { left: 5px; }
+    #next-btn { right: 5px; }
+    #legend {
+      position: absolute;
+      top: 5px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.7);
+      color: #fff;
+      padding: 0.5em 1em;
+      border-radius: 1em;
+      font-size: 15px;
+      max-width: 95vw;
+      width: 95vw;
+      text-align: center;
+      z-index: 10001;
+      display: none;
+    }
+    #fade-black {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #000;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 9999;
+      transition: opacity 0.5s;
+    }
+    #fade-black.active {
+      opacity: 1;
+      pointer-events: auto;
+      transition: opacity 1s;
+    }
+  </style>
+</head>
+<body>
+  <div id="slideshow-container">
+    <div id="controls">
+      <button id="prev-btn" class="arrow-btn" title="Previous view">&#8592;</button>
+      <button id="next-btn" class="arrow-btn" title="Next view">&#8594;</button>
+    </div>
+    <div id="iframe-wrapper">
+      <iframe id="main-iframe" src="" allowfullscreen></iframe>
+    </div>
+    <div id="legend"></div>
+    <div id="fade-black"></div>
+  </div>
+  <script>
+    const GDOC_URL = "https://docs.google.com/document/d/e/2PACX-1vTm4OWSoJn0eNfgGs9SjbNf5b_-k5y83VX2QdTN_lon3nh8m7Oj5E3BXpU17-_y0VkJGH_uFLbh6CE8/pub";
+
+    // --- Simple extraction: just pull all <p> as lines ---
+    async function fetchSlidesFromSimpleGDoc(docUrl) {
+      const html = await fetch(docUrl).then(r => r.text());
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      const docContent = doc.querySelector('.doc-content');
+      if (!docContent) throw new Error('No .doc-content found');
+      const allPs = Array.from(docContent.querySelectorAll('p'));
+      const lines = allPs.map(p => p.textContent.trim()).filter(Boolean);
+      const slides = [];
+      let buffer = [];
+      for (const line of lines) {
+        buffer.push(line);
+        if (buffer.length === 4) {
+          slides.push({
+            title: buffer[0],
+            caption: buffer[1],
+            url: buffer[2],
+            fade: parseFloat(buffer[3].replace(/FadeScreen:/i, '').trim()) || 1.0
+          });
+          buffer = [];
+        }
+      }
+      if (slides.length === 0) {
+        document.body.innerHTML = '<div style="color:yellow;padding:2em;white-space:pre-wrap;">No valid slides found. Raw lines:<br><br>' +
+          lines.join('\n') + '</div>';
+        throw new Error("No valid slides parsed");
+      }
+      return slides;
+    }
+
+    // --- Slideshow logic (unchanged) ---
+    let slides = [];
+    let current = 0;
+    let iframe, legend, fadeBlack;
+
+    function updateLegend() {
+      legend.innerHTML = `<span style="font-size:1.1em;font-weight:bold;color:#ffb347;">${slides[current].title}</span><br>${slides[current].caption}`;
+      legend.style.display = 'block';
+    }
+
+    function fadeTransition(callback, fadeSec) {
+      fadeBlack.classList.add('active');
+      setTimeout(() => {
+        callback();
+        setTimeout(() => {
+          fadeBlack.classList.remove('active');
+        }, fadeSec * 1000);
+      }, 500);
+    }
+
+    function gotoSlide(idx) {
+      current = idx;
+      fadeTransition(() => {
+        iframe.src = slides[current].url;
+        updateLegend();
+      }, slides[current].fade);
+    }
+
+    function setupSlideshow() {
+      iframe = document.getElementById('main-iframe');
+      legend = document.getElementById('legend');
+      fadeBlack = document.getElementById('fade-black');
+      document.getElementById('prev-btn').onclick = function() {
+        gotoSlide((current - 1 + slides.length) % slides.length);
+      };
+      document.getElementById('next-btn').onclick = function() {
+        gotoSlide((current + 1) % slides.length);
+      };
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowLeft') document.getElementById('prev-btn').click();
+        else if (e.key === 'ArrowRight') document.getElementById('next-btn').click();
+      });
+      gotoSlide(0);
+      fadeBlack.classList.add('active');
+      setTimeout(() => {
+        fadeBlack.classList.remove('active');
+      }, 1000);
+      legend.style.display = 'block';
+    }
+
+    // --- Main ---
+    fetchSlidesFromSimpleGDoc(GDOC_URL)
+      .then(result => { slides = result; setupSlideshow(); })
+      .catch(err => {
+        document.body.innerHTML = '<div style="color:red;padding:2em;">Failed to load slideshow: ' + err + '</div>';
+      });
+  </script>
+</body>
+</html>
