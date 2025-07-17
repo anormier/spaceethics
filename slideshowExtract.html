@@ -118,6 +118,7 @@
       <iframe id="main-iframe" src="" allowfullscreen></iframe>
     </div>
     <div id="legend"></div>
+    <div id="slide-menu"></div>
     <div id="slide-source"></div>
     <div id="fade-black"></div>
   </div>
@@ -188,6 +189,32 @@
       const sourceDiv = document.getElementById('slide-source');
       let sourceHtml = s.source.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" style="color:#bbb;text-decoration:underline;">$1</a>');
       sourceDiv.innerHTML = `<span style="font-size:0.7em;color:#bbb;opacity:0.7;display:block;margin:0.7em 0 0.2em 0;text-align:center;width:100vw;">${sourceHtml}</span>`;
+
+      // Update fast-travel menu
+      const menu = document.getElementById('slide-menu');
+      menu.innerHTML = slides.map((slide, idx) =>
+        `<button class="slide-menu-btn" data-idx="${idx}" style="margin:0 0.2em 0.2em 0.2em;padding:0.2em 0.7em;font-size:0.95em;border-radius:1em;border:none;cursor:pointer;background:${idx===current?'#ffb347':'#222'};color:${idx===current?'#222':'#fff'};opacity:${idx===current?'1':'0.7'};transition:background 0.2s;">${slide.title}</button>`
+      ).join('');
+      // Add click listeners
+      Array.from(menu.querySelectorAll('.slide-menu-btn')).forEach(btn => {
+        btn.onclick = e => {
+          const idx = parseInt(btn.getAttribute('data-idx'));
+          if (!isNaN(idx) && idx !== current) gotoSlide(idx);
+        };
+      });
+      menu.style.display = 'block';
+      menu.style.position = 'absolute';
+      menu.style.top = 'auto';
+      menu.style.bottom = '3.2em';
+      menu.style.left = '50%';
+      menu.style.transform = 'translateX(-50%)';
+      menu.style.zIndex = '10003';
+      menu.style.background = 'rgba(0,0,0,0.5)';
+      menu.style.borderRadius = '1em';
+      menu.style.padding = '0.2em 0.7em';
+      menu.style.maxWidth = '98vw';
+      menu.style.overflowX = 'auto';
+      menu.style.whiteSpace = 'nowrap';
     }
 
     function fadeTransition(callback, fadeSec) {
@@ -214,15 +241,19 @@
           img = document.createElement('img');
           img.id = 'slide-img';
           img.src = s.url;
-          img.style.maxWidth = '95vw';
-          img.style.maxHeight = '90vh';
+          img.alt = s.title;
           img.style.display = 'block';
-          img.style.margin = '0 auto';
           img.style.position = 'absolute';
           img.style.top = '50%';
           img.style.left = '50%';
           img.style.transform = 'translate(-50%, -50%)';
           img.style.boxShadow = '0 0 40px #000a';
+          img.style.maxWidth = '98vw';
+          img.style.maxHeight = '92vh';
+          img.style.width = 'auto';
+          img.style.height = 'auto';
+          img.style.objectFit = 'contain';
+          img.style.background = '#111';
           document.getElementById('iframe-wrapper').appendChild(img);
         } else {
           // Show as iframe
