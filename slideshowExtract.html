@@ -118,12 +118,13 @@
       <iframe id="main-iframe" src="" allowfullscreen></iframe>
     </div>
     <div id="legend"></div>
+    <div id="slide-source"></div>
     <div id="fade-black"></div>
   </div>
   <script>
     const GDOC_URL = "https://docs.google.com/document/d/e/2PACX-1vTm4OWSoJn0eNfgGs9SjbNf5b_-k5y83VX2QdTN_lon3nh8m7Oj5E3BXpU17-_y0VkJGH_uFLbh6CE8/pub";
 
-    // --- Simple extraction: just pull all <p> as lines ---
+    // --- Extraction: 5-line blocks with field prefixes, support inline images or iframe URLs ---
     async function fetchSlidesFromSimpleGDoc(docUrl) {
       const html = await fetch(docUrl).then(r => r.text());
       const parser = new DOMParser();
@@ -131,37 +132,60 @@
       const docContent = doc.querySelector('.doc-content');
       if (!docContent) throw new Error('No .doc-content found');
       const allPs = Array.from(docContent.querySelectorAll('p'));
-      const lines = allPs.map(p => p.textContent.trim()).filter(Boolean);
+      // Remove empty <p> unless it contains an image
+      const ps = allPs.filter(p => p.textContent.trim() || p.querySelector('img'));
       const slides = [];
       let buffer = [];
-      for (const line of lines) {
-        buffer.push(line);
-        if (buffer.length === 4) {
-          slides.push({
-            title: buffer[0],
-            caption: buffer[1],
-            url: buffer[2],
-            fade: parseFloat(buffer[3].replace(/FadeScreen:/i, '').trim()) || 1.0
-          });
-          buffer = [];
+      for (let i = 0; i < ps.length; i++) {
+        const p = ps[i];
+        // Only start a block if this <p> starts with 'Title:'
+        if (/^Title:/i.test(p.textContent.trim())) {
+          // Try to collect the next 5 <p> for a block
+          const block = ps.slice(i, i + 5);
+          if (block.length === 5 &&
+              /^Title:/i.test(block[0].textContent.trim()) &&
+              /^Caption:/i.test(block[1].textContent.trim()) &&
+              /^Source:/i.test(block[2].textContent.trim()) &&
+              /^Iframe Url Or inline image:/i.test(block[3].textContent.trim()) &&
+              /^FadeScreen:/i.test(block[4].textContent.trim())) {
+            // Extract fields by prefix
+            const title = block[0].textContent.replace(/^Title:/i, '').trim();
+            const caption = block[1].textContent.replace(/^Caption:/i, '').trim();
+            const source = block[2].textContent.replace(/^Source:/i, '').trim();
+            let url = block[3].textContent.replace(/^Iframe Url Or inline image:/i, '').trim();
+            const img = block[3].querySelector('img');
+            if (img && img.src) url = img.src;
+            const fade = parseFloat(block[4].textContent.replace(/^FadeScreen:/i, '').trim()) || 1.0;
+            slides.push({ title, caption, source, url, fade });
+            i += 4; // Skip to next after this block
+          }
         }
+        // Otherwise, skip this <p>
       }
       if (slides.length === 0) {
         document.body.innerHTML = '<div style="color:yellow;padding:2em;white-space:pre-wrap;">No valid slides found. Raw lines:<br><br>' +
-          lines.join('\n') + '</div>';
+          ps.map(p => p.textContent).join('\n') + '</div>';
         throw new Error("No valid slides parsed");
       }
       return slides;
     }
 
-    // --- Slideshow logic (unchanged) ---
+    // --- Slideshow logic: support inline images or iframe URLs, show source ---
     let slides = [];
     let current = 0;
     let iframe, legend, fadeBlack;
 
     function updateLegend() {
-      legend.innerHTML = `<span style="font-size:1.1em;font-weight:bold;color:#ffb347;">${slides[current].title}</span><br>${slides[current].caption}`;
+      const s = slides[current];
+      legend.innerHTML = `
+        <div style="font-size:1.1em;font-weight:bold;color:#ffb347;">${s.title}</div>
+        <div>${s.caption}</div>
+      `;
       legend.style.display = 'block';
+      // Update source at bottom
+      const sourceDiv = document.getElementById('slide-source');
+      let sourceHtml = s.source.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" style="color:#bbb;text-decoration:underline;">$1</a>');
+      sourceDiv.innerHTML = `<span style="font-size:0.7em;color:#bbb;opacity:0.7;display:block;margin:0.7em 0 0.2em 0;text-align:right;width:100vw;">${sourceHtml}</span>`;
     }
 
     function fadeTransition(callback, fadeSec) {
@@ -177,7 +201,33 @@
     function gotoSlide(idx) {
       current = idx;
       fadeTransition(() => {
-        iframe.src = slides[current].url;
+        const s = slides[current];
+        // Remove any previous image
+        let img = document.getElementById('slide-img');
+        if (img) img.remove();
+        // If url is an inline image (googleusercontent.com and image extension), show as image, else as iframe
+        if (/googleusercontent\.com\/.*\.(jpg|jpeg|png|gif|webp|svg)/i.test(s.url)) {
+          iframe.style.display = 'none';
+          // Create and insert image
+          img = document.createElement('img');
+          img.id = 'slide-img';
+          img.src = s.url;
+          img.style.maxWidth = '95vw';
+          img.style.maxHeight = '90vh';
+          img.style.display = 'block';
+          img.style.margin = '0 auto';
+          img.style.position = 'absolute';
+          img.style.top = '50%';
+          img.style.left = '50%';
+          img.style.transform = 'translate(-50%, -50%)';
+          img.style.boxShadow = '0 0 40px #000a';
+          document.getElementById('iframe-wrapper').appendChild(img);
+        } else {
+          // Show as iframe
+          if (img) img.remove();
+          iframe.style.display = 'block';
+          iframe.src = s.url;
+        }
         updateLegend();
       }, slides[current].fade);
     }
@@ -186,6 +236,23 @@
       iframe = document.getElementById('main-iframe');
       legend = document.getElementById('legend');
       fadeBlack = document.getElementById('fade-black');
+      // Style the source div at the bottom
+      const sourceDiv = document.getElementById('slide-source');
+      sourceDiv.style.position = 'absolute';
+      sourceDiv.style.bottom = '0';
+      sourceDiv.style.left = '0';
+      sourceDiv.style.width = '100vw';
+      sourceDiv.style.textAlign = 'right';
+      sourceDiv.style.pointerEvents = 'none';
+      sourceDiv.style.zIndex = '10002';
+      sourceDiv.style.padding = '0 1.5em 0.5em 0';
+      // Make links clickable
+      sourceDiv.addEventListener('click', function(e) {
+        if (e.target.tagName === 'A') {
+          e.stopPropagation();
+          sourceDiv.style.pointerEvents = 'auto';
+        }
+      });
       document.getElementById('prev-btn').onclick = function() {
         gotoSlide((current - 1 + slides.length) % slides.length);
       };
