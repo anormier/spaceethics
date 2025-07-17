@@ -118,8 +118,8 @@
       <iframe id="main-iframe" src="" allowfullscreen></iframe>
     </div>
     <div id="legend"></div>
-    <div id="slide-menu"></div>
     <div id="slide-source"></div>
+    <div id="slide-menu"></div>
     <div id="fade-black"></div>
   </div>
   <script>
@@ -185,12 +185,22 @@
         <div>${s.caption}</div>
       `;
       legend.style.display = 'block';
-      // Update source at bottom, centered
+      // Source (light grey) just above navbar
       const sourceDiv = document.getElementById('slide-source');
       let sourceHtml = s.source.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" style="color:#bbb;text-decoration:underline;">$1</a>');
       sourceDiv.innerHTML = `<span style="font-size:0.7em;color:#bbb;opacity:0.7;display:block;margin:0.7em 0 0.2em 0;text-align:center;width:100vw;">${sourceHtml}</span>`;
+      sourceDiv.style.display = 'block';
+      sourceDiv.style.position = 'absolute';
+      sourceDiv.style.left = '50%';
+      sourceDiv.style.transform = 'translateX(-50%)';
+      sourceDiv.style.bottom = '3.2em';
+      sourceDiv.style.width = '100vw';
+      sourceDiv.style.textAlign = 'center';
+      sourceDiv.style.pointerEvents = 'none';
+      sourceDiv.style.zIndex = '10002';
+      sourceDiv.style.padding = '0 1.5em 0.5em 0';
 
-      // Update fast-travel menu
+      // Navbar at the very bottom
       const menu = document.getElementById('slide-menu');
       menu.innerHTML = slides.map((slide, idx) =>
         `<button class="slide-menu-btn" data-idx="${idx}" style="margin:0 0.2em 0.2em 0.2em;padding:0.2em 0.7em;font-size:0.95em;border-radius:1em;border:none;cursor:pointer;background:${idx===current?'#ffb347':'#222'};color:${idx===current?'#222':'#fff'};opacity:${idx===current?'1':'0.7'};transition:background 0.2s;">${slide.title}</button>`
@@ -204,10 +214,9 @@
       });
       menu.style.display = 'block';
       menu.style.position = 'absolute';
-      menu.style.top = 'auto';
-      menu.style.bottom = '3.2em';
       menu.style.left = '50%';
       menu.style.transform = 'translateX(-50%)';
+      menu.style.bottom = '0.2em';
       menu.style.zIndex = '10003';
       menu.style.background = 'rgba(0,0,0,0.5)';
       menu.style.borderRadius = '1em';
