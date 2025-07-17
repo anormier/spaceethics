@@ -262,8 +262,8 @@
         let flexContainer = document.getElementById('slide-img-flex');
         if (img) img.remove();
         if (flexContainer) flexContainer.remove();
-        // If url is an inline image (googleusercontent.com and image extension), show as image, else as iframe
-        if (/googleusercontent\.com\/.*\.(jpg|jpeg|png|gif|webp|svg)/i.test(s.url)) {
+        // If url is an image (inline Google image or direct image URL), show as image in flex container, else as iframe
+        if (/\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i.test(s.url)) {
           iframe.style.display = 'none';
           // Create a flexbox container for robust centering and fitting
           flexContainer = document.createElement('div');
