@@ -5,6 +5,14 @@
   <title>Dynamic SpaceEthics Slideshow</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
+    /* Hide nav bar scroll bar (cross-browser) */
+    #slide-menu {
+      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none; /* IE 10+ */
+    }
+    #slide-menu::-webkit-scrollbar {
+      display: none; /* Chrome/Safari/Webkit */
+    }
     html, body {
       height: 100%;
       margin: 0;
@@ -193,7 +201,7 @@
       sourceDiv.style.position = 'absolute';
       sourceDiv.style.left = '50%';
       sourceDiv.style.transform = 'translateX(-50%)';
-      sourceDiv.style.bottom = '3.2em';
+      sourceDiv.style.bottom = '3.7em'; // move source bar up by 0.5em to compensate
       sourceDiv.style.width = '100vw';
       sourceDiv.style.textAlign = 'center';
       sourceDiv.style.pointerEvents = 'none';
@@ -216,7 +224,7 @@
       menu.style.position = 'absolute';
       menu.style.left = '50%';
       menu.style.transform = 'translateX(-50%)';
-      menu.style.bottom = '0.2em';
+      menu.style.bottom = '5px'; // move nav bar 5px lower
       menu.style.zIndex = '10003';
       menu.style.background = 'rgba(0,0,0,0.5)';
       menu.style.borderRadius = '1em';
