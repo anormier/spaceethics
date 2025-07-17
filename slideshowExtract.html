@@ -138,12 +138,14 @@
       let buffer = [];
       for (let i = 0; i < ps.length; i++) {
         const p = ps[i];
-        // Only start a block if this <p> starts with 'Title:'
-        if (/^Title:/i.test(p.textContent.trim())) {
+        // Only start a block if this <p> starts with 'Title:' and NOT with '#Title:'
+        const txt = p.textContent.trim();
+        if (/^Title:/i.test(txt) && !/^#Title:/i.test(txt)) {
           // Try to collect the next 5 <p> for a block
           const block = ps.slice(i, i + 5);
+          const blockTitle = block[0]?.textContent.trim();
           if (block.length === 5 &&
-              /^Title:/i.test(block[0].textContent.trim()) &&
+              /^Title:/i.test(blockTitle) && !/^#Title:/i.test(blockTitle) &&
               /^Caption:/i.test(block[1].textContent.trim()) &&
               /^Source:/i.test(block[2].textContent.trim()) &&
               /^Iframe Url Or inline image:/i.test(block[3].textContent.trim()) &&
@@ -182,10 +184,10 @@
         <div>${s.caption}</div>
       `;
       legend.style.display = 'block';
-      // Update source at bottom
+      // Update source at bottom, centered
       const sourceDiv = document.getElementById('slide-source');
       let sourceHtml = s.source.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" style="color:#bbb;text-decoration:underline;">$1</a>');
-      sourceDiv.innerHTML = `<span style="font-size:0.7em;color:#bbb;opacity:0.7;display:block;margin:0.7em 0 0.2em 0;text-align:right;width:100vw;">${sourceHtml}</span>`;
+      sourceDiv.innerHTML = `<span style="font-size:0.7em;color:#bbb;opacity:0.7;display:block;margin:0.7em 0 0.2em 0;text-align:center;width:100vw;">${sourceHtml}</span>`;
     }
 
     function fadeTransition(callback, fadeSec) {
@@ -242,7 +244,7 @@
       sourceDiv.style.bottom = '0';
       sourceDiv.style.left = '0';
       sourceDiv.style.width = '100vw';
-      sourceDiv.style.textAlign = 'right';
+      sourceDiv.style.textAlign = 'center';
       sourceDiv.style.pointerEvents = 'none';
       sourceDiv.style.zIndex = '10002';
       sourceDiv.style.padding = '0 1.5em 0.5em 0';
