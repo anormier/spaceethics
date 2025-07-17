@@ -240,33 +240,46 @@
       current = idx;
       fadeTransition(() => {
         const s = slides[current];
-        // Remove any previous image
+        // Remove any previous image or flex container
         let img = document.getElementById('slide-img');
+        let flexContainer = document.getElementById('slide-img-flex');
         if (img) img.remove();
+        if (flexContainer) flexContainer.remove();
         // If url is an inline image (googleusercontent.com and image extension), show as image, else as iframe
         if (/googleusercontent\.com\/.*\.(jpg|jpeg|png|gif|webp|svg)/i.test(s.url)) {
           iframe.style.display = 'none';
+          // Create a flexbox container for robust centering and fitting
+          flexContainer = document.createElement('div');
+          flexContainer.id = 'slide-img-flex';
+          flexContainer.style.position = 'absolute';
+          flexContainer.style.top = '0';
+          flexContainer.style.left = '0';
+          flexContainer.style.width = '100%';
+          flexContainer.style.height = '100%';
+          flexContainer.style.display = 'flex';
+          flexContainer.style.alignItems = 'center';
+          flexContainer.style.justifyContent = 'center';
+          flexContainer.style.background = 'transparent';
+          flexContainer.style.pointerEvents = 'none';
           // Create and insert image
           img = document.createElement('img');
           img.id = 'slide-img';
           img.src = s.url;
           img.alt = s.title;
-          img.style.display = 'block';
-          img.style.position = 'absolute';
-          img.style.top = '50%';
-          img.style.left = '50%';
-          img.style.transform = 'translate(-50%, -50%)';
-          img.style.boxShadow = '0 0 40px #000a';
           img.style.maxWidth = '98vw';
           img.style.maxHeight = '92vh';
           img.style.width = 'auto';
           img.style.height = 'auto';
           img.style.objectFit = 'contain';
           img.style.background = '#111';
-          document.getElementById('iframe-wrapper').appendChild(img);
+          img.style.boxShadow = '0 0 40px #000a';
+          img.style.pointerEvents = 'none';
+          flexContainer.appendChild(img);
+          document.getElementById('iframe-wrapper').appendChild(flexContainer);
         } else {
           // Show as iframe
           if (img) img.remove();
+          if (flexContainer) flexContainer.remove();
           iframe.style.display = 'block';
           iframe.src = s.url;
         }
