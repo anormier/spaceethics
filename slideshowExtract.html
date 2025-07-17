@@ -224,6 +224,15 @@
       menu.style.maxWidth = '98vw';
       menu.style.overflowX = 'auto';
       menu.style.whiteSpace = 'nowrap';
+      // Auto-scroll to center the active button
+      setTimeout(() => {
+        const activeBtn = menu.querySelector('.slide-menu-btn[data-idx="'+current+'"]');
+        if (activeBtn) {
+          const menuRect = menu.getBoundingClientRect();
+          const btnRect = activeBtn.getBoundingClientRect();
+          menu.scrollLeft = (activeBtn.offsetLeft + btnRect.width/2) - (menuRect.width/2);
+        }
+      }, 0);
     }
 
     function fadeTransition(callback, fadeSec) {
