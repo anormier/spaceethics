@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Dynamic SpaceEthics Slideshow</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <style>
     /* Hide nav bar scroll bar (cross-browser) */
     #slide-menu {
@@ -21,6 +21,7 @@
       color: #fff;
       font-family: 'Roboto', Arial, sans-serif;
       overflow: hidden;
+      touch-action: manipulation; /* Prevent unintended scrolling */
     }
     #slideshow-container {
       position: fixed;
@@ -40,12 +41,14 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      overflow: visible;
+      overflow: hidden; /* Prevent content from spilling */
       position: relative;
     }
     iframe {
       width: 100vw;
-      height: 100vw;
+      height: 100vh; /* Fix: was 100vw which made it square */
+      max-width: 100%; /* Avoid horizontal overflow on small devices */
+      max-height: 100%; /* Avoid vertical overflow */
       border: none;
       background: #000;
       display: block;
@@ -291,6 +294,24 @@
           img.style.background = '#111';
           img.style.boxShadow = '0 0 40px #000a';
           img.style.pointerEvents = 'none';
+          // Add error handling for images
+          img.onerror = function() {
+            console.error('Image failed to load:', s.url);
+            // Show a fallback message or hide the image
+            img.style.display = 'none';
+            // Create a fallback element
+            const fallback = document.createElement('div');
+            fallback.style.display = 'flex';
+            fallback.style.alignItems = 'center';
+            fallback.style.justifyContent = 'center';
+            fallback.style.width = '100%';
+            fallback.style.height = '100%';
+            fallback.style.color = '#fff';
+            fallback.style.fontSize = '1.2em';
+            fallback.style.textAlign = 'center';
+            fallback.innerHTML = 'Image could not be loaded<br><small>' + s.url + '</small>';
+            flexContainer.appendChild(fallback);
+          };
           flexContainer.appendChild(img);
           document.getElementById('iframe-wrapper').appendChild(flexContainer);
         } else {
